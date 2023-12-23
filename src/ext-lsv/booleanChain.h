@@ -66,6 +66,7 @@ public:
 
     void setVerbose(int v) { verbose = v; }
     void setNTimeLimit(size_t t) { nTimeLimit = t; }
+    void setDC(const set<int>& d) { dc = d; }
     bool Ntk2Chain(Abc_Ntk_t* pNtk);
     Abc_Ntk_t*  Chain2Ntk(Abc_Ntk_t* pNtkOld) const;
     void genTT() {updateTT(true); };
@@ -95,6 +96,7 @@ private:
     set<int> subCircuitPiIndex;
     set<int> subCircuitPoIndex;
     size_t nTimeLimit;
+    set<int> dc;
     // vector<int> PoIndex;
 };
 #endif

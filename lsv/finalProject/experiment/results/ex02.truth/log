@@ -1,0 +1,463 @@
+UC Berkeley, ABC 1.01 (compiled Dec  1 2023 18:58:55)
+================== Command history ==================
+resyn
+resyn2
+resyn3
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex00.truth/iter0.aig
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex00.truth/iter1.aig
+read_truth -xf ../../IWLS/benchmarks/ex00.truth 
+cec -n lsv/finalProject/experiment/results/ex00.truth/iter0.aig 
+source -s abc.rc
+read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex01.truth
+=====================================================
+abc 01> read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex02.truth
+abc 02> resyn
+abc 05> resyn2
+abc 09> resyn3
+abc 13> resyn
+abc 16> resyn2
+abc 20> resyn3
+abc 24> resyn
+abc 27> resyn2
+abc 31> resyn3
+abc 35> resyn
+abc 38> resyn2
+abc 42> resyn3
+abc 46> resyn
+abc 49> resyn2
+abc 53> resyn3
+abc 57> resyn
+abc 60> resyn2
+abc 64> resyn3
+abc 68> ps
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+abc 68> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     2.09 sec
+subCircuit with size 2
+Time =     3.88 sec
+subCircuit with size 3
+Time =    12.29 sec
+subCircuit with size 4
+Time =    72.05 sec
+subCircuit with size 5
+Time =   117.95 sec
+subCircuit with size 6
+Time =   121.56 sec
+subCircuit with size 7
+Time =   126.30 sec
+subCircuit with size 1
+Time =     1.46 sec
+subCircuit with size 2
+Time =     9.52 sec
+subCircuit with size 3
+Time =    22.08 sec
+subCircuit with size 4
+Time =   115.43 sec
+subCircuit with size 5
+Time =   124.87 sec
+subCircuit with size 6
+Time =   130.04 sec
+subCircuit with size 7
+Time =   177.26 sec
+subCircuit with size 1
+Time =     2.87 sec
+subCircuit with size 2
+Time =    10.34 sec
+subCircuit with size 3
+Time =    56.12 sec
+subCircuit with size 4
+Time =   115.75 sec
+subCircuit with size 5
+Time =   132.71 sec
+subCircuit with size 6
+Time =   118.93 sec
+subCircuit with size 7
+Time =   123.50 sec
+subCircuit with size 1
+Time =     3.67 sec
+subCircuit with size 2
+Time =     6.17 sec
+subCircuit with size 3
+Time =     7.44 sec
+subCircuit with size 4
+Time =    10.41 sec
+subCircuit with size 5
+Time =    14.20 sec
+subCircuit with size 6
+Time =   143.95 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+abc 80> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter0.aig
+abc 80> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     1.64 sec
+subCircuit with size 2
+Time =     7.75 sec
+subCircuit with size 3
+Time =    40.73 sec
+subCircuit with size 4
+Time =   132.43 sec
+subCircuit with size 5
+Time =   111.69 sec
+subCircuit with size 6
+Time =   151.14 sec
+subCircuit with size 7
+Time =   120.61 sec
+subCircuit with size 1
+Time =     3.15 sec
+subCircuit with size 2
+Time =    10.65 sec
+subCircuit with size 3
+Time =    44.93 sec
+subCircuit with size 4
+Time =   153.37 sec
+subCircuit with size 5
+Time =   111.79 sec
+subCircuit with size 6
+Time =   118.34 sec
+subCircuit with size 7
+Time =   132.64 sec
+subCircuit with size 1
+Time =     3.19 sec
+subCircuit with size 2
+Time =     4.57 sec
+subCircuit with size 3
+Time =     5.90 sec
+subCircuit with size 4
+Time =     8.60 sec
+subCircuit with size 5
+Time =   100.47 sec
+subCircuit with size 6
+Time =   200.03 sec
+subCircuit with size 7
+Time =   114.28 sec
+subCircuit with size 1
+Time =     2.68 sec
+subCircuit with size 2
+Time =     5.04 sec
+subCircuit with size 3
+Time =     6.64 sec
+subCircuit with size 4
+Time =     9.38 sec
+subCircuit with size 5
+Time =    86.09 sec
+subCircuit with size 6
+Time =   134.72 sec
+subCircuit with size 7
+Time =   206.40 sec
+subCircuit with size 1
+Time =     3.98 sec
+subCircuit with size 2
+Time =     5.27 sec
+subCircuit with size 3
+Time =     7.52 sec
+subCircuit with size 4
+Time =    28.30 sec
+subCircuit with size 5
+Time =    87.29 sec
+subCircuit with size 6
+Time =   114.09 sec
+subCircuit with size 1
+Time =     3.13 sec
+subCircuit with size 2
+Time =     4.55 sec
+subCircuit with size 3
+Time =     5.49 sec
+subCircuit with size 4
+Time =     7.39 sec
+subCircuit with size 5
+Time =    28.33 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+abc 92> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter1.aig
+abc 92> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     2.60 sec
+subCircuit with size 2
+Time =     3.62 sec
+subCircuit with size 3
+Time =     4.79 sec
+subCircuit with size 4
+Time =    22.26 sec
+subCircuit with size 5
+Time =   121.86 sec
+subCircuit with size 6
+Time =   116.46 sec
+subCircuit with size 1
+Time =     1.99 sec
+subCircuit with size 2
+Time =     2.67 sec
+subCircuit with size 3
+Time =   524.60 sec
+subCircuit with size 4
+Time =     9.46 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1589  lev = 22
+abc 104> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter2.aig
+abc 104> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     2.49 sec
+subCircuit with size 2
+Time =     9.02 sec
+subCircuit with size 3
+Time =    41.56 sec
+subCircuit with size 4
+Time =   109.85 sec
+subCircuit with size 5
+Time =   148.27 sec
+Success reduce subcircuit from 7 to 5
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+abc 116> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter3.aig
+abc 116> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     2.60 sec
+subCircuit with size 2
+Time =     9.74 sec
+subCircuit with size 3
+Time =    21.47 sec
+subCircuit with size 4
+Time =    90.56 sec
+subCircuit with size 5
+Time =   120.29 sec
+subCircuit with size 6
+Time =   119.17 sec
+subCircuit with size 7
+Time =   122.71 sec
+subCircuit with size 1
+Time =     1.59 sec
+subCircuit with size 2
+Time =     7.93 sec
+subCircuit with size 3
+Time =    40.07 sec
+subCircuit with size 4
+Time =   111.54 sec
+subCircuit with size 5
+Time =   122.17 sec
+subCircuit with size 6
+Time =   118.16 sec
+subCircuit with size 7
+Time =   124.39 sec
+subCircuit with size 1
+Time =     2.75 sec
+subCircuit with size 2
+Time =     4.65 sec
+subCircuit with size 3
+Time =    18.27 sec
+subCircuit with size 4
+Time =    39.54 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+abc 128> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter4.aig
+abc 128> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     3.20 sec
+subCircuit with size 2
+Time =     6.45 sec
+subCircuit with size 3
+Time =     8.40 sec
+subCircuit with size 4
+Time =    77.68 sec
+subCircuit with size 5
+Time =   141.09 sec
+subCircuit with size 6
+Time =   158.52 sec
+subCircuit with size 7
+Time =   196.56 sec
+subCircuit with size 1
+Time =     1.22 sec
+subCircuit with size 2
+Time =     2.34 sec
+subCircuit with size 3
+Time =     3.31 sec
+subCircuit with size 4
+Time =    17.04 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+abc 140> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter5.aig
+abc 140> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     2.95 sec
+subCircuit with size 2
+Time =     5.11 sec
+subCircuit with size 3
+Time =    17.11 sec
+subCircuit with size 4
+Time =    48.60 sec
+subCircuit with size 5
+Time =   116.35 sec
+subCircuit with size 6
+Time =   117.12 sec
+subCircuit with size 7
+Time =   128.13 sec
+subCircuit with size 1
+Time =     3.61 sec
+subCircuit with size 2
+Time =     5.07 sec
+subCircuit with size 3
+Time =     6.87 sec
+subCircuit with size 4
+Time =    21.06 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+[1;37mex                            :[0m i/o =   16/    6  lat =    0  and =   1586  lev = 22
+abc 152> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex02.truth/iter6.aig
+abc 152> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     5.32 sec
+subCircuit with size 2
+Time =    10.42 sec
+subCircuit with size 3
+Time =    28.82 sec
+subCircuit with size 4
+Time =   144.28 sec
+subCircuit with size 5
+Time =   128.61 sec
+subCircuit with size 6
+Time =   136.12 sec
+subCircuit with size 7
+Time =   131.70 sec
+subCircuit with size 1
+Time =     3.91 sec
+subCircuit with size 2
+Time =     8.84 sec
+subCircuit with size 3
+Time =    25.61 sec
+subCircuit with size 4
+Time =   119.39 sec
+subCircuit with size 5
+Time =   174.73 sec
+subCircuit with size 6
+Time =   122.80 sec
+subCircuit with size 7
+Time =   132.99 sec
+subCircuit with size 1
+Time =     3.45 sec
+subCircuit with size 2
+Time =     9.27 sec
+subCircuit with size 3
+Time =    33.25 sec
+subCircuit with size 4
+Time =   129.41 sec
+subCircuit with size 5
+Time =   113.22 sec
+subCircuit with size 6
+Time =   125.48 sec
+subCircuit with size 7
+Time =   124.02 sec
+subCircuit with size 1
+Time =     2.69 sec
+subCircuit with size 2
+Time =     9.23 sec
+subCircuit with size 3
+Time =    29.17 sec
+subCircuit with size 4
+Time =   108.41 sec
+subCircuit with size 5
+Time =   114.44 sec
+subCircuit with size 6
+Time =   119.99 sec
+subCircuit with size 7
+Time =   129.20 sec
+subCircuit with size 1
+Time =     1.64 sec
+subCircuit with size 2
+Time =     3.15 sec
+subCircuit with size 3
+Time =    21.40 sec
+subCircuit with size 4
+Time =    36.07 sec
+subCircuit with size 5
+Time =   129.72 sec
+subCircuit with size 6
+Time =   123.20 sec
+subCircuit with size 7
+Time =   128.56 sec
+subCircuit with size 1
+Time =     1.93 sec
+subCircuit with size 2
+Time =     3.88 sec
+subCircuit with size 3
+Time =    22.17 sec
+subCircuit with size 4
+Time =    90.31 sec
+subCircuit with size 5
+Time =   117.04 sec
+subCircuit with size 6
+Time =   117.89 sec
+subCircuit with size 7
+Time =   124.07 sec
+subCircuit with size 1
+Time =     3.56 sec
+subCircuit with size 2
+Time =     6.85 sec
+subCircuit with size 3
+Time =     8.96 sec
+subCircuit with size 4
+Time =    39.18 sec
+subCircuit with size 5
+Time =    66.71 sec
+subCircuit with size 6
+Time =  1333.43 sec
+subCircuit with size 7
+Time =   134.33 sec
+subCircuit with size 1
+Time =     2.26 sec
+subCircuit with size 2
+Time =     8.98 sec
+subCircuit with size 3
+Time =    31.63 sec
+subCircuit with size 4
+Time =   134.94 sec
+subCircuit with size 5
+Time =   123.00 sec
+subCircuit with size 6
+Time =   120.72 sec
+subCircuit with size 7
+Time =   129.35 sec
+subCircuit with size 1
+Time =     3.70 sec
+subCircuit with size 2
+Time =     9.39 sec
+subCircuit with size 3
+Time =    43.25 sec
+subCircuit with size 4
+Time =   108.23 sec
+subCircuit with size 5
+Time =   114.05 sec
+subCircuit with size 6
+Time =   131.97 sec
+subCircuit with size 7
+Time =   124.16 sec
+subCircuit with size 1
+Time =     1.09 sec
+subCircuit with size 2
+Time =     2.80 sec
+subCircuit with size 3
+Time =     6.53 sec
+subCircuit with size 4
+Time =    31.68 sec
+subCircuit with size 5
+Time =   143.29 sec
+subCircuit with size 6
+Time =   129.59 sec
+subCircuit with size 1
+Time =     2.69 sec
+subCircuit with size 2
+Time =    10.05 sec
+subCircuit with size 3
+Time =    52.50 sec
+subCircuit with size 4
+Time =   134.66 sec
+subCircuit with size 5
+Time =   113.75 sec
+subCircuit with size 6
+Time =   119.00 sec
+subCircuit with size 7

@@ -1,0 +1,1707 @@
+UC Berkeley, ABC 1.01 (compiled Dec  1 2023 18:58:55)
+================== Command history ==================
+read_truth -xf ../../IWLS/benchmarks/ex00.truth 
+cec -n lsv/finalProject/experiment/results/ex00.truth/iter0.aig 
+read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex01.truth
+resyn
+resyn2
+resyn3
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex01.truth/iter0.aig
+source -s abc.rc
+read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex03.truth
+=====================================================
+abc 01> read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex04.truth
+abc 02> resyn
+abc 05> resyn2
+abc 09> resyn3
+abc 13> resyn
+abc 16> resyn2
+abc 20> resyn3
+abc 24> resyn
+abc 27> resyn2
+abc 31> resyn3
+abc 35> resyn
+abc 38> resyn2
+abc 42> resyn3
+abc 46> resyn
+abc 49> resyn2
+abc 53> resyn3
+abc 57> resyn
+abc 60> resyn2
+abc 64> resyn3
+abc 68> ps
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+abc 68> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.07 sec
+subCircuit with size 5
+Time =     0.54 sec
+subCircuit with size 6
+Time =     3.70 sec
+subCircuit with size 7
+Time =    17.98 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+abc 80> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter0.aig
+abc 80> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.06 sec
+subCircuit with size 5
+Time =     0.59 sec
+subCircuit with size 6
+Time =     2.03 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+abc 92> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter1.aig
+abc 92> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.08 sec
+subCircuit with size 4
+Time =     0.26 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  6
+abc 104> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter2.aig
+abc 104> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.07 sec
+subCircuit with size 5
+Time =     0.94 sec
+subCircuit with size 6
+Time =     6.73 sec
+subCircuit with size 7
+Time =    21.78 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     54  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 116> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter3.aig
+abc 116> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.35 sec
+subCircuit with size 5
+Time =     4.44 sec
+subCircuit with size 6
+Time =     9.61 sec
+subCircuit with size 7
+Time =    33.55 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 128> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter4.aig
+abc 128> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.53 sec
+subCircuit with size 5
+Time =     0.97 sec
+subCircuit with size 6
+Time =     8.16 sec
+subCircuit with size 7
+Time =    18.52 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 140> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter5.aig
+abc 140> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.11 sec
+subCircuit with size 5
+Time =     1.89 sec
+subCircuit with size 6
+Time =     8.67 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 152> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter6.aig
+abc 152> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.05 sec
+subCircuit with size 2
+Time =     0.13 sec
+subCircuit with size 3
+Time =     0.57 sec
+subCircuit with size 4
+Time =     3.08 sec
+subCircuit with size 5
+Time =    18.25 sec
+subCircuit with size 6
+Time =    98.90 sec
+subCircuit with size 7
+Time =   101.02 sec
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.43 sec
+subCircuit with size 5
+Time =     2.68 sec
+subCircuit with size 6
+Time =    10.87 sec
+subCircuit with size 7
+Time =    17.62 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 164> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter7.aig
+abc 164> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.08 sec
+subCircuit with size 4
+Time =     0.13 sec
+subCircuit with size 5
+Time =     1.21 sec
+subCircuit with size 6
+Time =    15.07 sec
+subCircuit with size 7
+Time =    56.29 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 176> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter8.aig
+abc 176> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.29 sec
+subCircuit with size 5
+Time =     1.92 sec
+subCircuit with size 6
+Time =     8.36 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 188> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter9.aig
+abc 188> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.13 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 200> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter10.aig
+abc 200> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.43 sec
+subCircuit with size 5
+Time =     1.42 sec
+subCircuit with size 6
+Time =     7.58 sec
+subCircuit with size 7
+Time =    16.67 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 212> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter11.aig
+abc 212> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.17 sec
+subCircuit with size 4
+Time =     0.63 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 224> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter12.aig
+abc 224> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.18 sec
+subCircuit with size 4
+Time =     0.61 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 236> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter13.aig
+abc 236> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.10 sec
+subCircuit with size 5
+Time =     0.22 sec
+subCircuit with size 6
+Time =     2.39 sec
+subCircuit with size 7
+Time =    10.15 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 248> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter14.aig
+abc 248> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.23 sec
+subCircuit with size 5
+Time =     2.79 sec
+subCircuit with size 6
+Time =    15.37 sec
+subCircuit with size 7
+Time =    22.67 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+abc 260> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter15.aig
+abc 260> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.19 sec
+subCircuit with size 4
+Time =     0.80 sec
+subCircuit with size 5
+Time =     3.44 sec
+subCircuit with size 6
+Time =    11.17 sec
+subCircuit with size 7
+Time =    27.28 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     48  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 272> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter16.aig
+abc 272> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.06 sec
+subCircuit with size 3
+Time =     0.11 sec
+subCircuit with size 4
+Time =     0.21 sec
+subCircuit with size 5
+Time =     0.58 sec
+subCircuit with size 6
+Time =     6.04 sec
+subCircuit with size 7
+Time =    33.20 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 284> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter17.aig
+abc 284> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.19 sec
+subCircuit with size 4
+Time =     0.38 sec
+subCircuit with size 5
+Time =     4.70 sec
+subCircuit with size 6
+Time =    10.51 sec
+subCircuit with size 7
+Time =    26.35 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 296> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter18.aig
+abc 296> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.06 sec
+subCircuit with size 3
+Time =     0.11 sec
+subCircuit with size 4
+Time =     0.28 sec
+subCircuit with size 5
+Time =     0.45 sec
+subCircuit with size 6
+Time =     4.28 sec
+subCircuit with size 7
+Time =    28.99 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 308> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter19.aig
+abc 308> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.11 sec
+subCircuit with size 4
+Time =     0.83 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 320> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter20.aig
+abc 320> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.11 sec
+subCircuit with size 5
+Time =     1.68 sec
+subCircuit with size 6
+Time =     9.71 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 332> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter21.aig
+abc 332> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.07 sec
+subCircuit with size 3
+Time =     0.14 sec
+subCircuit with size 4
+Time =     0.27 sec
+subCircuit with size 5
+Time =     0.61 sec
+subCircuit with size 6
+Time =     7.93 sec
+subCircuit with size 7
+Time =    16.36 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 344> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter22.aig
+abc 344> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.60 sec
+subCircuit with size 5
+Time =     1.32 sec
+subCircuit with size 6
+Time =     5.17 sec
+subCircuit with size 7
+Time =    15.38 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 356> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter23.aig
+abc 356> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.08 sec
+subCircuit with size 3
+Time =     0.36 sec
+subCircuit with size 4
+Time =     2.07 sec
+subCircuit with size 5
+Time =    10.96 sec
+subCircuit with size 6
+Time =    66.83 sec
+subCircuit with size 7
+Time =    85.69 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 368> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter24.aig
+abc 368> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.18 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 380> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter25.aig
+abc 380> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.09 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 392> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter26.aig
+abc 392> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.16 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 404> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter27.aig
+abc 404> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.08 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 416> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter28.aig
+abc 416> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.07 sec
+subCircuit with size 3
+Time =     0.27 sec
+subCircuit with size 4
+Time =     1.76 sec
+subCircuit with size 5
+Time =     4.38 sec
+subCircuit with size 6
+Time =    29.82 sec
+subCircuit with size 7
+Time =    39.39 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 428> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter29.aig
+abc 428> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.23 sec
+subCircuit with size 5
+Time =     3.50 sec
+subCircuit with size 6
+Time =     0.45 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 440> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter30.aig
+abc 440> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.39 sec
+subCircuit with size 5
+Time =     2.27 sec
+subCircuit with size 6
+Time =    13.47 sec
+subCircuit with size 7
+Time =    36.08 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+abc 452> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter31.aig
+abc 452> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.15 sec
+subCircuit with size 5
+Time =     0.40 sec
+subCircuit with size 6
+Time =     1.95 sec
+Success reduce subcircuit from 7 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     47  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     46  lev =  7
+abc 464> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter32.aig
+abc 464> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.08 sec
+subCircuit with size 4
+Time =     0.25 sec
+subCircuit with size 5
+Time =     2.41 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     46  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     46  lev =  7
+abc 476> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter33.aig
+abc 476> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.13 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     46  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 488> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter34.aig
+abc 488> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.06 sec
+subCircuit with size 4
+Time =     0.13 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 500> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter35.aig
+abc 500> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.14 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 512> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter36.aig
+abc 512> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.16 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 524> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter37.aig
+abc 524> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.16 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 536> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter38.aig
+abc 536> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.08 sec
+subCircuit with size 5
+Time =     0.16 sec
+subCircuit with size 6
+Time =     2.56 sec
+subCircuit with size 7
+Time =    13.04 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 548> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter39.aig
+abc 548> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.24 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 560> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter40.aig
+abc 560> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.27 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 572> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter41.aig
+abc 572> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.22 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 584> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter42.aig
+abc 584> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.18 sec
+subCircuit with size 4
+Time =     0.36 sec
+subCircuit with size 5
+Time =     0.35 sec
+subCircuit with size 6
+Time =     3.94 sec
+subCircuit with size 7
+Time =    12.63 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 596> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter43.aig
+abc 596> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.05 sec
+subCircuit with size 2
+Time =     0.14 sec
+subCircuit with size 3
+Time =     0.38 sec
+subCircuit with size 4
+Time =     1.31 sec
+subCircuit with size 5
+Time =     8.13 sec
+subCircuit with size 6
+Time =    53.20 sec
+subCircuit with size 7
+Time =    64.45 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 608> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter44.aig
+abc 608> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.16 sec
+subCircuit with size 4
+Time =     0.26 sec
+subCircuit with size 5
+Time =     0.60 sec
+subCircuit with size 6
+Time =     2.48 sec
+subCircuit with size 7
+Time =     4.69 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 620> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter45.aig
+abc 620> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.30 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 632> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter46.aig
+abc 632> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.17 sec
+subCircuit with size 4
+Time =     0.36 sec
+subCircuit with size 5
+Time =     0.59 sec
+subCircuit with size 6
+Time =     4.50 sec
+subCircuit with size 7
+Time =    12.66 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 644> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter47.aig
+abc 644> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.15 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 656> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter48.aig
+abc 656> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.54 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 668> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter49.aig
+abc 668> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.11 sec
+subCircuit with size 4
+Time =     0.68 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 680> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter50.aig
+abc 680> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.06 sec
+subCircuit with size 4
+Time =     0.20 sec
+subCircuit with size 5
+Time =     0.21 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 692> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter51.aig
+abc 692> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.06 sec
+subCircuit with size 5
+Time =     0.12 sec
+subCircuit with size 6
+Time =     0.28 sec
+subCircuit with size 7
+Time =     0.54 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 704> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter52.aig
+abc 704> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.09 sec
+subCircuit with size 5
+Time =     0.86 sec
+subCircuit with size 6
+Time =     8.06 sec
+subCircuit with size 7
+Time =    13.07 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 716> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter53.aig
+abc 716> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.02 sec
+subCircuit with size 4
+Time =     0.11 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 728> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter54.aig
+abc 728> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.14 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 740> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter55.aig
+abc 740> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.16 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 752> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter56.aig
+abc 752> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.12 sec
+subCircuit with size 5
+Time =     0.19 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 764> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter57.aig
+abc 764> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.13 sec
+subCircuit with size 5
+Time =     0.19 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 776> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter58.aig
+abc 776> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.13 sec
+subCircuit with size 5
+Time =     0.23 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 788> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter59.aig
+abc 788> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.13 sec
+subCircuit with size 4
+Time =     0.58 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 800> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter60.aig
+abc 800> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.19 sec
+subCircuit with size 4
+Time =     0.11 sec
+subCircuit with size 5
+Time =     0.49 sec
+subCircuit with size 6
+Time =     1.77 sec
+subCircuit with size 7
+Time =     4.83 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 812> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter61.aig
+abc 812> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.23 sec
+subCircuit with size 4
+Time =     1.04 sec
+subCircuit with size 5
+Time =     3.41 sec
+subCircuit with size 6
+Time =    27.08 sec
+subCircuit with size 7
+Time =    25.43 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 824> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter62.aig
+abc 824> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.23 sec
+subCircuit with size 5
+Time =     0.47 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 836> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter63.aig
+abc 836> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.05 sec
+subCircuit with size 4
+Time =     0.11 sec
+subCircuit with size 5
+Time =     0.21 sec
+subCircuit with size 6
+Time =     1.57 sec
+subCircuit with size 7
+Time =     1.57 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 848> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter64.aig
+abc 848> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.12 sec
+subCircuit with size 4
+Time =     0.63 sec
+subCircuit with size 5
+Time =     3.00 sec
+subCircuit with size 6
+Time =    11.86 sec
+subCircuit with size 7
+Time =    33.54 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 860> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter65.aig
+abc 860> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.11 sec
+subCircuit with size 4
+Time =     0.23 sec
+subCircuit with size 5
+Time =     0.43 sec
+subCircuit with size 6
+Time =     2.00 sec
+subCircuit with size 7
+Time =     8.70 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 872> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter66.aig
+abc 872> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.08 sec
+subCircuit with size 3
+Time =     0.22 sec
+subCircuit with size 4
+Time =     1.00 sec
+subCircuit with size 5
+Time =     7.67 sec
+subCircuit with size 6
+Time =    33.75 sec
+subCircuit with size 7
+Time =    54.42 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 884> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter67.aig
+abc 884> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.30 sec
+subCircuit with size 5
+Time =     1.03 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 896> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter68.aig
+abc 896> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.20 sec
+subCircuit with size 5
+Time =     0.97 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 908> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter69.aig
+abc 908> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.06 sec
+subCircuit with size 4
+Time =     0.13 sec
+subCircuit with size 5
+Time =     0.25 sec
+subCircuit with size 6
+Time =     1.42 sec
+subCircuit with size 7
+Time =     1.62 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     45  lev =  7
+abc 920> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter70.aig
+abc 920> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.73 sec
+subCircuit with size 5
+Time =     0.77 sec
+Success reduce subcircuit from 7 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     43  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 932> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter71.aig
+abc 932> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.18 sec
+subCircuit with size 4
+Time =     0.26 sec
+subCircuit with size 5
+Time =     1.30 sec
+subCircuit with size 6
+Time =     2.02 sec
+subCircuit with size 7
+Time =     5.88 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 944> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter72.aig
+abc 944> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.19 sec
+subCircuit with size 5
+Time =     0.67 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 956> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter73.aig
+abc 956> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.17 sec
+subCircuit with size 4
+Time =     0.28 sec
+subCircuit with size 5
+Time =     0.58 sec
+subCircuit with size 6
+Time =     1.75 sec
+subCircuit with size 7
+Time =     5.37 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 968> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter74.aig
+abc 968> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.23 sec
+subCircuit with size 4
+Time =     0.87 sec
+subCircuit with size 5
+Time =     5.18 sec
+subCircuit with size 6
+Time =    22.01 sec
+subCircuit with size 7
+Time =    39.84 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 980> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter75.aig
+abc 980> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.17 sec
+subCircuit with size 4
+Time =     1.08 sec
+subCircuit with size 5
+Time =     5.89 sec
+subCircuit with size 6
+Time =    19.86 sec
+subCircuit with size 7
+Time =    42.16 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  8
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 992> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter76.aig
+abc 992> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.02 sec
+subCircuit with size 4
+Time =     0.09 sec
+subCircuit with size 5
+Time =     0.41 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1004> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter77.aig
+abc 1004> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.28 sec
+subCircuit with size 5
+Time =     0.90 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1016> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter78.aig
+abc 1016> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.28 sec
+subCircuit with size 5
+Time =     0.79 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1028> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter79.aig
+abc 1028> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.13 sec
+subCircuit with size 5
+Time =     0.24 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1040> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter80.aig
+abc 1040> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.13 sec
+subCircuit with size 4
+Time =     0.36 sec
+subCircuit with size 5
+Time =     1.12 sec
+subCircuit with size 6
+Time =     5.41 sec
+subCircuit with size 7
+Time =     6.24 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1052> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter81.aig
+abc 1052> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.05 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.32 sec
+subCircuit with size 5
+Time =     1.62 sec
+subCircuit with size 6
+Time =     7.16 sec
+subCircuit with size 7
+Time =    11.79 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1064> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter82.aig
+abc 1064> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.34 sec
+subCircuit with size 5
+Time =     0.46 sec
+subCircuit with size 6
+Time =     0.79 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1076> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter83.aig
+abc 1076> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.18 sec
+subCircuit with size 4
+Time =     0.40 sec
+subCircuit with size 5
+Time =     0.42 sec
+subCircuit with size 6
+Time =     3.31 sec
+subCircuit with size 7
+Time =     9.89 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev = 10
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1088> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter84.aig
+abc 1088> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.17 sec
+subCircuit with size 5
+Time =     1.28 sec
+subCircuit with size 6
+Time =     6.51 sec
+subCircuit with size 7
+Time =     4.78 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  8
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1100> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter85.aig
+abc 1100> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.03 sec
+subCircuit with size 3
+Time =     0.08 sec
+subCircuit with size 4
+Time =     0.24 sec
+subCircuit with size 5
+Time =     0.85 sec
+subCircuit with size 6
+Time =     3.80 sec
+subCircuit with size 7
+Time =     2.27 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1112> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter86.aig
+abc 1112> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.07 sec
+subCircuit with size 4
+Time =     0.33 sec
+subCircuit with size 5
+Time =     0.87 sec
+subCircuit with size 6
+Time =     6.52 sec
+subCircuit with size 7
+Time =     6.59 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1124> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter87.aig
+abc 1124> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.11 sec
+subCircuit with size 3
+Time =     0.39 sec
+subCircuit with size 4
+Time =     1.57 sec
+subCircuit with size 5
+Time =     4.54 sec
+subCircuit with size 6
+Time =    35.52 sec
+subCircuit with size 7
+Time =    34.39 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  8
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1136> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter88.aig
+abc 1136> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.08 sec
+subCircuit with size 3
+Time =     0.10 sec
+subCircuit with size 4
+Time =     0.86 sec
+subCircuit with size 5
+Time =     2.72 sec
+subCircuit with size 6
+Time =    16.04 sec
+subCircuit with size 7
+Time =    11.09 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1148> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter89.aig
+abc 1148> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.09 sec
+subCircuit with size 3
+Time =     0.37 sec
+subCircuit with size 4
+Time =     1.11 sec
+subCircuit with size 5
+Time =     5.24 sec
+subCircuit with size 6
+Time =    22.01 sec
+subCircuit with size 7
+Time =    27.00 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  8
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1160> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter90.aig
+abc 1160> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.04 sec
+subCircuit with size 4
+Time =     0.12 sec
+subCircuit with size 5
+Time =     1.39 sec
+subCircuit with size 6
+Time =     1.05 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1172> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter91.aig
+abc 1172> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.08 sec
+subCircuit with size 3
+Time =     0.46 sec
+subCircuit with size 4
+Time =     1.69 sec
+subCircuit with size 5
+Time =     7.59 sec
+subCircuit with size 6
+Time =    21.28 sec
+subCircuit with size 7
+Time =    26.25 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1184> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter92.aig
+abc 1184> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.03 sec
+subCircuit with size 2
+Time =     0.07 sec
+subCircuit with size 3
+Time =     0.25 sec
+subCircuit with size 4
+Time =     0.60 sec
+subCircuit with size 5
+Time =     2.66 sec
+subCircuit with size 6
+Time =    11.42 sec
+subCircuit with size 7
+Time =    15.92 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1196> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter93.aig
+abc 1196> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.08 sec
+subCircuit with size 4
+Time =     0.58 sec
+subCircuit with size 5
+Time =     0.55 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1208> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter94.aig
+abc 1208> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.04 sec
+subCircuit with size 3
+Time =     0.09 sec
+subCircuit with size 4
+Time =     0.51 sec
+subCircuit with size 5
+Time =     4.80 sec
+subCircuit with size 6
+Time =    23.41 sec
+subCircuit with size 7
+Time =    16.15 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  8
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1220> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter95.aig
+abc 1220> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.00 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.10 sec
+subCircuit with size 5
+Time =     0.32 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1232> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter96.aig
+abc 1232> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.02 sec
+subCircuit with size 2
+Time =     0.02 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.09 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1244> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter97.aig
+abc 1244> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.01 sec
+subCircuit with size 2
+Time =     0.01 sec
+subCircuit with size 3
+Time =     0.03 sec
+subCircuit with size 4
+Time =     0.08 sec
+Success reduce subcircuit from 4 to 4
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1256> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter98.aig
+abc 1256> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/lsv_reduce.dofile
+subCircuit with size 1
+Time =     0.04 sec
+subCircuit with size 2
+Time =     0.06 sec
+subCircuit with size 3
+Time =     0.23 sec
+subCircuit with size 4
+Time =     0.74 sec
+subCircuit with size 5
+Time =     3.76 sec
+subCircuit with size 6
+Time =    25.59 sec
+subCircuit with size 7
+Time =    24.51 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+[1;37mex                            :[0m i/o =   10/   10  lat =    0  and =     42  lev =  7
+abc 1268> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex04.truth/iter99.aig
+abc 1268> ***EOF***

@@ -1,4 +1,5 @@
 lsv_ntk2chain
+lsv_chain_time_limit 100
 lsv_chain_reduce
 lsv_chain2ntk
 ps

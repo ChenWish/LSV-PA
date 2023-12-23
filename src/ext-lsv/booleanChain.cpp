@@ -69,6 +69,7 @@ BooleanChain::Ntk2Chain(Abc_Ntk_t* pNtk) {
 
 
     chain.clear();
+    dc.clear();
     Gate::piNum = piNum = Abc_NtkPiNum(pNtk);
     poNum = Abc_NtkPoNum(pNtk);
 
@@ -598,6 +599,9 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<Lit>>& cnf, int len, con
                 const Lit s1 = mkLit(gate.select1Var[i]);
                 const Lit s2 = mkLit(gate.select2Var[j]);
                 for (int k = 0; k < (1 << piNum); ++k) {
+                    // modify for dc
+                    if (dc.find(k) != dc.end())
+                        continue;
                     const Lit gateLit = mkLit(gate.var[k]);
                     for (int m = 0; m < 4; ++m) {
                         const Lit c1Lit = mkLit(gate.c1Var, c1[m]);
@@ -647,6 +651,9 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<Lit>>& cnf, int len, con
             // clause[l] = toLit(var);
             clause[l] = mkLit(var);
             for (int j = 0; j < (1 << piNum); ++j) {
+                // modify for dc
+                if (dc.find(j) != dc.end())
+                    continue;
                 // sat_solver_add_buffer_enable(pSat, subCircuit[l].var[j], chain[*it].var[j], var, 0);
                 // var -> (a == b) == ~var + (a + ~b)(~a + b) == (~var + a + ~b)(~var + ~a + b)
                 solver.addClause(~mkLit(var), mkLit(subCircuit[l].var[j]), ~mkLit(chain[*it].var[j])); // ~var + a + ~b
@@ -843,6 +850,9 @@ BooleanChain::addGateCNF(const set<int>&TFO, vector<vector<Lit>>& cnf, int index
     }
 
     for (int i = 0; i < (1 << piNum); ++i) {
+        // modify for dc
+        if (dc.find(i) != dc.end())
+            continue;
 /*
         // Po has only fanin1
         lit l0 = (isConst0 ? chain[index].getIthTT(i)  : toLit(chain[index].var[i]));
