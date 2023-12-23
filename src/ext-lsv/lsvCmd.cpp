@@ -5,7 +5,7 @@
 #include "sat/glucose2/AbcGlucose2.h"
 #include "sat/glucose2/SimpSolver.h"
 #include <iostream>
-
+#include "lsvCone.h"
 using namespace std;
 
 static int Lsv_CommandPrintNodes(Abc_Frame_t* pAbc, int argc, char** argv);
@@ -14,6 +14,7 @@ static int Lsv_CommandChainTimeLimit(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintChain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
+static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 
 static BooleanChain booleanChain;
 
@@ -24,6 +25,7 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_chain", Lsv_CommandPrintChain, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_reduce", Lsv_CommandChainReduce, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -288,4 +290,20 @@ usage:
   Abc_Print(-2, "\t        convert the boolean chain to ntk\n");
   Abc_Print(-2, "\t-h    : print the command usage\n");
   return 1;
+}
+static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv){
+  Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
+  int length=Abc_NtkObjNum(pNtk);
+  bool* set=new bool[length];
+  bool* input=new bool[length];
+  for(int i=0;i<length;i++){
+    set[i]=false;
+    input[i]=false;
+  }
+  getCone(pNtk,set,input, 7, 3);
+  for(int i=0;i<length;i++){
+    if(set[i])
+      Abc_Print(-2, "node %d\n", i);
+  }
+  return 0;
 }

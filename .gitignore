@@ -13,7 +13,7 @@ lib/m114*
 lib/bip*
 docs/
 .vscode/
-
+bnechmark/
 src/xxx/
 src/aig/au/
 src/aig/ssm/
