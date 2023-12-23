@@ -10,6 +10,7 @@ using namespace std;
 
 static int Lsv_CommandPrintNodes(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandNtk2Chain(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandChainTimeLimit(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintChain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
@@ -19,9 +20,10 @@ static BooleanChain booleanChain;
 void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_nodes", Lsv_CommandPrintNodes, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_ntk2chain", Lsv_CommandNtk2Chain, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_time_limit", Lsv_CommandChainTimeLimit, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_chain", Lsv_CommandPrintChain, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_reduce", Lsv_CommandChainReduce, 0);
-  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -117,6 +119,29 @@ usage:
   return 1;
 }
 
+int Lsv_CommandChainTimeLimit(Abc_Frame_t* pAbc, int argc, char** argv) {
+  int c;
+  Extra_UtilGetoptReset();
+  while ((c = Extra_UtilGetopt(argc, argv, "h")) != EOF) {
+    switch (c) {
+      case 'h':
+        goto usage;
+      default:
+        goto usage;
+    }
+  }
+  if (argc >= 2) {
+    booleanChain.setNTimeLimit(atoi(argv[1]));
+  }
+  return 0;
+
+usage:
+  Abc_Print(-2, "usage: lsv_chain_time_limit [-h]\n");
+  Abc_Print(-2, "<timeLimit(sec)>\t        set the time limit of SAT solving\n");
+  Abc_Print(-2, "\t-h    : print the command usage\n");
+  return 1;
+}
+
 
 void Lsv_PrintChain(int fTT) {
   booleanChain.print(fTT);
@@ -168,8 +193,10 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fSmart) {
   }
   else {
     if (fSmart) {
-      if (booleanChain.reduce(5, 1) < 0)
-        booleanChain.reduce(5, 0);
+      while (booleanChain.reduce(6, -1) <= 0) {} // 5
+
+      // if (booleanChain.reduce(5, 1) < 0)
+      //   booleanChain.reduce(5, 0);
       // while (booleanChain.reduce(6, -1) < 0) {
       //   cout << "Reduce ......." << endl;
       // }

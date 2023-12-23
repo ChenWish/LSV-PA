@@ -17,6 +17,7 @@
 // }
 
 using namespace std;
+using namespace Gluco2;
 
 class Gate {
 // all members are private, only friend to BooleanChain
@@ -25,9 +26,9 @@ friend class BooleanChain;
 
 static int getFaninId(int fanin) { return fanin >> 1; }
 static int getFaninComplement(int fanin) { return fanin & 1; }
-static void setLogicZero(lit l) { logicZero = l; }
+static void setLogicZero(Lit l) { logicZero = l; }
 
-static lit logicZero;
+static Lit logicZero;
 static int piNum; // number of Pi var
 public:
     Gate() {
@@ -37,7 +38,7 @@ public:
 private:
     void init();
     void setVar(int& start);
-    lit getIthTT(int ith) const;
+    Lit getIthTT(int ith) const;
     void initTT() { tt.resize(((1<<piNum) - 1)/64 + 1, 0); } // init to zero
     // void addTTConstraint(vector<vector<lit>>& cnf);
 
@@ -60,10 +61,11 @@ private:
 
 class BooleanChain {
 public:
-    BooleanChain() { piNum = 0; poNum = 0; verbose = 0;}
+    BooleanChain() { piNum = 0; poNum = 0; verbose = 0; nTimeLimit = 0;}
     ~BooleanChain() {};
 
     void setVerbose(int v) { verbose = v; }
+    void setNTimeLimit(size_t t) { nTimeLimit = t; }
     bool Ntk2Chain(Abc_Ntk_t* pNtk);
     Abc_Ntk_t*  Chain2Ntk(Abc_Ntk_t* pNtkOld) const;
     void genTT() {updateTT(true); };
@@ -74,11 +76,11 @@ public:
 
 
 private:
-    int genCNF(vector<vector<lit>>& cnf, const set<int>& constraintCut);
-    void addGateCNF(const set<int>&TFO, vector<vector<lit>>& cnf, int index);
+    int genCNF(vector<vector<Lit>>& cnf, const set<int>& constraintCut);
+    void addGateCNF(const set<int>&TFO, vector<vector<Lit>>& cnf, int index);
     set<int> smartSelection(int circuitSize) const;
-    int reduceInt(int nofNode, const vector<vector<lit>>& cnf, int l, const set<int>& originSubCircuit);
-    void replace(sat_solver* pSat, const set<int>& originSubCircuit);
+    int reduceInt(int nofNode, const vector<vector<Lit>>& cnf, int l, const set<int>& originSubCircuit);
+    void replace(Solver& solver, const set<int>& originSubCircuit);
     void updateTopological();
     // void swapGate(int p, int q);
     bool checkValid(const set<int>& s, bool canBePo = false) const;
@@ -92,6 +94,7 @@ private:
     vector<Gate> subCircuit;
     set<int> subCircuitPiIndex;
     set<int> subCircuitPoIndex;
+    size_t nTimeLimit;
     // vector<int> PoIndex;
 };
 #endif

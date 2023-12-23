@@ -9,16 +9,23 @@
 
 
 int Gate::piNum = 0;
-lit Gate::logicZero = 0;
+Lit Gate::logicZero = mkLit(0);
 
-static void oneHot(sat_solver* pSat, lit* begin, lit* end) {
-    sat_solver_addclause(pSat, begin, end);
-    lit clause[2];
-    for (lit* j = begin; j < end; ++j) {
-        clause[0] = lit_neg(*j);
-        for (lit* i = begin; i < j; ++i) {
-            clause[1] = lit_neg(*i);
-            sat_solver_addclause(pSat, clause, clause+2);
+// static void oneHot(sat_solver* pSat, lit* begin, lit* end) {
+static void oneHot(Solver& s, const vec<Lit>& lits) {
+    // sat_solver_addclause(pSat, begin, end);
+    // lit clause[2];
+    // for (lit* j = begin; j < end; ++j) {
+    //     clause[0] = lit_neg(*j);
+    //     for (lit* i = begin; i < j; ++i) {
+    //         clause[1] = lit_neg(*i);
+    //         sat_solver_addclause(pSat, clause, clause+2);
+    //     }
+    // }
+    s.addClause(lits);
+    for (int j = 0; j < lits.size(); ++j) {
+        for (int i = 0; i < j; ++i) {
+            s.addClause(~lits[i], ~lits[j]);
         }
     }
 }
@@ -41,11 +48,11 @@ Gate::setVar(int& start) {
         var[i] = start++;
 }
 
-lit
+Lit
 Gate::getIthTT(int ith) const {
     assert(ith < (1 << piNum));
     bool isOne = (tt[ith/64] >> ((size_t)63 - (size_t)(ith%64))) & (size_t)1;
-    return isOne ? lit_neg(logicZero) : logicZero;
+    return isOne ? ~logicZero : logicZero;
 }
 
 
@@ -58,7 +65,7 @@ BooleanChain::Ntk2Chain(Abc_Ntk_t* pNtk) {
         return false;
     }
     if (verbose >= 2)
-        cerr << "Begin ntk2chain" << endl;
+        cout << "Begin ntk2chain" << endl;
 
 
     chain.clear();
@@ -97,7 +104,7 @@ BooleanChain::Ntk2Chain(Abc_Ntk_t* pNtk) {
     }
     updateTT(true);
     if (verbose >= 2)
-        cerr << "End ntk2chain" << endl;
+        cout << "End ntk2chain" << endl;
     return true;
 }
 
@@ -111,7 +118,7 @@ BooleanChain::Chain2Ntk(Abc_Ntk_t* pNtkOld) const {
 
     Abc_Ntk_t* pNtkNew = Abc_NtkAlloc( ABC_NTK_STRASH, ABC_FUNC_AIG, 1 );
     if (verbose >= 2)
-        cerr << "Begin chain2ntk" << endl;
+        cout << "Begin chain2ntk" << endl;
     pNtkNew->pName = Extra_UtilStrsav( pNtkOld->pName );
     pNtkNew->pSpec = Extra_UtilStrsav( pNtkOld->pSpec );
     pNtkNew->nConstrs = pNtkOld->nConstrs;
@@ -119,14 +126,14 @@ BooleanChain::Chain2Ntk(Abc_Ntk_t* pNtkOld) const {
     map<int, Abc_Obj_t*> chainId2pObj;
 
     if (verbose >= 2)
-        cerr << "Begin create node" << endl;
+        cout << "Begin create node" << endl;
     Abc_Obj_t* pObj;
     int i;
     for (i = 0; i < chain.size(); ++i) {
         if (chain[i].deleted)
             continue;
         if (verbose >= 2)
-            cerr << "i=" << i << endl;
+            cout << "i=" << i << endl;
         if (i == 0) {
             pObj = Abc_AigConst1(pNtkNew);
         }
@@ -148,10 +155,10 @@ BooleanChain::Chain2Ntk(Abc_Ntk_t* pNtkOld) const {
         chainId2pObj[i] = pObj;
     }
     if (verbose >= 2)
-        cerr << "After create node" << endl;
+        cout << "After create node" << endl;
 
     if (verbose >= 2)
-        cerr << "Before add Po fanin" << endl;
+        cout << "Before add Po fanin" << endl;
     // add Po fanin
     for (i = piNum + 1; i <= piNum + poNum; ++i) {
         assert(isPo(i));
@@ -161,7 +168,7 @@ BooleanChain::Chain2Ntk(Abc_Ntk_t* pNtkOld) const {
         Abc_ObjAddFanin(chainId2pObj[i], pNode1);
     }
     if (verbose >= 2)
-        cerr << "After add Po fanin" << endl;
+        cout << "After add Po fanin" << endl;
 
     // remove the extra nodes
     Abc_AigCleanup( (Abc_Aig_t *)pNtkNew->pManFunc );
@@ -233,28 +240,30 @@ BooleanChain::reduce(const set<int>& originSubCircuit, const set<int>& constrain
         }
     }
     if (verbose >= 1) {
-        cerr << "subCircuit PI index:";
+        cout << "subCircuit PI index:";
         for (set<int>::iterator it = subCircuitPiIndex.begin(); it != subCircuitPiIndex.end(); ++it) {
-            cerr << " " << *it;
+            cout << " " << *it;
         }
-        cerr << endl;
-        cerr << "subCircuit PO index:";
+        cout << endl;
+        cout << "subCircuit PO index:";
         for (set<int>::iterator it = subCircuitPoIndex.begin(); it != subCircuitPoIndex.end(); ++it) {
-            cerr << " " << *it;
+            cout << " " << *it;
         }
-        cerr << endl;
+        cout << endl;
     }
 
     
-    vector<vector<lit>> cnf;
+    // vector<vector<lit>> cnf;
+    vector<vector<Lit>> cnf;
     int nofVar = genCNF(cnf, constraintCut); 
     // cerr << "Here" << endl;
     // return 0;
     int result = 0; // glucose undef
     if (reduceSize == -1) {
-        for (int l = 1; l < originSubCircuit.size(); ++l) {
+        for (int l = 1; l <= originSubCircuit.size(); ++l) { // modify < to <=
             cout << "subCircuit with size " << l << endl;
             result = reduceInt(nofVar, cnf, l, originSubCircuit);
+            // l_Undef = 0, l_True = 1, l_False = -1
             if (result == 1) { // how about l_Undef ?
                 break;
             }
@@ -268,7 +277,8 @@ BooleanChain::reduce(const set<int>& originSubCircuit, const set<int>& constrain
 
     if (result == 1) {
         printf("Success reduce subcircuit from %ld to %ld\n", originSubCircuit.size(), subCircuit.size());
-        return originSubCircuit.size() - subCircuit.size();
+        // return originSubCircuit.size() - subCircuit.size();
+        return 1;
     }
     else if (result == -1) {
         return -1;
@@ -312,7 +322,8 @@ BooleanChain::print(bool tt) const {
         cout << setw(3 + max(7, int(2 * chain.size()/10 + 6))) << ss.str() << "  ";
         if (tt) {
             for (int j = 0; j < (1 << piNum); ++j) {
-                cout << chain[i].getIthTT(j);
+                // cout << (chain[i].getIthTT(j));
+                cout << toInt(chain[i].getIthTT(j));
             }
         }
         cout << endl;
@@ -322,7 +333,7 @@ BooleanChain::print(bool tt) const {
 /******************** private function ********************/
 
 int
-BooleanChain::genCNF(vector<vector<lit>>& cnf, const set<int>& constraintCut) {
+BooleanChain::genCNF(vector<vector<Lit>>& cnf, const set<int>& constraintCut) {
     // add cnf var in reverse topological order
     cnf.clear();
     set<int> TFO;
@@ -348,7 +359,7 @@ BooleanChain::genCNF(vector<vector<lit>>& cnf, const set<int>& constraintCut) {
             }
         }
     }
-    if (verbose >= 1) {
+    if (verbose >= 2) {
         cout << "TFO:";
         for (set<int>::iterator it = TFO.begin(); it != TFO.end(); ++it) {
             cout << " " << *it;
@@ -365,8 +376,9 @@ BooleanChain::genCNF(vector<vector<lit>>& cnf, const set<int>& constraintCut) {
     // sat var start from 0
     // reverse topological order
     int nowVar = 0;
-    cnf.push_back(vector<lit>{toLitCond(nowVar++, 1)}); // first var is logic zero
-    Gate::setLogicZero(toLit(0));
+    cnf.push_back(vector<Lit>{mkLit(nowVar++, 1)}); // first var is logic zero
+    // Gate::setLogicZero(toLit(0));
+    Gate::setLogicZero(mkLit(0));
     // for (set<int>::const_reverse_iterator rit = careCut.rbegin(); rit != careCut.rend(); ++rit) {
     //     chain[*rit].setVar(nowVar); // BUGGY
     // }
@@ -384,91 +396,104 @@ BooleanChain::genCNF(vector<vector<lit>>& cnf, const set<int>& constraintCut) {
 
 set<int>
 BooleanChain::smartSelection(int circuitSize) const {
-    srand(time(NULL));
-    int root = 0;
-    while (chain[root].deleted || root <= piNum + poNum) {
-        root = rand() % chain.size();
-    }
-    set<int> subCircuit;
-    subCircuit.insert(root);
-    if (verbose >= 1)
-        cout << "SmartSelection: Root = " << root << endl;
+    set<int> badRoot;
     while (1) {
-        int nextIndex = -1;
-        int nextAddInputNum = INT32_MAX;
-        int nextAddOutputNum = INT32_MAX;
-        for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
-            int fanin1 = Gate::getFaninId(chain[*it].fanin1);
-            int fanin2 = Gate::getFaninId(chain[*it].fanin2);
-            
-            int addInputNum;
-            int addOutputNum;
-            auto evalNode = [&] (int nodeIndex) {
-                addInputNum = 0;
-                addOutputNum = 0;
-                for (set<int>::iterator it = chain[nodeIndex].fanouts.begin(); it != chain[nodeIndex].fanouts.end(); ++it) {
-                    if (subCircuit.find(*it) == subCircuit.end())
-                        addOutputNum ++;
-                }
-                if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin1)) == subCircuit.end())
-                    addInputNum ++;
-                if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin2)) == subCircuit.end())
-                    addInputNum ++;
-            };
+        srand(time(NULL));
+        int root = 0;
+        while (chain[root].deleted || root <= piNum + poNum || badRoot.find(root) != badRoot.end()) {
+            root = rand() % chain.size();
+        }
+        set<int> subCircuit;
+        subCircuit.insert(root);
+        if (verbose >= 1)
+            cout << "SmartSelection: Root = " << root << endl;
+        while (1) {
+            int nextIndex = -1;
+            int nextAddInputNum = INT32_MAX;
+            int nextAddOutputNum = INT32_MAX;
+            for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
+                int fanin1 = Gate::getFaninId(chain[*it].fanin1);
+                int fanin2 = Gate::getFaninId(chain[*it].fanin2);
+                
+                int addInputNum;
+                int addOutputNum;
+                auto evalNode = [&] (int nodeIndex) {
+                    addInputNum = 0;
+                    addOutputNum = 0;
+                    for (set<int>::iterator it = chain[nodeIndex].fanouts.begin(); it != chain[nodeIndex].fanouts.end(); ++it) {
+                        if (subCircuit.find(*it) == subCircuit.end())
+                            addOutputNum ++;
+                    }
+                    if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin1)) == subCircuit.end())
+                        addInputNum ++;
+                    if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin2)) == subCircuit.end())
+                        addInputNum ++;
+                };
 
-            if (fanin1 > piNum + poNum && subCircuit.find(fanin1) == subCircuit.end()) {
-                evalNode(fanin1);
-                if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
-                    nextIndex = fanin1;
-                    nextAddInputNum = addInputNum;
-                    nextAddOutputNum = addOutputNum;
+                if (fanin1 > piNum + poNum && subCircuit.find(fanin1) == subCircuit.end()) {
+                    evalNode(fanin1);
+                    if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
+                        nextIndex = fanin1;
+                        nextAddInputNum = addInputNum;
+                        nextAddOutputNum = addOutputNum;
+                    }
+                }
+                if (fanin2 > piNum + poNum && subCircuit.find(fanin2) == subCircuit.end()) {
+                    evalNode(fanin2);
+                    if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
+                        nextIndex = fanin2;
+                        nextAddInputNum = addInputNum;
+                        nextAddOutputNum = addOutputNum;
+                    }
                 }
             }
-            if (fanin2 > piNum + poNum && subCircuit.find(fanin2) == subCircuit.end()) {
-                evalNode(fanin2);
-                if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
-                    nextIndex = fanin2;
-                    nextAddInputNum = addInputNum;
-                    nextAddOutputNum = addOutputNum;
-                }
+            // assert(nextIndex != -1);
+            if (nextIndex == -1)
+                break;
+            subCircuit.insert(nextIndex);
+            if (subCircuit.size() > circuitSize) {
+                break;
             }
         }
-        // assert(nextIndex != -1);
-        if (nextIndex == -1)
-            break;
-        subCircuit.insert(nextIndex);
-        if (subCircuit.size() > circuitSize) {
-            break;
+        if (subCircuit.size() >= 4) {
+            if (verbose >= 1) {
+                cout << "SmartSelection with subCircuit:";
+                for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it)
+                    cout << " " << *it;
+                cout << endl;
+            }
+            return subCircuit;
         }
+        badRoot.insert(root);
     }
-    if (verbose >= 1) {
-        cout << "SmartSelection with subCircuit:";
-        for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it)
-            cout << " " << *it;
-        cout << endl;
-    }
-    return subCircuit;
+    assert(0);
+    return set<int>();
 }
 
 
 int 
-BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, const set<int>& originSubCircuit) {
+BooleanChain::reduceInt(int nofVar, const vector<vector<Lit>>& cnf, int len, const set<int>& originSubCircuit) {
     // sat_solver_setnvars to init nVar
     // can benefit from incremental SAT?
     size_t startTime = Abc_Clock();
-    sat_solver* pSat = sat_solver_new();
-    // Gluco2::SI* ttt = glucose2_solver_start();
+    // sat_solver* pSat = sat_solver_new();
+    Solver solver;
+    solver.setIncrementalMode();
+
 
 
     // add cnf clause into solver
-    sat_solver_setnvars(pSat, nofVar);
+    // sat_solver_setnvars(pSat, nofVar);
+    solver.addVar(nofVar-1); // -1 or not
     for (int i = 0; i < cnf.size(); ++i) {
-        lit* clause = new lit[cnf[i].size()];
+        // lit* clause = new lit[cnf[i].size()];
+        vec<Lit> clause(cnf[i].size());
         for (int j = 0; j < cnf[i].size(); ++j) {
             clause[j] = cnf[i][j];
         }
-        sat_solver_addclause(pSat, clause, clause + cnf[i].size());
-        delete[] clause;  // WISH
+        // sat_solver_addclause(pSat, clause, clause + cnf[i].size());
+        solver.addClause(clause);
+        // delete[] clause;  // WISH
     }
     
 
@@ -487,26 +512,38 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, con
         Gate& gate = subCircuit[l];
         gate.init();
         gate.setVar(nofVar);
-        sat_solver_setnvars(pSat, nofVar);
-        gate.c1Var = sat_solver_addvar(pSat);
-        gate.c2Var = sat_solver_addvar(pSat);
+        // sat_solver_setnvars(pSat, nofVar);
+        // gate.c1Var = sat_solver_addvar(pSat);
+        // gate.c2Var = sat_solver_addvar(pSat);
+        solver.addVar(nofVar-1);
+        gate.c1Var = solver.newVar();
+        gate.c2Var = solver.newVar();
         nofVar += 2;
 
         // init select var and add one-hot constraint
-        lit* oneHotS1 = new lit[subCircuitPiIndex.size() + l];
-        lit* oneHotS2 = new lit[subCircuitPiIndex.size() + l];
+        // lit* oneHotS1 = new lit[subCircuitPiIndex.size() + l];
+        // lit* oneHotS2 = new lit[subCircuitPiIndex.size() + l];
+        vec<Lit> oneHotS1(subCircuitPiIndex.size() + l);
+        vec<Lit> oneHotS2(subCircuitPiIndex.size() + l);
         for (int i = 0; i < subCircuitPiIndex.size() + l; ++i) {
-            gate.select1Var.push_back(sat_solver_addvar(pSat));
-            gate.select2Var.push_back(sat_solver_addvar(pSat));
-            oneHotS1[i] = toLit(gate.select1Var.back());
-            oneHotS2[i] = toLit(gate.select2Var.back());
+            // gate.select1Var.push_back(sat_solver_addvar(pSat));
+            // gate.select2Var.push_back(sat_solver_addvar(pSat));
+            // oneHotS1[i] = toLit(gate.select1Var.back());
+            // oneHotS2[i] = toLit(gate.select2Var.back());
+            gate.select1Var.push_back(solver.newVar());
+            gate.select2Var.push_back(solver.newVar());
+            oneHotS1[i] = mkLit(gate.select1Var.back());
+            oneHotS2[i] = mkLit(gate.select2Var.back());
             nofVar += 2;
         }
-        oneHot(pSat, oneHotS1, oneHotS1 + subCircuitPiIndex.size() + l);
-        oneHot(pSat, oneHotS2, oneHotS2 + subCircuitPiIndex.size() + l);
+        // oneHot(pSat, oneHotS1, oneHotS1 + subCircuitPiIndex.size() + l);
+        // oneHot(pSat, oneHotS2, oneHotS2 + subCircuitPiIndex.size() + l);
         // WISH
-        delete[] oneHotS1;
-        delete[] oneHotS2;
+        // delete[] oneHotS1;
+        // delete[] oneHotS2;
+
+        oneHot(solver, oneHotS1);
+        oneHot(solver, oneHotS2);
 
         for (int j = 0; j < subCircuitPiIndex.size() + l; ++j) {
             for (int i = 0; i < subCircuitPiIndex.size() + l; ++i) {
@@ -514,16 +551,14 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, con
                     // forbid s1 >= s2 cases
                     // s1[i] -> ~s2[j]
                     // cout << "buggy, i=" << i << ", j=" << j << "s1Size=" << gate.select1Var.size() << " s2Size=" << gate.select2Var.size() << endl;
-                    lit clause[2] = {toLitCond(gate.select1Var[i], 1), toLitCond(gate.select2Var[j], 1)};
-                    sat_solver_addclause(pSat, clause, clause+2);
+                    // lit clause[2] = {toLitCond(gate.select1Var[i], 1), toLitCond(gate.select2Var[j], 1)};
+                    // sat_solver_addclause(pSat, clause, clause+2);
+                    solver.addClause(~mkLit(gate.select1Var[i]), ~mkLit(gate.select2Var[j]));
                     continue;
                 }
                 bool c1[4] = {false, false, true, true};
                 bool c2[4] = {false, true, false, true};
-                // const lit c1Lit = toLit(gate.c1Var);
-                // const lit c2Lit = toLit(gate.c2Var);
-                // lit c1[4] = {lit_neg(c1Lit), lit_neg(c1Lit), c1Lit, c1Lit};
-                // lit c2[4] = {lit_neg(c2Lit), c2Lit, lit_neg(c2Lit), c2Lit};
+/*
                 const lit s1 = toLit(gate.select1Var[i]);
                 const lit s2 = toLit(gate.select2Var[j]);
                 for (int k = 0; k < (1 << piNum); ++k) {
@@ -559,24 +594,69 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, con
                         sat_solver_addclause(pSat, clause, clause+6);
                     }
                 }
+*/
+                const Lit s1 = mkLit(gate.select1Var[i]);
+                const Lit s2 = mkLit(gate.select2Var[j]);
+                for (int k = 0; k < (1 << piNum); ++k) {
+                    const Lit gateLit = mkLit(gate.var[k]);
+                    for (int m = 0; m < 4; ++m) {
+                        const Lit c1Lit = mkLit(gate.c1Var, c1[m]);
+                        const Lit c2Lit = mkLit(gate.c2Var, c2[m]);
+                        const set<int>::const_iterator it = subCircuitPiIndex.begin();
+                        Lit temp = (i < subCircuitPiIndex.size()) ? (chain[*next(it, i)].getIthTT(k)) : mkLit(subCircuit[i - subCircuitPiIndex.size()].var[k]); // modify for Pi, which is const
+                        const Lit iLit = c1[m] ? ~temp : temp;
+                            temp = (j < subCircuitPiIndex.size()) ? (chain[*next(it, j)].getIthTT(k)) : mkLit(subCircuit[j - subCircuitPiIndex.size()].var[k]); // modify for Pi, which is const
+                        const Lit jLit = c2[m] ? ~temp : temp;
+                        vec<Lit> clause(7);
+                        clause[0] = ~s1;
+                        clause[1] = ~s2;
+                        clause[2] = c1Lit;
+                        clause[3] = c2Lit;
+
+                        // (~var_i + ~var_j + var)
+                        clause[4] = ~iLit;
+                        clause[5] = ~jLit;
+                        clause[6] = gateLit;
+                        solver.addClause(clause);
+
+                        clause.pop(); // resize to 6
+                        // (~var + var_i)
+                        clause[4] = ~gateLit;
+                        clause[5] = iLit;
+                        solver.addClause(clause);
+                        
+
+                        // (~var + var_j)
+                        clause[4] = ~gateLit;
+                        clause[5] = jLit;
+                        solver.addClause(clause);
+                    }
+                }
             }
         }
     }
     // subCircuit Po
-    lit* clause = new lit[len];
+    // lit* clause = new lit[len];
+    vec<Lit> clause(len);
     for (set<int>::iterator it = subCircuitPoIndex.begin(); it != subCircuitPoIndex.end(); ++it) {
         // cout << "*it: " << *it << endl;
         for (int l = 0; l < len; ++l) {
-            int var = sat_solver_addvar(pSat);
+            // int var = sat_solver_addvar(pSat);
+            int var = solver.newVar();
             subCircuit[l].ithPo.push_back(var);
-            clause[l] = toLit(var);
+            // clause[l] = toLit(var);
+            clause[l] = mkLit(var);
             for (int j = 0; j < (1 << piNum); ++j) {
-                sat_solver_add_buffer_enable(pSat, subCircuit[l].var[j], chain[*it].var[j], var, 0);
+                // sat_solver_add_buffer_enable(pSat, subCircuit[l].var[j], chain[*it].var[j], var, 0);
+                // var -> (a == b) == ~var + (a + ~b)(~a + b) == (~var + a + ~b)(~var + ~a + b)
+                solver.addClause(~mkLit(var), mkLit(subCircuit[l].var[j]), ~mkLit(chain[*it].var[j])); // ~var + a + ~b
+                solver.addClause(~mkLit(var), ~mkLit(subCircuit[l].var[j]), mkLit(chain[*it].var[j])); // ~var + ~a + b
             }
         }
-        oneHot(pSat, clause, clause+len);
+        // oneHot(pSat, clause, clause+len);
+        oneHot(solver, clause);
     }
-    delete[] clause; // WISH
+    // delete[] clause; // WISH
 
     // acyclic constraint
     map<int, set<int>> outPath2Pi; // Pi, Po are saved in ith index in subCircuitPi/PoIndex
@@ -605,47 +685,62 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, con
         }
     }
     if (!outPath2Pi.empty()) {
-        cerr << "not empty" << endl;
+        // cerr << "not empty" << endl;
         vector<map<int, int>> connect2Pi(subCircuit.size());
         for (int l = 0; l < connect2Pi.size(); ++l) {
             Gate& gate = subCircuit[l];
             for (map<int, set<int>>::iterator it = outPath2Pi.begin(); it != outPath2Pi.end(); ++it) {
                 const int ithPi = it->first;
-                connect2Pi[l][ithPi] = sat_solver_addvar(pSat);
-                lit clause[3];
-                clause[0] = toLitCond(gate.select1Var[ithPi], 1); // ~s1
-                clause[1] = toLit(connect2Pi[l][ithPi]); // c
-                sat_solver_addclause(pSat, clause, clause + 2);
+                // connect2Pi[l][ithPi] = sat_solver_addvar(pSat);
+                connect2Pi[l][ithPi] = solver.newVar();
+                // lit clause[3];
+                // clause[0] = toLitCond(gate.select1Var[ithPi], 1); // ~s1
+                // clause[1] = toLit(connect2Pi[l][ithPi]); // c
+                // sat_solver_addclause(pSat, clause, clause + 2);
+                // clause[0] = toLitCond(gate.select2Var[ithPi], 1); // ~s2
+                // sat_solver_addclause(pSat, clause, clause + 2);
+                solver.addClause(~mkLit(gate.select1Var[ithPi]), mkLit(connect2Pi[l][ithPi])); // ~s1 + c
+                solver.addClause(~mkLit(gate.select2Var[ithPi]), mkLit(connect2Pi[l][ithPi])); // ~s2 + c
 
-                clause[0] = toLitCond(gate.select2Var[ithPi], 1); // ~s2
-                sat_solver_addclause(pSat, clause, clause + 2);
 
                 // (s_i & c_i) -> c_l == ~s_i + ~c_i + c_l, for all i < l
                 for (int subCircuitIndex = 0; subCircuitIndex < l; ++subCircuitIndex) {
-                    clause[0] = toLitCond(gate.select1Var[subCircuitIndex + subCircuitPiIndex.size()], 1); // ~si
-                    clause[1] = toLitCond(connect2Pi[subCircuitIndex][ithPi], 1); // ~ci
-                    clause[2] = toLit(connect2Pi[l][ithPi]); // c_l
-                    sat_solver_addclause(pSat, clause, clause + 3);
+                    // clause[0] = toLitCond(gate.select1Var[subCircuitIndex + subCircuitPiIndex.size()], 1); // ~si
+                    // clause[1] = toLitCond(connect2Pi[subCircuitIndex][ithPi], 1); // ~ci
+                    // clause[2] = toLit(connect2Pi[l][ithPi]); // c_l
+                    // sat_solver_addclause(pSat, clause, clause + 3);
+                    solver.addClause(~mkLit(gate.select1Var[subCircuitIndex + subCircuitPiIndex.size()]), ~mkLit(connect2Pi[subCircuitIndex][ithPi]), mkLit(connect2Pi[l][ithPi])); // ~s1 + ~c_i + c_l
 
-                    clause[0] = toLitCond(gate.select2Var[subCircuitIndex + subCircuitPiIndex.size()], 1); // ~si
-                    sat_solver_addclause(pSat, clause, clause + 3);
+                    // clause[0] = toLitCond(gate.select2Var[subCircuitIndex + subCircuitPiIndex.size()], 1); // ~si
+                    // sat_solver_addclause(pSat, clause, clause + 3);
+                    solver.addClause(~mkLit(gate.select2Var[subCircuitIndex + subCircuitPiIndex.size()]), ~mkLit(connect2Pi[subCircuitIndex][ithPi]), mkLit(connect2Pi[l][ithPi])); // ~s2 + ~c_i + c_l
                 }
 
                 // Po constraint
                 // c_l -> ~ithPo == ~c_l + ~ithPo
                 for (set<int>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-                    lit clause[2] = {toLitCond(connect2Pi[l][ithPi], 1), toLitCond(gate.ithPo[*it2], 1)};
-                    sat_solver_addclause(pSat, clause, clause + 2);
+                    // lit clause[2] = {toLitCond(connect2Pi[l][ithPi], 1), toLitCond(gate.ithPo[*it2], 1)};
+                    // sat_solver_addclause(pSat, clause, clause + 2);
+                    solver.addClause(~mkLit(connect2Pi[l][ithPi]), ~mkLit(gate.ithPo[*it2])); // ~c_l + ~ithPo
                 }
             }
         }
     }
 
-    lbool result = sat_solver_solve(pSat, 0, 0, 0, 0, 0, 0);
+    // lbool result = sat_solver_solve(pSat, 0, 0, 0, 0, 0, 0);
+    // solver.nRuntimeLimit = xxx; set the runTimeLimit
+    if (nTimeLimit != 0)
+        solver.nRuntimeLimit = Abc_Clock() + nTimeLimit * CLOCKS_PER_SEC;
+    // bool result = solver.solve();
+    // solver.solveLimited();
+    // solver.nRuntimeLimit = 1000000;
+    Gluco2::lbool lboolResult = solver.solveLimited(vec<Lit>()); // no assumption
+    int result = (lboolResult == l_True) ? 1 : (lboolResult == l_False ? -1 : 0);
     Abc_PrintTime( 1, "Time", Abc_Clock() - startTime );
 
     // cerr << "after solve" << endl;
     if (result == 1) {
+/*
         if (verbose >= 2) {
             for (set<int>::iterator it = subCircuitPiIndex.begin(); it != subCircuitPiIndex.end(); ++it) {
                 cout << "----------- subCircuitPiIndex " << *it << endl;
@@ -707,20 +802,21 @@ BooleanChain::reduceInt(int nofVar, const vector<vector<lit>>& cnf, int len, con
             // }
             // return result;
         }
-        replace(pSat, originSubCircuit);
+*/ 
+        replace(solver, originSubCircuit);
         if (verbose >= 1) {
             cout << "--------------- print boolean chain ---------------" << endl;
             print(false);
         }
     }
-    sat_solver_delete(pSat);
+    // sat_solver_delete(pSat);
     // cout << "Exec Time: " << (Abc_Clock() - startTime)/1000000 << " sec" << endl;
     return result;
     // l_Undef = 0, l_True = 1, l_False = -1
 }
 
 void
-BooleanChain::addGateCNF(const set<int>&TFO, vector<vector<lit>>& cnf, int index) {
+BooleanChain::addGateCNF(const set<int>&TFO, vector<vector<Lit>>& cnf, int index) {
     int fanin1 = Gate::getFaninId(chain[index].fanin1);
     int fanin2 = Gate::getFaninId(chain[index].fanin2);
     bool c1 = Gate::getFaninComplement(chain[index].fanin1);
@@ -747,37 +843,47 @@ BooleanChain::addGateCNF(const set<int>&TFO, vector<vector<lit>>& cnf, int index
     }
 
     for (int i = 0; i < (1 << piNum); ++i) {
+/*
         // Po has only fanin1
         lit l0 = (isConst0 ? chain[index].getIthTT(i)  : toLit(chain[index].var[i]));
-        // lit l1 = (isConst1 ? (c1 ? lit_neg(chain[fanin1].getIthTT(i)) : chain[fanin1].getIthTT(i)) : toLitCond(chain[fanin1].var[i], c1));
-        // lit l2 = isPo(index) ? lit_neg(Gate::logicZero) : (isConst2 ? (c2 ? lit_neg(chain[fanin2].getIthTT(i)) : chain[fanin2].getIthTT(i)) : toLitCond(chain[fanin2].var[i], c2));
         lit l1 = isConst1 ? chain[fanin1].getIthTT(i) : toLit(chain[fanin1].var[i]);
         lit l2 = isPo(index) ? lit_neg(Gate::logicZero) : (isConst2 ? chain[fanin2].getIthTT(i) : toLit(chain[fanin2].var[i]));
         l1 = c1 ? lit_neg(l1) : l1;
-        // l2 = isPo(index) ? l2 : (c2 ? lit_neg(l2) : l2);
         l2 = (!isPo(index) && c2) ? lit_neg(l2) : l2;
 
-        
         // (p == a ^ b) =  (~p v a)(~p v b)(~a v ~b v p)
         cnf.push_back(vector<lit>{lit_neg(l0), l1});                // (~p v a)
         cnf.push_back(vector<lit>{lit_neg(l0), l2});                // (~p v b)
         cnf.push_back(vector<lit>{lit_neg(l1), lit_neg(l2), l0});   // (~a v ~b v p)
-        // cout << "l0: " << l0 << endl;
+*/
+        Lit l0 = (isConst0 ? chain[index].getIthTT(i) : mkLit(chain[index].var[i]));
+        Lit l1 = isConst1 ? chain[fanin1].getIthTT(i) : mkLit(chain[fanin1].var[i]);
+        Lit l2 = isPo(index) ? ~(Gate::logicZero) : (isConst2 ? chain[fanin2].getIthTT(i) : mkLit(chain[fanin2].var[i]));
+
+        l1 = c1 ? ~l1 : l1;
+        l2 = (!isPo(index) && c2) ? ~l2 : l2;
+
+        // (p == a ^ b) =  (~p v a)(~p v b)(~a v ~b v p)
+        cnf.push_back(vector<Lit>{~l0, l1});        // (~p v a)
+        cnf.push_back(vector<Lit>{~l0, l2});        // (~p v b)
+        cnf.push_back(vector<Lit>{~l1, ~l2, l0});   // (~a v ~b v p)
     }
 }
 
 
 void
-BooleanChain::replace(sat_solver* pSat, const set<int>& originSubCircuit) {
+BooleanChain::replace(Solver& s, const set<int>& originSubCircuit) {
     assert(originSubCircuit.size() >= subCircuit.size()); // could be equal
+/*
     int reducedSize = originSubCircuit.size() - subCircuit.size();
-    if (verbose >= 2) {
+    if (verbose >= 2)
         cerr << "reducedSize = " << reducedSize << endl;
-        for (int i = 0; i < reducedSize; ++i) {
-            chain[*prev(originSubCircuit.end(), i+1)].deleted = true;
+    for (int i = 0; i < reducedSize; ++i) {
+        chain[*prev(originSubCircuit.end(), i+1)].deleted = true;
+        if (verbose >= 2)
             cerr << "chain[" << *prev(originSubCircuit.end(), i+1) << "].deleted = true" << endl;
-        }
     }
+*/
 
     // remove gate fanouts to subCircuit in subCircuitPi
     for (set<int>::iterator it = subCircuitPiIndex.begin(); it != subCircuitPiIndex.end(); ++it) {
@@ -789,34 +895,102 @@ BooleanChain::replace(sat_solver* pSat, const set<int>& originSubCircuit) {
                 ++it2;
         }
     }
+    //
+    int fanin1, fanin2;
+    map<int, int> oldFanin2newFanin;
+    for (int i = 0; i < subCircuitPiIndex.size(); ++i)
+        oldFanin2newFanin[i] = *next(subCircuitPiIndex.begin(), i);
+
+    auto getFaninId = [&](const Gate& gate) {
+        fanin1 = -1;
+        fanin2 = -1;
+        for (int i = 0; i < gate.select1Var.size(); ++i) {
+            if (s.modelValue(gate.select1Var[i]) == l_True) {
+                fanin1 = i;
+                break;
+            }
+        }
+        for (int i = 0; i < gate.select2Var.size(); ++i) {
+            if (s.modelValue(gate.select2Var[i]) == l_True) {
+                fanin2 = i;
+                break;
+            }
+        }
+        assert(oldFanin2newFanin.find(fanin1) != oldFanin2newFanin.end());
+        assert(oldFanin2newFanin.find(fanin2) != oldFanin2newFanin.end());
+        fanin1 = oldFanin2newFanin[fanin1];
+        fanin2 = oldFanin2newFanin[fanin2];
+    };
+
+    for (int l = 0; l < subCircuit.size(); ++l) {
+        int index = -1;
+        for (int i = 0; i < subCircuitPoIndex.size(); ++i) {
+            if (s.modelValue(subCircuit[l].ithPo[i]) == l_True) {
+                index = *next(subCircuitPoIndex.begin(), i);
+                break;
+            }
+        }
+        if (index == -1) { // not subCircuitPo
+            index = chain.size();
+            chain.push_back(Gate());
+            chain.back().initTT();
+        }
+        getFaninId(subCircuit[l]);
+        int c1 = s.modelValue(subCircuit[l].c1Var) == l_True;
+        int c2 = s.modelValue(subCircuit[l].c2Var) == l_True;
+        chain[index].fanin1 = (fanin1 << 1) | c1;
+        chain[index].fanin2 = (fanin2 << 1) | c2;
+        chain[fanin1].fanouts.insert(index);
+        chain[fanin2].fanouts.insert(index);
+        oldFanin2newFanin[subCircuitPiIndex.size() + l] = index;
+    }
+    for (set<int>::const_iterator it = originSubCircuit.begin(); it != originSubCircuit.end(); ++it) {
+        if (subCircuitPoIndex.find(*it) == subCircuitPoIndex.end())
+            chain[*it].deleted = true;
+    }
+    if (verbose >= 2)
+        cout << "Before updateTopological" << endl;
+    updateTopological();
+    if (!updateTT()) {
+        cerr << "Error in replace(booleanChain.cpp): replaced circuit violated Po tt" << endl;
+    }
+    return;
 
     map<int, int> originPo2newPo;
     for (int l = 0; l < subCircuit.size(); ++l) {
         // Gate* gatePtr = &chain[*next(originSubCircuit.begin(), l)];
         int nowGateIndex = *next(originSubCircuit.begin(), l);
         for (int i = 0; i < subCircuitPoIndex.size(); ++i) {
-            if (sat_solver_var_value(pSat, subCircuit[l].ithPo[i]) == 1) {
+            // if (sat_solver_var_value(pSat, subCircuit[l].ithPo[i]) == 1) {
+            if (s.modelValue(subCircuit[l].ithPo[i]) == l_Undef) {
+                cerr << "/%/%//%//%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/% HAHAHA, there are undefine in the final model" << endl;
+            }
+            if (s.modelValue(subCircuit[l].ithPo[i]) == l_True) {
                 // newSubCircuitPoIndex[i] = nowGateIndex; // nowGateIndex is ith origin Po
                 originPo2newPo[*next(subCircuitPoIndex.begin(), i)] = nowGateIndex;
                 if (verbose >= 2)
-                    cerr << "originPo2newPo[" << *next(subCircuitPoIndex.begin(), i) << "] = " << nowGateIndex << endl;
+                    cout << "originPo2newPo[" << *next(subCircuitPoIndex.begin(), i) << "] = " << nowGateIndex << endl;
                 // chain[nowGateIndex].deleted = true;
                 // nowGateIndex = *next(subCircuitPoIndex.begin(), i);
                 break;
             }
         }
 
-        int c1 = sat_solver_var_value(pSat, subCircuit[l].c1Var);
-        int c2 = sat_solver_var_value(pSat, subCircuit[l].c2Var);
+        // int c1 = sat_solver_var_value(pSat, subCircuit[l].c1Var);
+        // int c2 = sat_solver_var_value(pSat, subCircuit[l].c2Var);
+        int c1 = s.modelValue(subCircuit[l].c1Var) == l_True;
+        int c2 = s.modelValue(subCircuit[l].c2Var) == l_True;
         int fanin1 = -1, fanin2 = -1;
         for (int i = 0; i < subCircuit[l].select1Var.size(); ++i) {
-            if (sat_solver_var_value(pSat, subCircuit[l].select1Var[i]) == 1) {
+            // if (sat_solver_var_value(pSat, subCircuit[l].select1Var[i]) == 1) {
+            if (s.modelValue(subCircuit[l].select1Var[i]) == l_True) {
                 fanin1 = i;
                 break;
             }
         }
         for (int i = 0; i < subCircuit[l].select2Var.size(); ++i) {
-            if (sat_solver_var_value(pSat, subCircuit[l].select2Var[i]) == 1) {
+            // if (sat_solver_var_value(pSat, subCircuit[l].select2Var[i]) == 1) {
+            if (s.modelValue(subCircuit[l].select2Var[i]) == l_True) {
                 fanin2 = i;
                 break;
             }
@@ -889,7 +1063,7 @@ BooleanChain::replace(sat_solver* pSat, const set<int>& originSubCircuit) {
     }
     // cannot remove deleted gate because the index will be wrong
     if (verbose >= 2)
-        cerr << "Before updateTopological" << endl;
+        cout << "Before updateTopological" << endl;
     updateTopological();
     if (!updateTT()) {
         cerr << "Error in replace(booleanChain.cpp): replaced circuit violated Po tt" << endl;

@@ -1,0 +1,2696 @@
+read_truth -xf ../../IWLS/benchmarks/ex00.truth
+strash
+resyn
+resyn2
+resyn3
+resyn
+resyn2
+resyn3
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+lsv_ntk2chain 1
+lsv_chain_reduce
+lsv_chain2ntk
+ps
+resyn
+resyn2
+resyn3
+ps
+
+write_aiger temp.aig
