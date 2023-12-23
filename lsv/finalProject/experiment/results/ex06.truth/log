@@ -809,3 +809,13 @@ Time =    11.48 sec
 subCircuit with size 5
 Time =    71.49 sec
 subCircuit with size 6
+Time =   106.12 sec
+subCircuit with size 1
+Time =     0.38 sec
+subCircuit with size 2
+Time =     0.50 sec
+subCircuit with size 3
+Time =     2.32 sec
+subCircuit with size 4
+Time =    36.33 sec
+subCircuit with size 5

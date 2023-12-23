@@ -750,3 +750,13 @@ Time =    17.95 sec
 subCircuit with size 6
 Time =    77.33 sec
 subCircuit with size 7
+Time =   108.22 sec
+subCircuit with size 1
+Time =     0.33 sec
+subCircuit with size 2
+Time =     1.53 sec
+subCircuit with size 3
+Time =     7.10 sec
+subCircuit with size 4
+Time =    35.82 sec
+subCircuit with size 5
