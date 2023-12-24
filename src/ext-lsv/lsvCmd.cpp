@@ -14,6 +14,7 @@ static int Lsv_CommandNtk2Chain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainTimeLimit(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintChain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandChainBadRootClear(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 
@@ -25,6 +26,7 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_time_limit", Lsv_CommandChainTimeLimit, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_chain", Lsv_CommandPrintChain, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_reduce", Lsv_CommandChainReduce, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_bad_root_clear", Lsv_CommandChainBadRootClear, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
 }
@@ -217,14 +219,28 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
     }
   }
   if (fSmart) {
-      while (booleanChain.reduce(6, -1) <= 0) {} // 5
+    size_t prevTimeLimit = booleanChain.getNTimeLimit();
+    int maxIteration = 3;
+    for (int i = 0; i < maxIteration; ++i) {
+      int result = booleanChain.reduce(6, reduceSize);
+      if (result > 0)
+        break;
+      if (result == -1) {
+        booleanChain.setNTimeLimit(booleanChain.getNTimeLimit() * 1.2);
+      }
+    }
+    for (int i = 0; i < maxIteration; ++i) {
+      if (booleanChain.reduce(5, reduceSize) > 0)
+        break;
+    }
+    booleanChain.setNTimeLimit(prevTimeLimit);
 
-      // if (booleanChain.reduce(5, 1) < 0)
-      //   booleanChain.reduce(5, 0);
-      // while (booleanChain.reduce(6, -1) < 0) {
-      //   cout << "Reduce ......." << endl;
-      // }
-      return;
+    // if (booleanChain.reduce(5, 1) < 0)
+    //   booleanChain.reduce(5, 0);
+    // while (booleanChain.reduce(6, -1) < 0) {
+    //   cout << "Reduce ......." << endl;
+    // }
+    return;
   }
   if (fDC) {
     int length = Abc_NtkObjNum(pNtk);
@@ -235,6 +251,10 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
       input[i] = false;
     }
     int root = getCone(pNtk, cone, input, 11, 3, booleanChain.badConeRoot);
+    if (root == -1) {
+      Abc_Print(-2, "Cannot find required cone\n");
+      return;
+    }
     booleanChain.badConeRoot.insert(root);
     for (int i = 0; i < length; ++i) {
       if (cone[i])
@@ -291,6 +311,11 @@ usage:
   Abc_Print(-2, "\t        reduce the boolean chain\n");
   Abc_Print(-2, "\t-h    : print the command usage\n");
   return 1;
+}
+
+int Lsv_CommandChainBadRootClear(Abc_Frame_t* pAbc, int argc, char** argv) {
+  booleanChain.badConeRoot.clear();
+  return 0;
 }
 
 void Lsv_Chain2Ntk(Abc_Ntk_t* pNtk) {

@@ -131,4 +131,5 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
       return Abc_ObjId(pNode); // return the root of the cone
     }
   }
+  return -1;
 }
