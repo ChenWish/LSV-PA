@@ -4,10 +4,10 @@
 
 #include <string>
 #include <bdd/cudd/cudd.h>
-#include <fstream>
-#include <vector>
-#include <map>
 #include <set>
+
+using namespace std;
+
 typedef struct coneobj 
 {
   int out_count=0;
@@ -59,6 +59,8 @@ int zerofanout(coneobj_t* cone,int node, bool* set, bool* input,int length){
   int i;
   int total=0;
   Abc_ObjForEachFanin(cone[node].node, pFanin, i){
+    if (Abc_ObjIsPi(pFanin))
+      continue;
     if(Abc_ObjFanoutNum(pFanin)==1 || forallfanout(&cone[Abc_ObjId(pFanin)], set)){
       set[Abc_ObjId(pFanin)]=true;
       //Abc_Print(-2, "node %d set in zerofanout\n", Abc_ObjId(pFanin));
@@ -71,8 +73,8 @@ int zerofanout(coneobj_t* cone,int node, bool* set, bool* input,int length){
   return total;
 }
 //set is a bool array to record the node is in the window
-int getCone(Abc_Ntk_t* pNtk, bool* set,bool* input, int sizeup,int sizedown){
-  if(Abc_NtkIsStrash(pNtk)==NULL){
+int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, const set<int>& badConeRoot) {
+  if (Abc_NtkIsStrash(pNtk) == NULL) {
     Abc_Print(-1, "The network is not Aig logic.\n");
   }
   int i;
@@ -84,46 +86,49 @@ int getCone(Abc_Ntk_t* pNtk, bool* set,bool* input, int sizeup,int sizedown){
   //  Abc_Print(-2, "CI: %s %d\n", Abc_ObjName(pCi),Abc_ObjId(pCi));
   //}
   Abc_Obj_t* pNode;
-  int length=Abc_NtkObjNum(pNtk);
-  if(input==NULL){
-    input=new bool[length];
+  int length = Abc_NtkObjNum(pNtk);
+  if (input == NULL) {
+    input = new bool[length];
   }
   coneobj_t* cone = new coneobj_t[length];
-  for(i=0;i<length;i++){
-    cone[i].node=Abc_NtkObj(pNtk, i);
+  for (i = 0; i < length; ++i) {
+    cone[i].node = Abc_NtkObj(pNtk, i);
   }
-  Abc_NtkForEachNode(pNtk, pNode, i){
-    memset(set, false, length);
+  Abc_NtkForEachNode(pNtk, pNode, i) {
+    if (badConeRoot.find(i) != badConeRoot.end()) {
+      continue;
+    }
+    memset(coneRet, false, length);
     memset(input, false, length);
-    for(int j=0;j<length;j++){
-      cone[j].out_count=0;
+    for (int j = 0; j < length; ++j) {
+      cone[j].out_count = 0;
     }
     //find all 
-    set[Abc_ObjId(pNode)]=true;
-    int res=zerofanout(cone ,i, set, input, length)+1;
-    if(res>sizedown){
-      int input_num=0;
-      for(int j=0;j<length;j++){
-        if(input[j])
+    coneRet[Abc_ObjId(pNode)] = true;
+    int res = zerofanout(cone ,i, coneRet, input, length) + 1;
+    if (res > sizedown) {
+      int input_num = 0;
+      for (int j = 0; j < length; ++j) {
+        if (input[j])
           input_num++;
       }
-      if(res>sizeup){
-        int count=0;
-        for(int j=0;j<length;j++){
-          if(set[j]){
+      if (res > sizeup) {
+        int count = 0;
+        for (int j = 0; j < length; ++j) {
+          if (coneRet[j]) {
             count++;
-            set[j]=false;
-            input[j]=false;
+            coneRet[j] = false;
+            input[j] = false;
             Abc_Obj_t* pFanin;
-            int k=0;
-            Abc_ObjForEachFanin(Abc_NtkObj(pNtk,j), pFanin, k){
-              input[Abc_ObjId(pFanin)]=false;
+            int k = 0;
+            Abc_ObjForEachFanin(Abc_NtkObj(pNtk,j), pFanin, k) {
+              input[Abc_ObjId(pFanin)] = false;
             }
           }
         }
       }
-      Abc_Print(-2, "XDC %d num %d input %d:\n", Abc_ObjId(pNode),res,input_num);
-      return 0;
+      Abc_Print(-2, "XDC %d num %d input %d:\n", Abc_ObjId(pNode), res, input_num);
+      return Abc_ObjId(pNode); // return the root of the cone
     }
   }
 }

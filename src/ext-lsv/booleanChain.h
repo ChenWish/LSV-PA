@@ -75,11 +75,14 @@ public:
     int reduce(const set<int>& subCircuit, const set<int>& constraint, int reduceSize = -1);
     void print(bool tt = true) const;
 
+    set<int> badConeRoot;
 
 private:
     int genCNF(vector<vector<Lit>>& cnf, const set<int>& constraintCut);
     void addGateCNF(const set<int>&TFO, vector<vector<Lit>>& cnf, int index);
     set<int> smartSelection(int circuitSize) const;
+    int selectRoot(set<int>& badRoot) const;
+    set<int> selectSubCircuit(int root, int subCircuitSize) const;
     int reduceInt(int nofNode, const vector<vector<Lit>>& cnf, int l, const set<int>& originSubCircuit);
     void replace(Solver& solver, const set<int>& originSubCircuit);
     void updateTopological();
@@ -96,8 +99,9 @@ private:
     set<int> subCircuitPiIndex;
     set<int> subCircuitPoIndex;
     size_t nTimeLimit;
+    
+    // for FFC & dc
     set<int> dc;
-    // vector<int> PoIndex;
 };
 #endif
 // BOOLEAN_CHAIN_H

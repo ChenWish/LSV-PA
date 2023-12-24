@@ -3,6 +3,11 @@ lsv_chain_time_limit 100
 lsv_chain_reduce
 lsv_chain2ntk
 ps
+dc2
+resyn
+resyn2
+resyn3
+dc2
 resyn
 resyn2
 resyn3

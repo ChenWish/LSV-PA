@@ -349,11 +349,13 @@ BooleanChain::genCNF(vector<vector<Lit>>& cnf, const set<int>& constraintCut) {
         q.pop();
         if (constraintCut.find(index) != constraintCut.end()) {
             careCut.insert(index);
-            // cout << "careCut: " << index << endl;
+            if (verbose >= 2)
+                cout << "careCut: " << index << endl;
         }
         else { // index is not in the constraintCut
             TFO.insert(index);
-            // cout << "TFO: " << index << endl;
+            if (verbose >= 2)
+                cout << "TFO: " << index << endl;
             for (set<int>::iterator it = chain[index].fanouts.begin(); it != chain[index].fanouts.end(); ++it) {
                 if (TFO.find(*it) == TFO.end())
                     q.push(*it);
@@ -399,76 +401,102 @@ set<int>
 BooleanChain::smartSelection(int circuitSize) const {
     set<int> badRoot;
     while (1) {
-        srand(time(NULL));
-        int root = 0;
-        while (chain[root].deleted || root <= piNum + poNum || badRoot.find(root) != badRoot.end()) {
-            root = rand() % chain.size();
-        }
-        set<int> subCircuit;
-        subCircuit.insert(root);
-        if (verbose >= 1)
-            cout << "SmartSelection: Root = " << root << endl;
-        while (1) {
-            int nextIndex = -1;
-            int nextAddInputNum = INT32_MAX;
-            int nextAddOutputNum = INT32_MAX;
-            for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
-                int fanin1 = Gate::getFaninId(chain[*it].fanin1);
-                int fanin2 = Gate::getFaninId(chain[*it].fanin2);
-                
-                int addInputNum;
-                int addOutputNum;
-                auto evalNode = [&] (int nodeIndex) {
-                    addInputNum = 0;
-                    addOutputNum = 0;
-                    for (set<int>::iterator it = chain[nodeIndex].fanouts.begin(); it != chain[nodeIndex].fanouts.end(); ++it) {
-                        if (subCircuit.find(*it) == subCircuit.end())
-                            addOutputNum ++;
-                    }
-                    if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin1)) == subCircuit.end())
-                        addInputNum ++;
-                    if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin2)) == subCircuit.end())
-                        addInputNum ++;
-                };
-
-                if (fanin1 > piNum + poNum && subCircuit.find(fanin1) == subCircuit.end()) {
-                    evalNode(fanin1);
-                    if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
-                        nextIndex = fanin1;
-                        nextAddInputNum = addInputNum;
-                        nextAddOutputNum = addOutputNum;
-                    }
-                }
-                if (fanin2 > piNum + poNum && subCircuit.find(fanin2) == subCircuit.end()) {
-                    evalNode(fanin2);
-                    if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
-                        nextIndex = fanin2;
-                        nextAddInputNum = addInputNum;
-                        nextAddOutputNum = addOutputNum;
-                    }
+        int root = selectRoot(badRoot);
+        set<int> subCircuit = selectSubCircuit(root, circuitSize);
+        int subCircuitPoNum = 0;
+        for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
+            for (set<int>::iterator it2 = chain[*it].fanouts.begin(); it2 != chain[*it].fanouts.end(); ++it2) {
+                if (subCircuit.find(*it2) == subCircuit.end()) {
+                    subCircuitPoNum++;
+                    break;
                 }
             }
-            // assert(nextIndex != -1);
-            if (nextIndex == -1)
-                break;
-            subCircuit.insert(nextIndex);
-            if (subCircuit.size() > circuitSize) {
-                break;
-            }
         }
-        if (subCircuit.size() >= 4) {
-            if (verbose >= 1) {
-                cout << "SmartSelection with subCircuit:";
-                for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it)
-                    cout << " " << *it;
-                cout << endl;
-            }
-            return subCircuit;
+        if (subCircuitPoNum >= subCircuit.size()-1) {
+            badRoot.insert(root);
+            continue;
         }
-        badRoot.insert(root);
+        if (subCircuit.size() < 4) {
+            badRoot.insert(root);
+            continue;
+        }
+        if (verbose >= 1) {
+            cout << "SmartSelection with subCircuit:";
+            for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it)
+                cout << " " << *it;
+            cout << ", with subCircuitPoNum = " << subCircuitPoNum << endl;
+        }
+        return subCircuit;
     }
     assert(0);
     return set<int>();
+}
+
+int 
+BooleanChain::selectRoot(set<int>& badRoot) const {
+    srand(time(NULL));
+    int root = 0;
+    while (chain[root].deleted || root <= piNum + poNum || badRoot.find(root) != badRoot.end()) {
+        root = rand() % chain.size();
+    }
+    if (verbose >= 1)
+        cout << "SmartSelection: Root = " << root << endl;
+    return root;
+}
+
+set<int>
+BooleanChain::selectSubCircuit(int root, int subCircuitSize) const {
+    set<int> subCircuit;
+    subCircuit.insert(root);
+    while (1) {
+        int nextIndex = -1;
+        int nextAddInputNum = INT32_MAX;
+        int nextAddOutputNum = INT32_MAX;
+        for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
+            int fanin1 = Gate::getFaninId(chain[*it].fanin1);
+            int fanin2 = Gate::getFaninId(chain[*it].fanin2);
+            
+            int addInputNum;
+            int addOutputNum;
+            auto evalNode = [&] (int nodeIndex) {
+                addInputNum = 0;
+                addOutputNum = 0;
+                for (set<int>::iterator it = chain[nodeIndex].fanouts.begin(); it != chain[nodeIndex].fanouts.end(); ++it) {
+                    if (subCircuit.find(*it) == subCircuit.end())
+                        addOutputNum ++;
+                }
+                if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin1)) == subCircuit.end())
+                    addInputNum ++;
+                if (subCircuit.find(Gate::getFaninId(chain[nodeIndex].fanin2)) == subCircuit.end())
+                    addInputNum ++;
+            };
+
+            if (fanin1 > piNum + poNum && subCircuit.find(fanin1) == subCircuit.end()) {
+                evalNode(fanin1);
+                if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
+                    nextIndex = fanin1;
+                    nextAddInputNum = addInputNum;
+                    nextAddOutputNum = addOutputNum;
+                }
+            }
+            if (fanin2 > piNum + poNum && subCircuit.find(fanin2) == subCircuit.end()) {
+                evalNode(fanin2);
+                if (addOutputNum < nextAddOutputNum || (addOutputNum == nextAddOutputNum && addInputNum < nextAddInputNum)) {
+                    nextIndex = fanin2;
+                    nextAddInputNum = addInputNum;
+                    nextAddOutputNum = addOutputNum;
+                }
+            }
+        }
+        // assert(nextIndex != -1);
+        if (nextIndex == -1)
+            break;
+        subCircuit.insert(nextIndex);
+        if (subCircuit.size() > subCircuitSize) {
+            break;
+        }
+    }
+    return subCircuit;
 }
 
 
@@ -1134,7 +1162,14 @@ BooleanChain::updateTopological() {
             }
         }
     }
+    set<int> newBadConeRoot;
+    for (set<int>::iterator it = badConeRoot.begin(); it != badConeRoot.end(); ++it) {
+        if (chain[*it].deleted)
+            continue;
+        newBadConeRoot.insert(old2new[*it]);
+    }
     chain = newChain;
+    badConeRoot = newBadConeRoot;
     return;
 
 /*

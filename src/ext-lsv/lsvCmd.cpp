@@ -5,6 +5,7 @@
 #include "sat/glucose2/AbcGlucose2.h"
 #include "sat/glucose2/SimpSolver.h"
 #include <iostream>
+#include <set>
 #include "lsvCone.h"
 using namespace std;
 
@@ -176,9 +177,31 @@ usage:
 }
 
 
-void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fSmart) {
+void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int reduceSize) {
   set<int> subCircuit;
   set<int> constraintCut;
+  // fAll, fDC, fSmart can at most 
+  int check = fAll + fDC + fSmart;
+  if (check > 1) {
+    cerr << "Error: fAll, fDC, fSmart can only select one" << endl;
+    return;
+  }
+  if (!fAll && !fDC && !fSmart) {
+    cout << "Enter subCircuit index: ";
+    int subIndex;
+    while (cin >> subIndex) {
+      if (subIndex == -1)
+        break;
+      subCircuit.insert(subIndex);
+    }
+    cout << "Enter constraintCut index: ";
+    int consttraintCutIndex;
+    while (cin >> consttraintCutIndex) {
+      if (consttraintCutIndex == -1)
+        break;
+      constraintCut.insert(consttraintCutIndex);
+    }
+  }
   if (fAll) {
     Abc_Obj_t* pObj;
     int i;
@@ -193,8 +216,7 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fSmart) {
       }
     }
   }
-  else {
-    if (fSmart) {
+  if (fSmart) {
       while (booleanChain.reduce(6, -1) <= 0) {} // 5
 
       // if (booleanChain.reduce(5, 1) < 0)
@@ -203,47 +225,50 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fSmart) {
       //   cout << "Reduce ......." << endl;
       // }
       return;
-    }
-    cout << "Enter subCircuit index: ";
-    int subIndex;
-    while (cin >> subIndex) {
-      if (subIndex == -1)
-        break;
-      subCircuit.insert(subIndex);
-    }
-
-    cout << "Enter constraintCut index: ";
-    int consttraintCutIndex;
-    while (cin >> consttraintCutIndex) {
-      if (consttraintCutIndex == -1)
-        break;
-      constraintCut.insert(consttraintCutIndex);
-    }
   }
-  int reduceSize;
-  printf("Enter reduce size: ");
-  scanf("%d", &reduceSize);
+  if (fDC) {
+    int length = Abc_NtkObjNum(pNtk);
+    bool* cone = new bool[length];
+    bool* input = new bool[length];
+    for (int i = 0; i < length; ++i) {
+      cone[i] = false;
+      input[i] = false;
+    }
+    int root = getCone(pNtk, cone, input, 11, 3, booleanChain.badConeRoot);
+    booleanChain.badConeRoot.insert(root);
+    for (int i = 0; i < length; ++i) {
+      if (cone[i])
+        subCircuit.insert(i);
+    }
+    delete[] cone;
+    delete[] input;
+    
+    Abc_Obj_t* pObjFanout;
+    int i;
+    Abc_ObjForEachFanout(Abc_NtkObj(pNtk, root), pObjFanout, i) {
+      constraintCut.insert(pObjFanout->Id);
+    }
+    // TODO: get DC and add DC
+  }
   booleanChain.reduce(subCircuit, constraintCut, reduceSize);
   // printf("exec time: %d\n", Abc_Clock() - t);
 }
 
 int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv) {
-  // bmcg2_sat_solver * s = bmcg2_sat_solver_start() ;
-
-
-  // sat_solver_setnvars(pSat, 100);
-  // int v = sat_solver_addvar(pSat);
-  // printf("%d\n", v);
-  // return 0;
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
   int fAll = 0;
-  int fSmart = 1;
+  int fDC = 0;
+  int fSmart = 0;
+  int reduceSize = -1;
   int c;
   Extra_UtilGetoptReset();
-  while ((c = Extra_UtilGetopt(argc, argv, "ash")) != EOF) {
+  while ((c = Extra_UtilGetopt(argc, argv, "adsh")) != EOF) {
     switch (c) {
       case 'a':
         fAll ^= 1;
+        break;
+      case 'd':
+        fDC ^= 1;
         break;
       case 's':
         fSmart ^= 1;
@@ -254,7 +279,11 @@ int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv) {
         goto usage;
     }
   }
-  Lsv_ChainReduce(pNtk, fAll, fSmart);
+  if (argc == 3) {
+    reduceSize = atoi(argv[2]);
+    cerr << "reduceSize: " << reduceSize << endl;
+  }
+  Lsv_ChainReduce(pNtk, fAll, fDC, fSmart, reduceSize);
   return 0;
 
 usage:
@@ -291,18 +320,18 @@ usage:
   Abc_Print(-2, "\t-h    : print the command usage\n");
   return 1;
 }
-static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv){
+static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
-  int length=Abc_NtkObjNum(pNtk);
-  bool* set=new bool[length];
-  bool* input=new bool[length];
-  for(int i=0;i<length;i++){
-    set[i]=false;
-    input[i]=false;
+  int length = Abc_NtkObjNum(pNtk);
+  bool* cone = new bool[length];
+  bool* input = new bool[length];
+  for (int i = 0; i < length; ++i) {
+    cone[i] = false;
+    input[i] = false;
   }
-  getCone(pNtk,set,input, 7, 3);
-  for(int i=0;i<length;i++){
-    if(set[i])
+  getCone(pNtk, cone, input, 7, 3, set<int>());
+  for (int i = 0; i < length; ++i){
+    if (cone[i])
       Abc_Print(-2, "node %d\n", i);
   }
   return 0;
