@@ -61,7 +61,7 @@ private:
 
 class BooleanChain {
 public:
-    BooleanChain() { piNum = 0; poNum = 0; verbose = 0; nTimeLimit = 0;}
+    BooleanChain() { piNum = 0; poNum = 0; verbose = 0; nTimeLimit = 0; coneUpperBound = 10; coneLowerBound = 5;}
     ~BooleanChain() {};
 
     void setVerbose(int v) { verbose = v; }
@@ -78,6 +78,9 @@ public:
     void print(bool tt = true) const;
 
     set<int> badConeRoot;
+    int coneUpperBound;
+    int coneLowerBound;
+    
 
 private:
     int genCNF(vector<vector<Lit>>& cnf, const set<int>& constraintCut);

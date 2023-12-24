@@ -93,7 +93,8 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
   coneobj_t* cone = new coneobj_t[length];
   for (i = 0; i < length; ++i) {
     cone[i].node = Abc_NtkObj(pNtk, i);
-  }
+  } 
+
   Abc_NtkForEachNode(pNtk, pNode, i) {
     if (badConeRoot.find(i) != badConeRoot.end()) {
       continue;

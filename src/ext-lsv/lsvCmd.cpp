@@ -8,16 +8,18 @@
 #include <set>
 #include "lsvCone.h"
 using namespace std;
-
+static int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintNodes(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandNtk2Chain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainTimeLimit(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintChain(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainReduce(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChainBadRootClear(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandChainDCClear(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandChainDCBound(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
-
+extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
 static BooleanChain booleanChain;
 
 void init(Abc_Frame_t* pAbc) {
@@ -27,8 +29,11 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_chain", Lsv_CommandPrintChain, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_reduce", Lsv_CommandChainReduce, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_bad_root_clear", Lsv_CommandChainBadRootClear, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_dc_clear", Lsv_CommandChainDCClear, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_chain_dc_bound", Lsv_CommandChainDCBound, 0);
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -250,7 +255,7 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
       cone[i] = false;
       input[i] = false;
     }
-    int root = getCone(pNtk, cone, input, 11, 3, booleanChain.badConeRoot);
+    int root = getCone(pNtk, cone, input, booleanChain.coneUpperBound, booleanChain.coneLowerBound, booleanChain.badConeRoot);
     if (root == -1) {
       Abc_Print(-2, "Cannot find required cone\n");
       return;
@@ -269,6 +274,13 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
       constraintCut.insert(pObjFanout->Id);
     }
     // TODO: get DC and add DC
+    Abc_Ntk_t* pNtkTemp;
+    int mintermCount = Boolean_Chain_Insertion(pNtkTemp, pNtk, Abc_NtkObj(pNtk, root), false, booleanChain);
+    cout << "mintermCount: " << mintermCount << endl;
+    if (mintermCount == 0) {
+      cerr << "minterm = 0" << endl;
+      return;
+    }
   }
   booleanChain.reduce(subCircuit, constraintCut, reduceSize);
   // printf("exec time: %d\n", Abc_Clock() - t);
@@ -318,11 +330,25 @@ int Lsv_CommandChainBadRootClear(Abc_Frame_t* pAbc, int argc, char** argv) {
   return 0;
 }
 
+int Lsv_CommandChainDCClear(Abc_Frame_t* pAbc, int argc, char** argv) {
+  booleanChain.clearDC();
+  return 0;
+}
+
 void Lsv_Chain2Ntk(Abc_Ntk_t* pNtk) {
   Abc_Ntk_t* pNtkNew = booleanChain.Chain2Ntk(pNtk);
   Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtkNew);
   // Abc_FrameClearVerifStatus( Abc_FrameReadGlobalFrame() );
 }
+int Lsv_CommandChainDCBound(Abc_Frame_t* pAbc, int argc, char** argv) {
+  if (argc != 3) {
+    Abc_Print(-1, "Usage: lsv_chain_dc_bound <upperBound> <lowerBound>\n");
+    return 1;
+  }
+  booleanChain.coneUpperBound = atoi(argv[1]);
+  booleanChain.coneLowerBound = atoi(argv[2]);
+}
+
 
 int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
@@ -359,5 +385,25 @@ static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
     if (cone[i])
       Abc_Print(-2, "node %d\n", i);
   }
+  return 0;
+}
+int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
+  if(argc!=2){
+    Abc_Print(-1, "Usage: xtest <target>\n");
+    return 1;
+  }
+  int target=atoi(argv[1]);
+  Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
+  Abc_Print(-2, "ntk type: %d\n",pNtk->ntkType);
+  if(Abc_NtkIsStrash(pNtk)==NULL){
+    Abc_Print(-1, "The network is not Aig logic.\n");
+  }
+  int i;
+  Abc_Obj_t* pNode;
+  BooleanChain bc;
+
+  Abc_Ntk_t* newntk;
+  int cubecnt=Boolean_Chain_Insertion(newntk, pNtk, Abc_NtkObj(pNtk, target),false, bc);
+  Abc_Print(-2, "cube count: %d\n", cubecnt);
   return 0;
 }
