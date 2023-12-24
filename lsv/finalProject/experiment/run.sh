@@ -18,13 +18,11 @@ LOGFILE=$DIR/log
 INPUT_FILE=$BENCHMARK_DIR/$1
 
 echo "read_truth -xf " $INPUT_FILE > $DOFILE
-echo "collapse" >> $DOFILE
-echo "sop" >> $DOFILE
 echo "strash" >> $DOFILE
+echo "ps" >> $DOFILE
 
-for i in {0..10}
+for i in {0..5}
 do
-    echo "dc2" >> $DOFILE
     echo "resyn" >> $DOFILE
     echo "resyn2" >> $DOFILE
     echo "resyn3" >> $DOFILE

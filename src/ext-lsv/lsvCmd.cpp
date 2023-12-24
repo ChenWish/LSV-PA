@@ -6,7 +6,14 @@
 #include "sat/glucose2/SimpSolver.h"
 #include <iostream>
 #include <set>
+#include <map>
 #include "lsvCone.h"
+
+#include "sat/cnf/cnf.h"
+extern "C"{
+    Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
+}
+
 using namespace std;
 
 static int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv);
@@ -21,6 +28,8 @@ static int Lsv_CommandChainDCBound(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
+static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
+
 static BooleanChain booleanChain;
 
 void init(Abc_Frame_t* pAbc) {
@@ -35,6 +44,7 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -407,5 +417,189 @@ int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Ntk_t* newntk;
   int cubecnt=Boolean_Chain_Insertion(newntk, pNtk, Abc_NtkObj(pNtk, target),false, bc);
   Abc_Print(-2, "cube count: %d\n", cubecnt);
+  return 0;
+}
+
+static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
+  // cout << "id = " << id << ", saValue = " << saValue << ", undetectable = " << undetectable << endl;
+  map<int, int> id2Var;
+  map<int, int> id2VarSA;
+  sat_solver* pSat = sat_solver_new();
+  Abc_Obj_t* pObj;
+  int i;
+  Abc_NtkForEachPi(pNtk, pObj, i) {
+    id2Var[pObj->Id] = sat_solver_addvar(pSat);
+    id2VarSA[pObj->Id] = id2Var[pObj->Id];
+  }
+  Abc_NtkForEachNode(pNtk, pObj, i) {
+    // cerr << "NodeID = " << pObj->Id << endl;
+    id2Var[pObj->Id] = sat_solver_addvar(pSat);
+    id2VarSA[pObj->Id] = sat_solver_addvar(pSat);
+    int fanin0 = Abc_ObjFanin0(pObj)->Id;
+    int fanin1 = Abc_ObjFanin1(pObj)->Id;
+    int c0 = Abc_ObjFaninC0(pObj);
+    int c1 = Abc_ObjFaninC1(pObj);
+    // cerr << "Fanin0 = " << Abc_ObjFanin0(pObj)->Id << ", C0 = " << c0 << endl;
+    // cerr << "Fanin1 = " << Abc_ObjFanin1(pObj)->Id << ", C1 = " << c1 << endl;
+    // cerr << endl;
+    sat_solver_add_and(pSat, id2Var[pObj->Id], id2Var[fanin0], id2Var[fanin1], c0, c1, 0);
+    if (pObj->Id != id)
+      sat_solver_add_and(pSat, id2VarSA[pObj->Id], id2VarSA[fanin0], id2VarSA[fanin1], c0, c1, 0);
+  }
+  int* miterVar = new int[Abc_NtkPoNum(pNtk)];
+  lit* clause = new lit[Abc_NtkPoNum(pNtk)];
+  Abc_NtkForEachPo(pNtk, pObj, i) {
+    int var = id2Var[Abc_ObjFanin0(pObj)->Id];
+    int varSA = id2VarSA[Abc_ObjFanin0(pObj)->Id];
+    miterVar[i] = sat_solver_addvar(pSat);
+    sat_solver_add_xor(pSat, miterVar[i], var, varSA, !undetectable);
+    clause[i] = toLitCond(miterVar[i], 0);
+    // assert(id2Var.find(Abc_ObjFanin0(pObj)->Id) != id2Var.end());
+    // assert(id2VarSA.find(Abc_ObjFanin0(pObj)->Id) != id2VarSA.end());
+    // cerr << "Fanin0 = " << Abc_ObjFanin0(pObj)->Id << endl;
+  }
+  sat_solver_addclause(pSat, clause, clause + Abc_NtkPoNum(pNtk));
+  delete[] miterVar;
+  delete[] clause;
+  clause = new lit[Abc_NtkPiNum(pNtk)];
+  int index = 0;
+  clause[index++] = toLitCond(id2VarSA[id], saValue == 0);
+  if (!undetectable) {
+    int value;
+    cout << "Enter PI assignment(index start from 1): ";
+    while (cin >> value) {
+      if (value == 0)
+        break;
+      if (index == Abc_NtkPiNum(pNtk) + 1) {
+        cerr << "Error: index out of bound" << endl;
+        break;
+      }
+      clause[index++] = toLitCond(id2Var[abs(value)], value < 0);
+    }
+  }
+
+  int result = (1 == sat_solver_solve(pSat, clause, clause + index, 0, 0, 0, 0)); // l_True = 1 in MiniSat
+  cerr << "Result = " << result << endl;
+  if (!result) {
+    cout << "The result is UNSAT" << endl;
+  }
+  else {
+    cout << "The result is SAT, you fuck up" << endl;
+    cout << "--------- CEX ---------" << endl;
+    Abc_NtkForEachPi(pNtk, pObj, i) {
+      int var = id2Var[pObj->Id];
+      cout << sat_solver_var_value(pSat, var);
+    }
+    cout << endl;
+    cout << "--------- CEX END ---------" << endl;
+  }
+  delete[] clause;
+  sat_solver_delete(pSat);
+  return 0;
+}
+static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
+  Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
+  Abc_Ntk_t* pNtkSA = Abc_NtkDup(pNtk);
+  if (argc != 4) {
+    Abc_Print(-2, "usage: test2 <node> <sa(1/0)> <undetectable(1/0)>\n");
+    Abc_NtkDelete(pNtkSA);
+    return 0;
+  }
+  int id = atoi(argv[1]);
+  int saValue = atoi(argv[2]);
+  int undetectable = atoi(argv[3]);
+  if (id <= Abc_NtkPiNum(pNtk) + Abc_NtkPoNum(pNtk) || id > Abc_NtkObjNum(pNtk)) {
+    Abc_Print(-2, "Error: id is out of bound\n");
+    Abc_NtkDelete(pNtkSA);
+    return 0;
+  }
+  Abc_NtkDelete(pNtkSA);
+  return stupid(pNtk, id, saValue, undetectable);
+  Abc_Obj_t* pTarget = Abc_NtkObj(pNtkSA, id);
+  Abc_Obj_t* pFanout;
+  // cerr << pTarget->Type << endl;
+  int i;
+  Abc_ObjForEachFanout(pTarget, pFanout, i) {
+    Abc_ObjDeleteFanin(pFanout, pTarget);
+    Abc_ObjAddFanin(pFanout, Abc_ObjNotCond(Abc_AigConst1(pNtkSA), saValue == 0));
+  }
+  // cerr << pTarget->Type << endl;
+
+  Abc_NtkDeleteObj(pTarget);
+  Abc_Ntk_t* pNtkTemp = pNtkSA;
+  pNtkSA = Abc_NtkStrash(pNtkTemp, 1, 1, 0); // fAllNodes, fCleanup, fRecord
+  Abc_NtkDelete(pNtkTemp);
+  int temp = Abc_AigCleanup( (Abc_Aig_t *)pNtkSA->pManFunc ); // ???
+// cerr << temp << endl;
+  // Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtkSA);
+  // return 0;
+  Aig_Man_t* pMan = Abc_NtkToDar(pNtk, 0, 0); // 0 -> fExors, 0 -> fRegisters
+  Cnf_Dat_t* pCnf = Cnf_Derive(pMan, Aig_ManCoNum(pMan));
+// cerr << "pNtk to Cnf done" << endl; 
+
+  Aig_Man_t* pManSA = Abc_NtkToDar(pNtkSA, 0, 0); // 0 -> fExors, 0 -> fRegisters
+  Cnf_Dat_t* pCnfSA = Cnf_Derive(pManSA, Aig_ManCoNum(pManSA));
+// cerr << "pNtkSA to Cnf done" << endl; 
+
+  int liftNum = Aig_ManObjNum(pMan);
+  Cnf_DataLift(pCnfSA, liftNum);
+
+  sat_solver* pSat = sat_solver_new();
+  pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnf, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
+  pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnfSA, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
+
+  assert(Abc_NtkPiNum(pNtk) == Abc_NtkPiNum(pNtkSA));
+  assert(Abc_NtkPoNum(pNtk) == Abc_NtkPoNum(pNtkSA));
+  Abc_Obj_t* pObj;
+  Abc_NtkForEachPi(pNtk, pObj, i) {
+    lit clause[2];
+    // (a + ~b)(~a + b)
+    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 0); // Pi in pNtk
+    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 1); // Pi in pNtkSA
+    sat_solver_addclause(pSat, clause, clause + 2);
+    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 1); // Pi in pNtk
+    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 0); // Pi in pNtkSA
+    sat_solver_addclause(pSat, clause, clause + 2);
+  }
+
+  Abc_NtkForEachPo(pNtk, pObj, i) {
+    lit clause[2];
+    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , !undetectable); // Po in pNtk
+    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 1);     // Po in pNtkSA
+    sat_solver_addclause(pSat, clause, clause + 2);
+    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , undetectable);  // Po in pNtk
+    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 0);     // Po in pNtkSA
+    sat_solver_addclause(pSat, clause, clause + 2);
+  }
+  lit* clause = new lit[Abc_NtkPiNum(pNtk)];
+  int index = 0;
+  if (undetectable) {
+    int value;
+    cout << "Enter PI assignment(index start from 1): ";
+    while (cin >> value) {
+      if (value == 0)
+        break;
+      if (index == Abc_NtkPiNum(pNtk)) {
+        cerr << "Error: index out of bound" << endl;
+        break;
+      }
+      clause[index++] = toLitCond(pCnf->pVarNums[abs(value)], value < 0);
+    }
+  }
+  bool result = (1 == sat_solver_solve(pSat, clause, clause + index, 0, 0, 0, 0)); // l_True = 1 in MiniSat
+  if (!result) {
+    cout << "The result is UNSAT" << endl;
+  }
+  else {
+    cout << "The result is SAT, you fuck up" << endl;
+    cout << "--------- CEX ---------" << endl;
+    Abc_NtkForEachPi(pNtk, pObj, i) {
+      int var = pCnf->pVarNums[pObj->Id];
+      cout << sat_solver_var_value(pSat, var);
+    }
+    cout << endl;
+    cout << "--------- CEX END ---------" << endl;
+  }
+  delete[] clause;
   return 0;
 }
