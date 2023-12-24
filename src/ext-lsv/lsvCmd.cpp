@@ -8,6 +8,7 @@
 #include <set>
 #include "lsvCone.h"
 using namespace std;
+
 static int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintNodes(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandNtk2Chain(Abc_Frame_t* pAbc, int argc, char** argv);
@@ -380,7 +381,8 @@ static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
     cone[i] = false;
     input[i] = false;
   }
-  getCone(pNtk, cone, input, 7, 3, set<int>());
+  set<int> badCone;
+  getCone(pNtk, cone, input, 7, 3, badCone);
   for (int i = 0; i < length; ++i){
     if (cone[i])
       Abc_Print(-2, "node %d\n", i);
