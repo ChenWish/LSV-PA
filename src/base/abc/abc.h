@@ -230,6 +230,8 @@ struct Abc_Des_t_
 ////////////////////////////////////////////////////////////////////////
 ///                      MACRO DEFINITIONS                           ///
 ////////////////////////////////////////////////////////////////////////
+// my method
+static inline int myAbc_ObjId(Abc_Obj_t* pObj){return pObj->Id - 1; }
 
 // transforming floats into ints and back
 static inline unsigned    Abc_InfoRandomWord()                       { return ((((unsigned)rand()) << 24) ^ (((unsigned)rand()) << 12) ^ ((unsigned)rand())); } // #define RAND_MAX 0x7fff

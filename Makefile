@@ -79,6 +79,14 @@ endif
 ABC_READLINE_INCLUDES ?=
 ABC_READLINE_LIBRARIES ?= -lreadline
 
+# LSVLDFLAGS ?= /lib/lsv-ext
+# LSVMODE ?= atpgDBG
+# LSVIDFLAGS ?= include/lsv_ext
+# LSVCLIBS     = $(wildcard $(LSVLDFLAGS)/$(LSVMODE)/*.a)
+# LSVBASECLIBS = $(notdir $(LSVCLIBS))
+# LSVLIFLAGS ?= /lib/lsv-ext/libcore.a
+# LSVLIBS ?= core
+# LSVLIBS = /lib/lsv-ext/libcore.a
 # whether to use libreadline
 ifndef ABC_USE_NO_READLINE
   CFLAGS += -DABC_USE_READLINE $(ABC_READLINE_INCLUDES)
@@ -214,7 +222,7 @@ tags:
 
 $(PROG): $(OBJ)
 	@echo "$(MSG_PREFIX)\`\` Building binary:" $(notdir $@)
-	$(VERBOSE)$(LD) -o $@ $^ $(LDFLAGS) $(LIBS)
+	$(VERBOSE)$(LD) -o $@ $^ $(LDFLAGS) $(LIBS) 
 
 lib$(PROG).a: $(LIBOBJ)
 	@echo "$(MSG_PREFIX)\`\` Linking:" $(notdir $@)

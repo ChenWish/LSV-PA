@@ -2,8 +2,10 @@
 #include "base/main/main.h"
 #include "base/main/mainInt.h"
 #include "booleanChain.h"
+#include "atpgMgr.h"
 #include "sat/glucose2/AbcGlucose2.h"
 #include "sat/glucose2/SimpSolver.h"
+#include "atpgPKG/atpg.h"
 #include <iostream>
 #include <set>
 #include <map>
@@ -29,8 +31,17 @@ static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv);
+// static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
+static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable);
 
 static BooleanChain booleanChain;
+static AtpgMgr atpgmgr;
+
+extern "C"{
+    Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
+}
 
 void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_print_nodes", Lsv_CommandPrintNodes, 0);
@@ -46,6 +57,9 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
+  Cmd_CommandAdd(pAbc, "LSV", "z", Lsv_CommandConst1Searching, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "x", Lsv_CommandMyTest, 0);
+  // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -99,8 +113,125 @@ usage:
   return 1;
 }
 
+int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
+  Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
+    if(!Abc_NtkIsStrash(pNtk)){
+      printf("this command can only be called after strashed.\n");
+      return 0;
+    }
+  atpgmgr.init(pNtk);
+  cout << "numPI_ = " << atpgmgr.pCir->numPI_ << endl;                // Number of PIs.
+  cout << "numPPI_ = " << atpgmgr.pCir->numPPI_ << endl;                // Number of PIs.
+  cout << "numPO_ = " << atpgmgr.pCir->numPO_ << endl;                // Number of PIs.
+  cout << "numComb_ = " << atpgmgr.pCir->numComb_ << endl;                // Number of PIs.
+  cout << "numGate_ = " << atpgmgr.pCir->numGate_ << endl;                // Number of PIs.
+  cout << "numNet_ = " << atpgmgr.pCir->numNet_ << endl;                // Number of PIs.
+  cout << "circuitLvl_ = " << atpgmgr.pCir->circuitLvl_ << endl;                // Number of PIs.
+  cout << "numFrame_ = " << atpgmgr.pCir->numFrame_ << endl;                // Number of PIs.
+  cout << "totalGate_ = " << atpgmgr.pCir->totalGate_ << endl;                // Number of PIs.
+  cout << "totalLvl_ = " << atpgmgr.pCir->totalLvl_ << endl;                // Number of PIs.
+  Abc_Obj_t* pNode;
+  int i;
+  int count = 0;
+  Abc_NtkForEachNode(pNtk, pNode, i){
+    cout <<pNode->Id << " stuck at 0" << endl;
+    int res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    
+    // assert(stupid(pNtk,pNode->Id, 0, 1) == res);
+    // if(stupid(pNtk,pNode->Id, 0, 1) != res)
+      // count++;
+  }
+
+  // cout << i << ' ' << count;
+  // atpgmgr.runSingleSAF(52, Fault::SA1); // run single stuck at fault
+
+  // Abc_Obj_t *pPo;
+  //   int i;
+  //   Abc_NtkForEachPo(pNtk, pPo, i){
+  //       std::cout << pPo->fCompl0 << std::endl;
+  //   }
+  // atpgmgr.myselftest(pNtk);
+  return 0;
+} 
 
 
+int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
+  Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
+  if(!Abc_NtkIsStrash(pNtk)){
+    printf("this command can only be called after strashed.\n");
+    return 0;
+    }
+  Abc_Obj_t* pNode;
+  // Abc_NtkForEachNode(pNtk, pNode, i){
+  for(int i = 1, n = Abc_NtkObjNum(pNtk); i < n; ++i){
+    std::cout <<"n = " << n << endl;
+    pNode = Abc_NtkObj(pNtk, i);
+    if(Abc_ObjType(pNode) != ABC_OBJ_NODE)
+      continue;
+    // cout <<pNode->Id << "stuck at 0" << endl;
+    // int res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    // assert(stupid(pNtk,pNode->Id, 0, 1) == res);
+    int res = 0;
+    res = stupid(pNtk,pNode->Id, 1, 1);
+    // atpgmgr.init(pNtk);
+    // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    assert(res!= -1);
+    cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
+    cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
+    cout << "res = " << res << endl;
+    if( res == 0) // if return 0 --> undectable
+    {
+      cout << '\a';
+      // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
+      // pNode = Abc_NtkObj(pNtkNew, i);
+      Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, pNode, Abc_AigConst1(pNtk), 0 );
+      // Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_AigConst1(pNtkNew), 0 );
+      // Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
+      Abc_NtkReassignIds( pNtk );
+
+      // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+      cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
+      cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
+      // Abc_NtkDelete(pNtk);
+      // pNtk = Abc_NtkDup( pNtkNew );
+      // Abc_NtkDelete(pNtkNew);
+      return 1;
+    }
+    res = -1;
+    res = stupid(pNtk,pNode->Id, 0, 1);
+    // atpgmgr.init(pNtk);
+    // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    assert(res != -1);
+    cout << "res = " << res << endl;
+    if( res == 0) // if return 0 --> undectable
+    {
+      cout << '\a';
+      // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
+      // pNode = Abc_NtkObj(pNtkNew, i);
+      Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, pNode, Abc_ObjNot(Abc_AigConst1(pNtk)), 0 );
+      // Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_ObjNot(Abc_AigConst1(pNtkNew)), 0 );
+      // Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
+      Abc_NtkReassignIds( pNtk );
+
+      // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+      cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
+      cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
+      // Abc_NtkDelete(pNtk);
+      // pNtk = Abc_NtkDup( pNtkNew );
+      // Abc_NtkDelete(pNtkNew);
+      // Abc_NtkStrash(pNtk);
+      return 1;
+
+      // Abc_AigReplace((Abc_Aig_t *)pNode->pNtk->pManFunc, pNode,Abc_ObjNot(Abc_AigConst1(pNtk)), 0 );
+      // Abc_AigCleanup((Abc_Aig_t *)pNtk->pManFunc);
+      // Abc_NtkReassignIds( pNtk );
+
+      // Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtk);
+      // return 1;
+    }
+  }
+  return 0;
+}
 
 void Lsv_Ntk2Chain(Abc_Ntk_t* pNtk) {
   if (!Abc_NtkIsStrash(pNtk)) {
@@ -387,6 +518,8 @@ usage:
   Abc_Print(-2, "\t-h    : print the command usage\n");
   return 1;
 }
+
+
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
   int length = Abc_NtkObjNum(pNtk);
@@ -424,8 +557,7 @@ int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Print(-2, "cube count: %d\n", cubecnt);
   return 0;
 }
-
-static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
+int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
   // cout << "id = " << id << ", saValue = " << saValue << ", undetectable = " << undetectable << endl;
   map<int, int> id2Var;
   map<int, int> id2VarSA;
@@ -500,8 +632,11 @@ static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
   }
   delete[] clause;
   sat_solver_delete(pSat);
-  return 0;
+  return result;
+
+  // return 0;
 }
+// test2 id sa? 1
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
   Abc_Ntk_t* pNtkSA = Abc_NtkDup(pNtk);
