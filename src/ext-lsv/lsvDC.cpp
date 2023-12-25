@@ -109,16 +109,16 @@ int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNod
   CUDD_VALUE_TYPE value;
   int count=0;
   Cudd_ForeachCube(dd, dccheck, gen,cube,value ){
-    Abc_Print(-2, "cube: ");
-    for(int j=0;j<dd->size;j++){
-      if(cube[j]==0)
-        Abc_Print(-2, "!%d ", j);
-      else if(cube[j]==1)
-        Abc_Print(-2, "%d ", j);
-    }
-    Abc_Print(-2, "\n");
+    // Abc_Print(-2, "cube: ");
+    // for(int j=0;j<dd->size;j++){
+    //   if(cube[j]==0)
+    //     Abc_Print(-2, "!%d ", j);
+    //   else if(cube[j]==1)
+    //     Abc_Print(-2, "%d ", j);
+    // }
+    // Abc_Print(-2, "\n");
     count+=DCIntGen(cube, bc,dd->size-1);
-    Abc_Print(-2,"%d\n",DCIntGen(cube, bc,dd->size-1));
+    // Abc_Print(-2,"%d\n",DCIntGen(cube, bc,dd->size-1));
   }
   Cudd_RecursiveDeref(dd, dccheck);
 

@@ -402,7 +402,7 @@ BooleanChain::smartSelection(int circuitSize) const {
     set<int> badRoot;
     while (1) {
         int root = selectRoot(badRoot);
-        set<int> subCircuit = selectSubCircuit(root, circuitSize);
+        set<int> subCircuit = selectSubCircuit(root, coneUpperBound);
         int subCircuitPoNum = 0;
         for (set<int>::iterator it = subCircuit.begin(); it != subCircuit.end(); ++it) {
             for (set<int>::iterator it2 = chain[*it].fanouts.begin(); it2 != chain[*it].fanouts.end(); ++it2) {
@@ -434,7 +434,6 @@ BooleanChain::smartSelection(int circuitSize) const {
 
 int 
 BooleanChain::selectRoot(set<int>& badRoot) const {
-    srand(time(NULL));
     int root = 0;
     while (chain[root].deleted || root <= piNum + poNum || badRoot.find(root) != badRoot.end()) {
         root = rand() % chain.size();

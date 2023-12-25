@@ -1,0 +1,40 @@
+"lsv_ntk2chain"
+"lsv_chain_time_limit"
+"lsv_print_chain"
+"lsv_chain_reduce"
+"lsv_chain_bad_root_clear"
+"lsv_chain_dc_clear"
+"lsv_chain_dc_bound"
+"lsv_chain2ntk"
+
+lsv_chain_time_limit 100
+lsv_chain_dc_bound 10 4
+lsv_chain_bad_root_clear
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+
+
+lsv_chain_time_limit 100
+lsv_chain_dc_bound 6 4
+lsv_chain_bad_root_clear
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -s
+lsv_chain2ntk
+
+
+

@@ -13,14 +13,17 @@ then
     exit
 fi
 
-mkdir results/$1
-DIR=$(pwd)/results/$1
+mkdir results/Collapse_$1
+DIR=$(pwd)/results/Collapse_$1
 DOFILE=$DIR/dofile
 LOGFILE=$DIR/log
 INPUT_FILE=$BENCHMARK_DIR/$1
 
 echo "read_truth -xf " $INPUT_FILE > $DOFILE
+echo "collapse" >> $DOFILE
+echo "sop" >> $DOFILE
 echo "strash" >> $DOFILE
+echo "dc2" >> $DOFILE
 echo "ps" >> $DOFILE
 
 for i in {0..5}

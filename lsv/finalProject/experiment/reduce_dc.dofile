@@ -1,0 +1,25 @@
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+ps
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+ps
+
+lsv_ntk2chain
+lsv_chain_dc_clear
+lsv_chain_reduce -d
+lsv_chain2ntk
+ps
+
+resyn
+resyn2
+resyn3
+resyn
+resyn2
+resyn3
+ps

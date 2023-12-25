@@ -6,6 +6,8 @@
 #include <bdd/cudd/cudd.h>
 #include <set>
 
+#define RATIO 8
+
 using namespace std;
 
 typedef struct coneobj 
@@ -146,12 +148,13 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
         }
       }
 
-      if(input_num <= input_min || res >= conemax) {
+      if(input_num <= input_min && res >= conemax && ((rand() % RATIO) != 0)) {
         input_min = input_num;
         conemax = res;
         conemaxid = i;
         memcpy(coneRet, coneset, sizeof(bool) * length);
       }
+/*
       Abc_Print(-2, "Cone %d num %d\n", Abc_ObjId(pNode), res);
       for(int i=0;i<length;i++){
         if(coneset[i]){
@@ -166,6 +169,7 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
         }
       }
       Abc_Print(-2, "\n");
+*/
     }else{
       badConeRoot.insert(i);
     }

@@ -45,6 +45,7 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
+  srand(5487);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -240,7 +241,7 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
     for (int i = 0; i < maxIteration; ++i) {
       int result = booleanChain.reduce(6, reduceSize);
       if (result > 0)
-        break;
+        return;
       if (result == -1) {
         booleanChain.setNTimeLimit(booleanChain.getNTimeLimit() * 1.2);
       }
@@ -272,10 +273,14 @@ void Lsv_ChainReduce(Abc_Ntk_t* pNtk, bool fAll, bool fDC, bool fSmart, int redu
       return;
     }
     booleanChain.badConeRoot.insert(root);
+    cout << "Cone Root = " << root << ",";
     for (int i = 0; i < length; ++i) {
-      if (cone[i])
+      if (cone[i]) {
         subCircuit.insert(i);
+        cout << " " << i;
+      }
     }
+    cout << endl;
     delete[] cone;
     delete[] input;
     
