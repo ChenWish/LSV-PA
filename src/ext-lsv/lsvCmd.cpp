@@ -15,7 +15,7 @@ extern "C"{
 }
 
 using namespace std;
-
+static int resub_test(Abc_Frame_t* pAbc, int argc, char** argv);
 static int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandPrintNodes(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandNtk2Chain(Abc_Frame_t* pAbc, int argc, char** argv);
@@ -28,6 +28,7 @@ static int Lsv_CommandChainDCBound(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
+extern int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int nodeid,bool needntk);
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 
 static BooleanChain booleanChain;
@@ -45,7 +46,11 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
+<<<<<<< HEAD
   srand(5487);
+=======
+  Cmd_CommandAdd(pAbc, "LSV", "rtest", resub_test, 0);
+>>>>>>> b4779e84 (doing img)
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
@@ -607,4 +612,14 @@ static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   }
   delete[] clause;
   return 0;
+}
+int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
+  if(argc!=2){
+    Abc_Print(-1, "rtest <nodeID>\n");
+    return 0;
+  }
+  int nodeid=atoi(argv[1]);
+  Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
+  Abc_Ntk_t* pNewNtk;
+  Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false);
 }
