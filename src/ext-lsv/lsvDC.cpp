@@ -312,19 +312,6 @@ DdNode* Build_ImageBdd(Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,int* roots
   DdNode** hon=new DdNode*[Abc_NtkCoNum(pNtk)];
   DdNode** hoff=new DdNode*[Abc_NtkCoNum(pNtk)];
   Abc_NtkForEachCo(pNtk, pCo, i){
-    DdNode* ddnode1=Cudd_Cofactor(dd, (DdNode *)Abc_ObjGlobalBdd(pCo), (DdNode *)yBdd);
-    Cudd_Ref(ddnode1);
-    DdNode* ddnode2=Cudd_Cofactor(dd, (DdNode *)Abc_ObjGlobalBdd(pCo), Cudd_Not((DdNode *)yBdd));
-    Cudd_Ref(ddnode2);
-    DdNode* dcnode=Cudd_bddXnor(dd, ddnode1, ddnode2);
-    Cudd_Ref(dcnode);
-    Cudd_RecursiveDeref(dd, ddnode1);
-    Cudd_RecursiveDeref(dd, ddnode2);
-    DdNode* temp=Cudd_bddAnd(dd, DC, dcnode);
-    Cudd_Ref(temp);
-    Cudd_RecursiveDeref(dd, DC);
-    Cudd_RecursiveDeref(dd, dcnode);
-    DC=temp;
   }
 }
 
