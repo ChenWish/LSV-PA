@@ -1,0 +1,19 @@
+# Benchmark "ex" written by ABC on Tue Dec 26 18:15:13 2023
+.model ex
+.inputs a b c
+.outputs F0 F1
+.names a b new_n6
+10 1
+.names b c new_n7
+10 1
+.names a new_n7 new_n8
+01 1
+.names new_n6 new_n8 F0
+00 0
+.names b c new_n10
+11 1
+.names b c new_n11
+00 1
+.names new_n10 new_n11 F1
+00 0
+.end

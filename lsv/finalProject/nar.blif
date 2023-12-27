@@ -1,0 +1,13 @@
+.model nar
+.inputs a b c d
+.outputs X Y
+.names b d v1
+11 1
+.names b c v2
+10 1
+.names c d v3
+01 1
+.names a v1 X
+10 1
+.names v2 v3 Y
+11 1

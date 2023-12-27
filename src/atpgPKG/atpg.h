@@ -30,6 +30,7 @@ namespace CoreNs
 	{
 	public:
 		inline Atpg(Circuit *pCircuit, Simulator *pSimulator);
+		// inline ~Atpg(){delete firstTimeFrameHeadLine_; delete pSimulator_; delete pCircuit_;}
 // inline Atpg(Circuit *pCircuit);
 
 		enum SINGLE_PATTERN_GENERATION_STATUS
@@ -72,10 +73,10 @@ namespace CoreNs
 		// class Atpg main method
 		void generatePatternSet(PatternProcessor *pPatternProcessor, FaultListExtract *pFaultListExtractor, bool isMFO);
 // my method
-		int runSingleSAF(PatternProcessor *pPatternProcessor, int gateID, CoreNs::Fault::FAULT_TYPE faultType); // run single stuck at fault
+		int runSingleSAF(PatternProcessor *pPatternProcessor, int gateID, CoreNs::Fault::FAULT_TYPE faultType, Abc_Ntk_t* pNtk = 0, std::vector<int>* maval = 0); // run single stuck at fault
 
-	private:
 		Circuit *pCircuit_;																				// the circuit built on read verilog
+	private:
 		Simulator *pSimulator_;																		// the simulator based on the built circuit
 		Fault currentTargetFault_;																// current target fault for generateSinglePatternOnTargetFault
 		Fault currentTargetHeadLineFault_;												// current equivalent headline fault of target currentTargetFault_
@@ -111,7 +112,7 @@ namespace CoreNs
 		void identifyGateUniquePath();
 
 		void TransitionDelayFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *pPatternProcessor, int &numOfAtpgUntestableFaults);
-		int StuckAtFaultATPG(FaultPtrList &faultListToGen, PatternProcessor *pPatternProcessor, int &numOfAtpgUntestableFaults);
+		int StuckAtFaultATPG(FaultPtrList &faultListToGen, PatternProcessor *pPatternProcessor, int &numOfAtpgUntestableFaults, Abc_Ntk_t* pNtk = 0,std::vector<int>* maval = 0);
 
 		Gate *getGateForFaultActivation(const Fault &fault);
 		void setGateAtpgValAndRunImplication(Gate &gate, const Value &val);

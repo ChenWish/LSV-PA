@@ -262,7 +262,7 @@ void Circuit::insertINV(std::vector<Gate>& gateVec){
 	int currentTmpId = Abc_NtkObjNum(pNtk_) - 1;
 	// std::cout << "currentTmpId = " << currentTmpId << std::endl;
 	Abc_NtkForEachObj(pNtk_, pNode, i){
-		if(Abc_ObjType(pNode) == ABC_OBJ_PI)
+		if(Abc_ObjType(pNode) == ABC_OBJ_PI || Abc_ObjType(pNode) == ABC_OBJ_CONST1)
 			continue;
 		if(Abc_ObjFaninC0(pNode)){
 			int INVid = currentTmpId++;
@@ -380,15 +380,17 @@ void Circuit::insertINVbetweenNodeandPI(const int NodeId, int& currentId, Abc_Ob
 }
 
 void Circuit::DFSreorder(std::vector<Gate>& gateVec){
-	int count = Abc_NtkPiNum(pNtk_) + Abc_NtkPoNum(pNtk_);
+	// int count = Abc_NtkPiNum(pNtk_) + Abc_NtkPoNum(pNtk_);
+	int count = Abc_NtkPiNum(pNtk_);
+	int poOffset = count + numComb_;
 	Abc_Obj_t* pPo;
 	int i;
 	Gate::setGlobalRef();
 	// DFS
 	Abc_NtkForEachPo(pNtk_, pPo, i){
 		DFS(gateVec, gateVec[myAbc_ObjId(pPo)], count);
-		assert(umapinsert(unorderedIdtoOrderId, myAbc_ObjId(pPo), myAbc_ObjId(pPo)));
-		assert(umapinsert(orderIdtoUnorderedId, myAbc_ObjId(pPo), myAbc_ObjId(pPo)));
+		assert(umapinsert(unorderedIdtoOrderId, myAbc_ObjId(pPo), poOffset + i));
+		assert(umapinsert(orderIdtoUnorderedId, poOffset + i, myAbc_ObjId(pPo)));
 	}
 	Abc_NtkForEachPi(pNtk_, pPo, i){
 		assert(umapinsert(unorderedIdtoOrderId, myAbc_ObjId(pPo), myAbc_ObjId(pPo)));
@@ -397,11 +399,11 @@ void Circuit::DFSreorder(std::vector<Gate>& gateVec){
 
 	// deal with PO
 	Abc_NtkForEachPo(pNtk_, pPo, i){
-		circuitGates_[myAbc_ObjId(pPo)].gateId_ = gateVec[myAbc_ObjId(pPo)].gateId_;
-		circuitGates_[myAbc_ObjId(pPo)].gateType_ = gateVec[myAbc_ObjId(pPo)].gateType_;
-		circuitGates_[myAbc_ObjId(pPo)].numFI_ = gateVec[myAbc_ObjId(pPo)].numFI_;
-		circuitGates_[myAbc_ObjId(pPo)].numFO_ = gateVec[myAbc_ObjId(pPo)].numFO_;
-		circuitGates_[myAbc_ObjId(pPo)].faninVector_.push_back(unorderedIdtoOrderId.at(gateVec[myAbc_ObjId(pPo)].faninVector_[0]));
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].gateId_ = poOffset + i;
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].gateType_ = gateVec[myAbc_ObjId(pPo)].gateType_;
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].numFI_ = gateVec[myAbc_ObjId(pPo)].numFI_;
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].numFO_ = gateVec[myAbc_ObjId(pPo)].numFO_;
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].faninVector_.push_back(unorderedIdtoOrderId.at(gateVec[myAbc_ObjId(pPo)].faninVector_[0]));
 	}
 
 	// deal with Pi
@@ -415,7 +417,8 @@ void Circuit::DFSreorder(std::vector<Gate>& gateVec){
 	}
 
 	// deal with node
-	for(int j = Abc_NtkPiNum(pNtk_) + Abc_NtkPoNum(pNtk_) , nj = circuitGates_.size(); j < nj; ++j){
+	// for(int j = Abc_NtkPiNum(pNtk_) + Abc_NtkPoNum(pNtk_) , nj = circuitGates_.size(); j < nj; ++j){
+	for(int j = Abc_NtkPiNum(pNtk_), nj = j + numComb_; j < nj; ++j){
 		int oldId = orderIdtoUnorderedId.at(j);
 		circuitGates_[j].gateId_ = j;
 		circuitGates_[j].gateType_ = gateVec[oldId].gateType_;
@@ -456,6 +459,7 @@ void Circuit::levelize(){
 			continue;
 		int maxLevel = -1;
 		for(auto fanin : i.faninVector_){
+			assert(circuitGates_[fanin].numLevel_ != -10);
 			maxLevel = maxLevel < circuitGates_[fanin].numLevel_ ? circuitGates_[fanin].numLevel_ : maxLevel;
 		}
 		i.numLevel_ = maxLevel + 1;
@@ -463,10 +467,11 @@ void Circuit::levelize(){
 	Abc_Obj_t* pPo;
 	int i, maxLevel = -1;
 	Abc_NtkForEachPo(pNtk_, pPo, i){
-		circuitGates_[myAbc_ObjId(pPo)].numLevel_ = circuitGates_[circuitGates_[myAbc_ObjId(pPo)].faninVector_[0]].numLevel_ + 1;
-		maxLevel = circuitGates_[myAbc_ObjId(pPo)].numLevel_  > maxLevel ? circuitGates_[myAbc_ObjId(pPo)].numLevel_  : maxLevel;
+		circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].numLevel_ = circuitGates_[circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].faninVector_[0]].numLevel_ + 1;
+		maxLevel = circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].numLevel_  > maxLevel ? circuitGates_[unorderedIdtoOrderId.at(myAbc_ObjId(pPo))].numLevel_  : maxLevel;
 	}
 	circuitLvl_ = maxLevel + 1; // +1 ?? // my content
+	// circuitLvl_ = maxLevel; // +1 ?? // my content
 
 }
 // **************************************************************************

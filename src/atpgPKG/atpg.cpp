@@ -110,7 +110,7 @@ void Atpg::generatePatternSet(PatternProcessor *pPatternProcessor, FaultListExtr
 }
 // my method
 // run single stuck at fault
-int Atpg::runSingleSAF(PatternProcessor *pPatternProcessor, int gateID, CoreNs::Fault::FAULT_TYPE faultType){
+int Atpg::runSingleSAF(PatternProcessor *pPatternProcessor, int gateID, CoreNs::Fault::FAULT_TYPE faultType, Abc_Ntk_t* pNtk,std::vector<int>* maval){
 	Fault *pCurrentFault = NULL;
 	FaultPtrList originalFaultPtrList;//, faultPtrListForSTC;
 	setupCircuitParameter();
@@ -169,7 +169,7 @@ int Atpg::runSingleSAF(PatternProcessor *pPatternProcessor, int gateID, CoreNs::
 		// }
 		// else
 		// {
-			return StuckAtFaultATPG(originalFaultPtrList, pPatternProcessor, numOfAtpgUntestableFaults);
+			return StuckAtFaultATPG(originalFaultPtrList, pPatternProcessor, numOfAtpgUntestableFaults, pNtk,maval);
 		// }
 	}
 	// if (pPatternProcessor->staticCompression_ == PatternProcessor::ON)
@@ -658,19 +658,25 @@ void Atpg::TransitionDelayFaultATPG(FaultPtrList &faultPtrListForGen, PatternPro
 //            ]
 // Date       [ started 2020/07/07    last modified 2023/01/05 ]
 // **************************************************************************
-int Atpg::StuckAtFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *pPatternProcessor, int &numOfAtpgUntestableFaults)
+int Atpg::StuckAtFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *pPatternProcessor, int &numOfAtpgUntestableFaults, Abc_Ntk_t* pNtk, std::vector<int>* maval)
 {
 	SINGLE_PATTERN_GENERATION_STATUS result = generateSinglePatternOnTargetFault(*faultPtrListForGen.front(), false);
 	std::cout << result << std::endl;
 	// return result;
 	if (result == PATTERN_FOUND)
 	{
-		for (int i = 0; i < pCircuit_->numPI_; ++i)
-		{
-			std::cout << static_cast<unsigned>(pCircuit_->circuitGates_[i].atpgVal_) << ' ';
+		Abc_Obj_t* pNode;
+		int i;
+		Abc_NtkForEachObj(pNtk, pNode, i){
+			if(Abc_ObjType(pNode) == ABC_OBJ_CONST1)
+				continue;
+			maval->at(pNode->Id) = static_cast<unsigned>(pCircuit_->circuitGates_[pCircuit_->unorderedIdtoOrderId.at(myAbc_ObjId(pNode))].atpgVal_);
 		}
-		std::cout << std::endl;
-		return result;
+		// for (int i = 0; i < pCircuit_->numPI_; ++i)
+		// {
+		// 	std::cout << static_cast<unsigned>(pCircuit_->circuitGates_[i].atpgVal_) << ' ';
+		// }
+		// std::cout << std::endl;
 		Pattern pattern(pCircuit_);
 		pPatternProcessor->patternVector_.push_back(pattern);
 
@@ -679,7 +685,8 @@ int Atpg::StuckAtFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *p
 		storeCurrentAtpgVal();
 		writeAtpgValToPatternPI(pPatternProcessor->patternVector_.back());
 
-		if (pPatternProcessor->dynamicCompression_ == PatternProcessor::ON)
+		// if (pPatternProcessor->dynamicCompression_ == PatternProcessor::ON)
+		if (false)
 		{
 			FaultPtrList faultListTemp = faultPtrListForGen;
 			pSimulator_->parallelFaultFaultSimWithOnePattern(pPatternProcessor->patternVector_.back(), faultPtrListForGen);
@@ -743,7 +750,8 @@ int Atpg::StuckAtFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *p
 		storeCurrentAtpgVal();
 		writeAtpgValToPatternPI(pPatternProcessor->patternVector_.back());
 
-		if (pPatternProcessor->XFill_ == PatternProcessor::ON)
+		// if (pPatternProcessor->XFill_ == PatternProcessor::ON)
+		if (false)
 		{
 			// Randomly fill the pats_.back().
 			// Note that the v_, gh_, gl_, fh_ and fl_ do not be changed.
@@ -754,6 +762,7 @@ int Atpg::StuckAtFaultATPG(FaultPtrList &faultPtrListForGen, PatternProcessor *p
 		//  the gh_ and gl_ in each gate, and then it will run fault
 		//  simulation to drop fault.
 
+		return result;
 		pSimulator_->parallelFaultFaultSimWithOnePattern(pPatternProcessor->patternVector_.back(), faultPtrListForGen);
 
 		// After pSimulator_->parallelFaultFaultSimWithOnePattern(pPatternProcessor->patternVector_.back(),faultListToGen) , the pi/ppi

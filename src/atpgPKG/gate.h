@@ -119,7 +119,7 @@ namespace CoreNs
 		gateId_ = -1;
 		cellId_ = -1;
 		primitiveId_ = 0;
-		numLevel_ = -1;
+		numLevel_ = -10;
 		frame_ = 0;
 		gateType_ = NA;
 		numFI_ = 0;

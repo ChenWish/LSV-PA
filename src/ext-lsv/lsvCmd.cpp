@@ -6,6 +6,7 @@
 #include "sat/glucose2/AbcGlucose2.h"
 #include "sat/glucose2/SimpSolver.h"
 #include "atpgPKG/atpg.h"
+#include "lsvUtils.h"
 #include <iostream>
 #include <set>
 #include <map>
@@ -33,8 +34,9 @@ extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv);
 // static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
-static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable);
+static bool stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable);
 
 static BooleanChain booleanChain;
 static AtpgMgr atpgmgr;
@@ -58,10 +60,12 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
   Cmd_CommandAdd(pAbc, "LSV", "z", Lsv_CommandConst1Searching, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "s", Lsv_CommandSimpleNodeSub, 1);
   Cmd_CommandAdd(pAbc, "LSV", "x", Lsv_CommandMyTest, 0);
   // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
 }
 
+//  先執行 Lsv_CommandConst1Searching，再執行 Lsv_CommandSimpleNodeSub
 void destroy(Abc_Frame_t* pAbc) {}
 
 Abc_FrameInitializer_t frame_initializer = {init, destroy};
@@ -113,13 +117,26 @@ usage:
   return 1;
 }
 
+
+
 int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
     if(!Abc_NtkIsStrash(pNtk)){
       printf("this command can only be called after strashed.\n");
       return 0;
     }
+
+
+  // unordered_set<Abc_Obj_t*> vTFO;
+  // collectTFO(vTFO, Abc_NtkObj(pNtk, 7) );
+  // for(auto p:vTFO)
+  //   cout << p->Id << endl;
+
+
   atpgmgr.init(pNtk);
+  // cout << Abc_ObjFanout(Abc_NtkObj(pNtk, 1), 4)->Id << ' ' << isFanoutC(Abc_NtkObj(pNtk, 1), Abc_ObjFanout(Abc_NtkObj(pNtk, 1), 4)) << endl;
+  // return 0;
+    /*
   cout << "numPI_ = " << atpgmgr.pCir->numPI_ << endl;                // Number of PIs.
   cout << "numPPI_ = " << atpgmgr.pCir->numPPI_ << endl;                // Number of PIs.
   cout << "numPO_ = " << atpgmgr.pCir->numPO_ << endl;                // Number of PIs.
@@ -130,16 +147,17 @@ int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
   cout << "numFrame_ = " << atpgmgr.pCir->numFrame_ << endl;                // Number of PIs.
   cout << "totalGate_ = " << atpgmgr.pCir->totalGate_ << endl;                // Number of PIs.
   cout << "totalLvl_ = " << atpgmgr.pCir->totalLvl_ << endl;                // Number of PIs.
+    */
   Abc_Obj_t* pNode;
   int i;
   int count = 0;
   Abc_NtkForEachNode(pNtk, pNode, i){
     cout <<pNode->Id << " stuck at 0" << endl;
-    int res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    int res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA1); // run single stuck at fault
     
-    // assert(stupid(pNtk,pNode->Id, 0, 1) == res);
+    assert(stupid(pNtk,pNode->Id, 1, 1) == res);
     // if(stupid(pNtk,pNode->Id, 0, 1) != res)
-      // count++;
+    //   count++;
   }
 
   // cout << i << ' ' << count;
@@ -155,6 +173,38 @@ int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
 } 
 
 
+int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv){
+  Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
+  if(!Abc_NtkIsStrash(pNtk)){
+    printf("this command can only be called after strashed.\n");
+    return 0;
+  }
+  atpgmgr.init(pNtk);
+  Abc_Obj_t* pNode;
+  int i;
+  Abc_NtkForEachNode(pNtk, pNode, i){
+    if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA0, 1))
+      continue;
+    if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA1, 1))
+      continue;
+    if(atpgmgr.simpleNodeSub(pNtk)){
+      Abc_NtkReassignIds( pNtk );
+      atpgmgr.init(pNtk);
+    }
+    
+    // if(atpgmgr.simpleNodeSub(pNtk) != -1){
+    //   Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, Abc_NtkObj(pNtk, atpgmgr.NodeTarget()), Abc_NtkObj(pNtk, atpgmgr.simpleNodeSub(pNtk)), 0 );
+      // Abc_Obj_t* fanin;
+      // int j;
+      // Abc_ObjForEachFanout(Abc_NtkObj(pNtk, 26), fanin, j)
+      //   cout << fanin->Id << ' ';
+      // cout << endl;
+      // break;
+      // atpgmgr.init(pNtk);
+    }
+  
+  return 0;
+}
 int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
   if(!Abc_NtkIsStrash(pNtk)){
@@ -172,14 +222,15 @@ int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
     // int res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
     // assert(stupid(pNtk,pNode->Id, 0, 1) == res);
     int res = 0;
-    res = stupid(pNtk,pNode->Id, 1, 1);
-    // atpgmgr.init(pNtk);
+    // res = stupid(pNtk,pNode->Id, 1, 1);
+    atpgmgr.init(pNtk);
+    res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
     // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
     assert(res!= -1);
     cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
     cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
     cout << "res = " << res << endl;
-    if( res == 0) // if return 0 --> undectable
+    if( res == 1) // if return 1 --> undectable
     {
       cout << '\a';
       // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
@@ -198,12 +249,13 @@ int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
       return 1;
     }
     res = -1;
-    res = stupid(pNtk,pNode->Id, 0, 1);
+    // res = stupid(pNtk,pNode->Id, 0, 1);
     // atpgmgr.init(pNtk);
+    res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
     // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
     assert(res != -1);
     cout << "res = " << res << endl;
-    if( res == 0) // if return 0 --> undectable
+    if( res == 1) // if return 1 --> undectable
     {
       cout << '\a';
       // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
@@ -557,7 +609,7 @@ int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Print(-2, "cube count: %d\n", cubecnt);
   return 0;
 }
-int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
+bool stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
   // cout << "id = " << id << ", saValue = " << saValue << ", undetectable = " << undetectable << endl;
   map<int, int> id2Var;
   map<int, int> id2VarSA;
@@ -632,7 +684,7 @@ int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
   }
   delete[] clause;
   sat_solver_delete(pSat);
-  return result;
+  return (result != 1);
 
   // return 0;
 }

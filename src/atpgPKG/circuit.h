@@ -94,6 +94,10 @@ namespace CoreNs
 		void assignMinLevelOfFanins();
 		bool umapinsert(std::unordered_map<int, int> &umap1,int key, int value){
 			return umap1.insert(std::pair<int,int>(key, value)).second;
+			// if(umap1.insert(std::pair<int,int>(key, value)).second == false){
+			// 	return value == umap1.at(key);
+			// }
+			// return 1;
 		}
 		void DFSreorder(std::vector<Gate>& gateVec);
 		void DFS(std::vector<Gate>& gateVec, Gate& _gate, int &tmp);
