@@ -247,7 +247,7 @@ int Dec_GraphUpdateNetwork( Abc_Obj_t * pRoot, Dec_Graph_t * pGraph, int fUpdate
     // create the new structure of nodes
     pRootNew = Dec_GraphToNetwork( pNtk, pGraph );
     // remove the old nodes
-    RetValue = Abc_AigReplace( (Abc_Aig_t *)pNtk->pManFunc, pRoot, pRootNew, fUpdateLevel );
+    RetValue = Abc_AigReplace( (Abc_Aig_t *)pNtk->pManFunc, pRoot, pRootNew, fUpdateLevel, 0 , -1);
     // compare the gains
     nNodesNew = Abc_NtkNodeNum(pNtk);
     //assert( nGain <= nNodesOld - nNodesNew );

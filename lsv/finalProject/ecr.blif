@@ -1,0 +1,25 @@
+.model ecr
+.inputs a b d e
+.outputs o1 o2 o3
+.names a b g1
+10 1
+01 1
+11 1
+.names a b g2
+01 1
+.names b d g3
+01 1
+.names b e g4
+01 1
+.names g2 d o2
+11 1
+.names g3 g4 g6
+10 1
+01 1
+11 1
+.names g1 g6 o1
+10 1
+01 1
+11 1
+.names g1 g6 o3
+11 1

@@ -5,16 +5,21 @@
 #include "atpgMgr.h"
 #include "sat/glucose2/AbcGlucose2.h"
 #include "sat/glucose2/SimpSolver.h"
-#include "atpgPKG/atpg.h"
+// #include "atpgPKG/atpg.h"
 #include "lsvUtils.h"
 #include <iostream>
 #include <set>
-#include <map>
+#include <unordered_map>
 #include "lsvCone.h"
 
 #include "sat/cnf/cnf.h"
 extern "C"{
-    Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
+  Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
+  void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose, int* isEqui);
+  int Lsv_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, Abc_Obj_t* pFanout, int fUpdateLevel, int ispNewCompl, int forcedFanouttoPositive);
+  Abc_Obj_t * Abc_AigAndCreateFrom( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1, Abc_Obj_t * pAnd );
+  void        Abc_AigAndDelete( Abc_Aig_t * pMan, Abc_Obj_t * pThis );
+
 }
 
 using namespace std;
@@ -35,11 +40,11 @@ static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandRewiring(Abc_Frame_t* pAbc, int argc, char** argv);
 // static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
-static bool stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable);
 
 static BooleanChain booleanChain;
-static AtpgMgr atpgmgr;
+static LSV::AtpgMgr atpgmgr;
 
 extern "C"{
     Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
@@ -57,11 +62,12 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "lsv_chain2ntk", Lsv_CommandChain2Ntk, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test", test_Command, 0);
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
-  Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
+  // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
   Cmd_CommandAdd(pAbc, "LSV", "z", Lsv_CommandConst1Searching, 1);
   Cmd_CommandAdd(pAbc, "LSV", "s", Lsv_CommandSimpleNodeSub, 1);
   Cmd_CommandAdd(pAbc, "LSV", "x", Lsv_CommandMyTest, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "myrw", Lsv_CommandRewiring, 1);
   // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
 }
 
@@ -119,13 +125,260 @@ usage:
 
 
 
+int Lsv_CommandRewiring(Abc_Frame_t* pAbc, int argc, char** argv) {
+  vector<vector<int>> rewiredNodes;
+  cout << "rewiring" << endl;
+  Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
+  if(!Abc_NtkIsStrash(pNtk)){
+    printf("this command can only be called after strashed.\n");
+    return 0;
+  }
+  bool flag = 0;
+  // atpgmgr.init(pNtk);
+  // atpgmgr.runSingleSAF(pNtk, pTargetNode->Id, CoreNs::Fault::SA1, -1, 1);
+  // atpgmgr.init(pNtk);
+  // atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout0->Id, CoreNs::Fault::SA0, pTargetNode->Id, 1);
+  Abc_Obj_t* pTargetNode;
+  int j = 0;
+  Abc_NtkForEachNode(pNtk, pTargetNode, j){
+
+    // Abc_Obj_t* pTargetNode = Abc_NtkObj(pNtk, 7);
+    // Abc_Obj_t* pTargetNodeFanout0 = Abc_ObjFanout0(pTargetNode);
+    Abc_Obj_t* pTargetNodeFanout;
+    int k = 0;
+    Abc_ObjForEachFanout(pTargetNode, pTargetNodeFanout, k){
+      atpgmgr.init(pNtk);
+      int res = 1;
+      res = atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
+      // if(isFanoutC(pTargetNode, pTargetNodeFanout0))
+      // else
+        // res =  atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout0->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
+      if(res == 1)
+        continue;
+      unordered_map<int, bool> SMAs, CandidateDestinations, ValidDestinations;
+      atpgmgr.collectSMA(pNtk, SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+      atpgmgr.collectCandidateDestination(pNtk, CandidateDestinations, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+      for(auto i : CandidateDestinations){
+        if(1 == atpgmgr.DestinationNodeCheck(pNtk, &SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1, i.first, i.second == 1 ? Fault::SA0 : Fault::SA1)){
+            ValidDestinations[i.first] = i.second;
+        }
+      }
+      CandidateDestinations.clear();
+      if(ValidDestinations.empty())
+        continue;
+      for(auto i : ValidDestinations){
+        bool found = 0;
+        if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id || i.first == pTargetNodeFanout->Id)
+          continue;
+        Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+        std::unordered_set<Abc_Obj_t*> vTFO;
+        collectTFO(vTFO, Abc_NtkObj(pNtk,  i.first));
+        Abc_Obj_t* pPossibleSMANode;
+        int j;
+        Abc_NtkForEachNode(pNtkNew, pPossibleSMANode, j){
+          if(pPossibleSMANode->Id >= i.first)
+            break;
+          if(vTFO.count(pPossibleSMANode) == 1 || pPossibleSMANode->Id == pTargetNode->Id)
+            continue;
+
+          // add rectificationNetwork
+          atpgmgr.addRectificationNetwork_v2(pNtkNew, Abc_NtkObj(pNtkNew, i.first), i.second == 1 ? Fault::SA0 : Fault::SA1, pPossibleSMANode);
+
+          // remove w_t
+          Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtkNew, pTargetNode->Id), *pDstNode = Abc_NtkObj(pNtkNew, pTargetNodeFanout->Id), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+          Abc_AigReplace((Abc_Aig_t*)pNtkNew->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+          Abc_NtkCheck(pNtkNew);
+          Abc_NtkReassignIds(pNtkNew);
+          int* isEqui = new int;
+          *isEqui = 0;
+          Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+          assert(*isEqui == 1 || *isEqui == 0);
+          if(*isEqui == 1 && rand() % 2 == 1)
+            *isEqui = 0;
+          if(*isEqui == 0){
+            Abc_NtkDelete(pNtkNew);
+            pNtkNew = Abc_NtkDup(pNtk);
+          }
+          else{
+            // Abc_NtkDelete(pNtk);
+            Abc_NtkStrash(pNtkNew, 0, 0, 0);
+            Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+            vector<int> tmp({pPossibleSMANode->Id, i.first, pTargetNode->Id, pTargetNodeFanout->Id});
+            rewiredNodes.push_back(tmp);
+            flag = 1;
+            found = 1;
+            cout << "we use " << pPossibleSMANode->Id << " and " << i.first << " to replace wire from " << pTargetNode->Id << " to " << pTargetNodeFanout->Id << endl;
+            return 1;
+            break;
+          }
+
+          // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+          // return 1;
+        }
+        if(found)
+          break;
+      }
+    }
+    }
+    if(flag){
+      cout << "we did find some alternative wire" << endl;
+      for(auto i : rewiredNodes){ 
+          cout << "we use " << i[0] << " and " << i[1] << " to replace wire from " << i[2] << " to " << i[3] << endl;
+      }
+      return 1;
+    }
+    else{
+      cout << "didn't find any alternative wire" << endl;
+      return 0;
+    }
+      // for(auto i : ValidDestinations){
+      //   Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+      //   if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   }
+      //   // cout << "rect circuit at " <<  i.first << " is added" << endl;
+
+      //   // add rectification network
+
+      //   if(!atpgmgr.addRectificationNetwork(pNtkNew, Abc_NtkObj(pNtkNew, i.first), i.second == 1 ? Fault::SA0 : Fault::SA1, SMAs)){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   }
+
+        
+      //   // remove target wire
+
+      //   // those whose objID < Nd will not change after the ID reassignment
+      //   // Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtk, 18), *pDstNode  = Abc_NtkObj(pNtk, 19), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+      //   Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtkNew, pTargetNode->Id), *pDstNode = Abc_NtkObj(pNtkNew, pTargetNodeFanout->Id), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+      //   Abc_AigReplace((Abc_Aig_t*)pNtkNew->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+      //   Abc_NtkCheck(pNtkNew);
+      //   Abc_NtkReassignIds(pNtkNew);
+
+      //   // source node identification
+
+      //   vector<Abc_Obj_t*> possibleSourceNodes1, possibleSourceNodes2;
+      //   Abc_Obj_t* pSMA = atpgmgr.getANDSMAs(pNtkNew, SMAs);
+      //   if(pSMA == 0){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   } 
+      //   if(atpgmgr.runSingleSAF(pNtkNew, pSMA->Id, CoreNs::Fault::SA0, -1, 1)){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   }
+      //   if(atpgmgr.runSingleSAF(pNtkNew, pSMA->Id, CoreNs::Fault::SA1, -1, 1)){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   }
+      //   atpgmgr.sourceNodeIdentification(pNtkNew, i.first, possibleSourceNodes1, possibleSourceNodes2);
+      //   if(possibleSourceNodes1.empty() && possibleSourceNodes2.empty()){
+      //     Abc_NtkDelete(pNtkNew);
+      //     continue;
+      //   }
+      //   cout << "possible source nodes1: " << endl;
+      //   for(auto i : possibleSourceNodes1)
+      //     cout << i->Id << ' ';
+      //   cout << endl;
+      //   cout << "possible source nodes2: " << endl;
+      //   for(auto i : possibleSourceNodes2)
+      //     cout << i->Id << ' ';
+      //   cout << endl;
+      //   // cout << "we find some possible source nodes" << endl;
+      //   Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+        
+      //   return 1;
+      // }
+    // }
+    
+  // }
+  // return 1;
+
+  // // add a wire
+  // Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtk, 10), *pDstNode  = Abc_NtkObj(pNtk, 9), *pDstNodeFanin0 = Abc_ObjFanin1(pDstNode);
+  // Abc_Obj_t* pNewNode = Abc_AigAnd((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, Abc_ObjNotCond(pDstNodeFanin0, Abc_ObjFaninC1(pDstNode)));
+  // Lsv_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pDstNodeFanin0, pNewNode, pDstNode, 1, 0, 1); // a!b!c = a(!b!c) != a!(b!c)
+  // Abc_NtkCheck(pNtk);
+  // Abc_NtkReassignIds( pNtk );
+  // // Abc_NtkStrash(pNtk, 0, 0, 0);
+
+
+  /*
+  // // delete a wire // 不要刪到po或pi出來的
+  // if old node has only one fanout -> replace it with const1
+  Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtk, 18), *pDstNode  = Abc_NtkObj(pNtk, 19), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+  // Lsv_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, Abc_AigConst1(pNtk), pDstNode, 1, isFanoutC(pSrcNode, pDstNode), 0); // a!b!c = a(!b!c) != a!(b!c)
+
+
+    // // remove the old fanout node from the structural hashing table
+    //     Abc_AigAndDelete( pMan, pFanout );
+    //     // remove the fanins of the old fanout
+    //     Abc_ObjRemoveFanins( pFanout );
+    //     // recreate the old fanout with new fanins and add it to the table
+    //     Abc_AigAndCreateFrom( pMan, pFanin1, pFanin2, pFanout);
+
+
+  // Lsv_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, Abc_AigConst1(pNtk), pDstNode, 1, 0, 1); // a!b!c = a(!b!c) != a!(b!c)
+  // Lsv_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, pSrcNodeSiblingFanin, pDstNode, 1, isFanoutC(pSrcNodeSiblingFanin, pDstNode), 0); // a!b!c = a(!b!c) != a!(b!c)
+  // Abc_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, Abc_ObjNotCond(Abc_AigConst1(pNtk), isFanoutC(pSrcNode, pDstNode)), 1); // a!b!c = a(!b!c) != a!(b!c)
+  // Abc_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pSrcNode, pDstNode, 1); // a!b!c = a(!b!c) != a!(b!c)
+
+  // Abc_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pDstNode, pSrcNode, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+  Abc_AigReplace((Abc_Aig_t*)pNtk->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+  // Abc_NtkStrash(pNtk, 0, 0, 0);
+  Abc_NtkCheck(pNtk);
+  Abc_NtkReassignIds( pNtk );
+  return 0;
+  */
+
+  // add rectification network
+  // unordered_map<int, bool> smas;
+  // smas[1] = 1; 
+  // smas[2] = 0; 
+  // smas[3] = 0; 
+  // atpgmgr.addRectificationNetwork(pNtk, Abc_NtkObj(pNtk, 18), Fault::SA0, smas);
+  // return 0;
+
+  // int i;
+  // Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+  // atpgmgr.init(pNtk);
+  // Abc_NtkForEachNodeReverse(pNtk, pNode, i){
+  //   if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA0, 1))
+  //     continue;
+  //   if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA1, 1))
+  //     continue;
+  //   if(atpgmgr.simpleNodeSub(pNtkNew)){
+  //     Abc_NtkReassignIds( pNtkNew );
+  //     Abc_NtkStrash(pNtkNew, 0, 0, 0);
+  //     int* isEqui = new int;
+  //     *isEqui = 0;
+  //     Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+  //     assert(*isEqui == 1 || *isEqui == 0);
+  //     if(*isEqui == 0){
+  //       Abc_NtkDelete(pNtkNew);
+  //       pNtkNew = Abc_NtkDup(pNtk);
+  //     }
+  //     else{
+  //       // Abc_NtkDelete(pNtk);
+  //       Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+  //       return 0;
+  //     }
+  //     delete isEqui;
+  //     // findSub = 1;
+  //     // atpgmgr.init(pNtk);
+  //     // break;
+  //   }
+  // }
+
+}
 int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
     if(!Abc_NtkIsStrash(pNtk)){
       printf("this command can only be called after strashed.\n");
       return 0;
     }
-
+  // atpgmgr.myselftest(pNtk, 10);
 
   // unordered_set<Abc_Obj_t*> vTFO;
   // collectTFO(vTFO, Abc_NtkObj(pNtk, 7) );
@@ -136,29 +389,34 @@ int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
   atpgmgr.init(pNtk);
   // cout << Abc_ObjFanout(Abc_NtkObj(pNtk, 1), 4)->Id << ' ' << isFanoutC(Abc_NtkObj(pNtk, 1), Abc_ObjFanout(Abc_NtkObj(pNtk, 1), 4)) << endl;
   // return 0;
-    /*
-  cout << "numPI_ = " << atpgmgr.pCir->numPI_ << endl;                // Number of PIs.
-  cout << "numPPI_ = " << atpgmgr.pCir->numPPI_ << endl;                // Number of PIs.
-  cout << "numPO_ = " << atpgmgr.pCir->numPO_ << endl;                // Number of PIs.
-  cout << "numComb_ = " << atpgmgr.pCir->numComb_ << endl;                // Number of PIs.
-  cout << "numGate_ = " << atpgmgr.pCir->numGate_ << endl;                // Number of PIs.
-  cout << "numNet_ = " << atpgmgr.pCir->numNet_ << endl;                // Number of PIs.
-  cout << "circuitLvl_ = " << atpgmgr.pCir->circuitLvl_ << endl;                // Number of PIs.
-  cout << "numFrame_ = " << atpgmgr.pCir->numFrame_ << endl;                // Number of PIs.
-  cout << "totalGate_ = " << atpgmgr.pCir->totalGate_ << endl;                // Number of PIs.
-  cout << "totalLvl_ = " << atpgmgr.pCir->totalLvl_ << endl;                // Number of PIs.
-    */
-  Abc_Obj_t* pNode;
-  int i;
-  int count = 0;
-  Abc_NtkForEachNode(pNtk, pNode, i){
-    cout <<pNode->Id << " stuck at 0" << endl;
-    int res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA1); // run single stuck at fault
     
-    assert(stupid(pNtk,pNode->Id, 1, 1) == res);
-    // if(stupid(pNtk,pNode->Id, 0, 1) != res)
-    //   count++;
-  }
+  // cout << "numPI_ = " << atpgmgr.pCir->numPI_ << endl;                // Number of PIs.
+  // cout << "numPPI_ = " << atpgmgr.pCir->numPPI_ << endl;                // Number of PIs.
+  // cout << "numPO_ = " << atpgmgr.pCir->numPO_ << endl;                // Number of PIs.
+  // cout << "numComb_ = " << atpgmgr.pCir->numComb_ << endl;                // Number of PIs.
+  // cout << "numGate_ = " << atpgmgr.pCir->numGate_ << endl;                // Number of PIs.
+  // cout << "numNet_ = " << atpgmgr.pCir->numNet_ << endl;                // Number of PIs.
+  // cout << "circuitLvl_ = " << atpgmgr.pCir->circuitLvl_ << endl;                // Number of PIs.
+  // cout << "numFrame_ = " << atpgmgr.pCir->numFrame_ << endl;                // Number of PIs.
+  // cout << "totalGate_ = " << atpgmgr.pCir->totalGate_ << endl;                // Number of PIs.
+  // cout << "totalLvl_ = " << atpgmgr.pCir->totalLvl_ << endl;                // Number of PIs.
+    
+  int res = atpgmgr.runSingleSAF(pNtk, 8, Fault::SA0, 2, 1); // run single stuck at fault
+  // Abc_Obj_t* pNode;
+  // int i;
+  // int count = 0;
+
+  // Abc_NtkForEachNode(pNtk, pNode, i){
+  //   cout <<pNode->Id << " stuck at 0" << endl;
+  //   // int res = atpgmgr.myselftest(pNtk, pNode->Id);
+  //   int res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
+  //   // res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
+    
+  //   assert(stupid(pNtk,pNode->Id, 0) == res);
+  //   // if(stupid(pNtk,pNode->Id, 0, 1) != res)
+  //   //   count++;
+  // }
+  /*
 
   // cout << i << ' ' << count;
   // atpgmgr.runSingleSAF(52, Fault::SA1); // run single stuck at fault
@@ -169,29 +427,62 @@ int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv) {
   //       std::cout << pPo->fCompl0 << std::endl;
   //   }
   // atpgmgr.myselftest(pNtk);
+  */
+
   return 0;
 } 
 
 
 int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv){
+
+  // extern void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose, int* isEqui);
+
   Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
   if(!Abc_NtkIsStrash(pNtk)){
     printf("this command can only be called after strashed.\n");
     return 0;
   }
-  atpgmgr.init(pNtk);
+
+
+
+
   Abc_Obj_t* pNode;
   int i;
-  Abc_NtkForEachNode(pNtk, pNode, i){
-    if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA0, 1))
-      continue;
-    if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA1, 1))
-      continue;
-    if(atpgmgr.simpleNodeSub(pNtk)){
-      Abc_NtkReassignIds( pNtk );
-      atpgmgr.init(pNtk);
+  // while(1){
+  //   bool findSub = 0;
+  Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+    atpgmgr.init(pNtk);
+    Abc_NtkForEachNodeReverse(pNtk, pNode, i){
+      if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA0, -1, 1))
+        continue;
+      if(atpgmgr.runSingleSAF(pNtk, pNode->Id, CoreNs::Fault::SA1, -1, 1))
+        continue;
+      if(atpgmgr.simpleNodeSub(pNtkNew)){
+        Abc_NtkReassignIds( pNtkNew );
+        Abc_NtkStrash(pNtkNew, 0, 0, 0);
+        int* isEqui = new int;
+        *isEqui = 0;
+        Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+        assert(*isEqui == 1 || *isEqui == 0);
+        if(*isEqui == 0){
+          Abc_NtkDelete(pNtkNew);
+          pNtkNew = Abc_NtkDup(pNtk);
+        }
+        else{
+          // Abc_NtkDelete(pNtk);
+          Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+          return 0;
+        }
+        delete isEqui;
+        // findSub = 1;
+        // atpgmgr.init(pNtk);
+        // break;
+      }
     }
-    
+    // if(!findSub)
+      // break;
+    // }
+
     // if(atpgmgr.simpleNodeSub(pNtk) != -1){
     //   Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, Abc_NtkObj(pNtk, atpgmgr.NodeTarget()), Abc_NtkObj(pNtk, atpgmgr.simpleNodeSub(pNtk)), 0 );
       // Abc_Obj_t* fanin;
@@ -201,11 +492,13 @@ int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv){
       // cout << endl;
       // break;
       // atpgmgr.init(pNtk);
-    }
   
   return 0;
+
+
 }
 int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
+
   Abc_Ntk_t * pNtk = Abc_FrameReadNtk(pAbc);
   if(!Abc_NtkIsStrash(pNtk)){
     printf("this command can only be called after strashed.\n");
@@ -214,75 +507,74 @@ int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Obj_t* pNode;
   // Abc_NtkForEachNode(pNtk, pNode, i){
   for(int i = 1, n = Abc_NtkObjNum(pNtk); i < n; ++i){
-    std::cout <<"n = " << n << endl;
     pNode = Abc_NtkObj(pNtk, i);
     if(Abc_ObjType(pNode) != ABC_OBJ_NODE)
       continue;
-    // cout <<pNode->Id << "stuck at 0" << endl;
-    // int res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
-    // assert(stupid(pNtk,pNode->Id, 0, 1) == res);
+    std::cout <<"n = " << n << endl;
     int res = 0;
-    // res = stupid(pNtk,pNode->Id, 1, 1);
-    atpgmgr.init(pNtk);
-    res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
-    // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+    pNode = Abc_NtkObj(pNtkNew, i);
+    atpgmgr.init(pNtkNew);
+    res = atpgmgr.runSingleSAF(pNtkNew, pNode->Id, Fault::SA1); // run single stuck at fault
     assert(res!= -1);
-    cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
-    cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
-    cout << "res = " << res << endl;
     if( res == 1) // if return 1 --> undectable
     {
-      cout << '\a';
-      // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
-      // pNode = Abc_NtkObj(pNtkNew, i);
-      Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, pNode, Abc_AigConst1(pNtk), 0 );
-      // Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_AigConst1(pNtkNew), 0 );
-      // Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
-      Abc_NtkReassignIds( pNtk );
-
-      // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
-      cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
-      cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
-      // Abc_NtkDelete(pNtk);
-      // pNtk = Abc_NtkDup( pNtkNew );
-      // Abc_NtkDelete(pNtkNew);
-      return 1;
+      cout << pNode->Id << "is replaced by const 1\n" ;
+      Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_AigConst1(pNtkNew), 0 , 0, -1);
+      Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
+      Abc_NtkReassignIds( pNtkNew );
+      Abc_NtkLevelize(pNtkNew);
+      Abc_AigCheck( (Abc_Aig_t *)pNtkNew->pManFunc );
+      Abc_NtkStrash(pNtkNew, 0, 0, 0);
+      int* isEqui = new int;
+      *isEqui = 0;
+      Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+      assert(*isEqui == 1 || *isEqui == 0);
+      if(*isEqui == 0){
+        Abc_NtkDelete(pNtkNew);
+        pNtkNew = Abc_NtkDup(pNtk);
+      }
+      else{
+        // Abc_NtkDelete(pNtk);
+        Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+        return 1;
+      }
+      delete isEqui;
+      // return 1;
     }
     res = -1;
-    // res = stupid(pNtk,pNode->Id, 0, 1);
-    // atpgmgr.init(pNtk);
-    res = atpgmgr.runSingleSAF(pNtk, pNode->Id, Fault::SA0); // run single stuck at fault
-    // res = atpgmgr.runSingleSAF(atpgmgr.pCir->unorderedIdtoOrderId.at(myAbc_ObjId(pNode)), Fault::SA0); // run single stuck at fault
+    res = atpgmgr.runSingleSAF(pNtkNew, pNode->Id, Fault::SA0); // run single stuck at fault
     assert(res != -1);
     cout << "res = " << res << endl;
     if( res == 1) // if return 1 --> undectable
     {
-      cout << '\a';
-      // Abc_Ntk_t*  pNtkNew = Abc_NtkDup( pNtk );
-      // pNode = Abc_NtkObj(pNtkNew, i);
-      Abc_AigReplace((Abc_Aig_t *)pNtk->pManFunc, pNode, Abc_ObjNot(Abc_AigConst1(pNtk)), 0 );
-      // Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_ObjNot(Abc_AigConst1(pNtkNew)), 0 );
-      // Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
-      Abc_NtkReassignIds( pNtk );
-
-      // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
-      cout << "obj num = " << Abc_NtkObjNum(pNtk) << endl;
-      cout << "obj maxnum = " << Abc_NtkObjNumMax(pNtk) << endl;
-      // Abc_NtkDelete(pNtk);
-      // pNtk = Abc_NtkDup( pNtkNew );
-      // Abc_NtkDelete(pNtkNew);
-      // Abc_NtkStrash(pNtk);
+      Abc_AigReplace((Abc_Aig_t *)pNtkNew->pManFunc, pNode, Abc_ObjNot(Abc_AigConst1(pNtkNew)), 0 , 0, -1);
+      Abc_AigCleanup((Abc_Aig_t *)pNtkNew->pManFunc);
+      Abc_NtkReassignIds( pNtkNew );
+      Abc_NtkLevelize(pNtkNew);
+      Abc_AigCheck( (Abc_Aig_t *)pNtkNew->pManFunc );
+      int* isEqui = new int;
+      *isEqui = 0;
+      Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+      assert(*isEqui == 1 || *isEqui == 0);
+      if(*isEqui == 0){
+        Abc_NtkDelete(pNtkNew);
+        pNtkNew = Abc_NtkDup(pNtk);
+      }
+      else{
+        // Abc_NtkDelete(pNtk);
+        Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+        return 1;
+      }
+      delete isEqui;
       return 1;
 
-      // Abc_AigReplace((Abc_Aig_t *)pNode->pNtk->pManFunc, pNode,Abc_ObjNot(Abc_AigConst1(pNtk)), 0 );
-      // Abc_AigCleanup((Abc_Aig_t *)pNtk->pManFunc);
-      // Abc_NtkReassignIds( pNtk );
-
-      // Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtk);
-      // return 1;
     }
   }
+
+
   return 0;
+
 }
 
 void Lsv_Ntk2Chain(Abc_Ntk_t* pNtk) {
@@ -609,189 +901,111 @@ int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Print(-2, "cube count: %d\n", cubecnt);
   return 0;
 }
-bool stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
-  // cout << "id = " << id << ", saValue = " << saValue << ", undetectable = " << undetectable << endl;
-  map<int, int> id2Var;
-  map<int, int> id2VarSA;
-  sat_solver* pSat = sat_solver_new();
-  Abc_Obj_t* pObj;
-  int i;
-  Abc_NtkForEachPi(pNtk, pObj, i) {
-    id2Var[pObj->Id] = sat_solver_addvar(pSat);
-    id2VarSA[pObj->Id] = id2Var[pObj->Id];
-  }
-  Abc_NtkForEachNode(pNtk, pObj, i) {
-    // cerr << "NodeID = " << pObj->Id << endl;
-    id2Var[pObj->Id] = sat_solver_addvar(pSat);
-    id2VarSA[pObj->Id] = sat_solver_addvar(pSat);
-    int fanin0 = Abc_ObjFanin0(pObj)->Id;
-    int fanin1 = Abc_ObjFanin1(pObj)->Id;
-    int c0 = Abc_ObjFaninC0(pObj);
-    int c1 = Abc_ObjFaninC1(pObj);
-    // cerr << "Fanin0 = " << Abc_ObjFanin0(pObj)->Id << ", C0 = " << c0 << endl;
-    // cerr << "Fanin1 = " << Abc_ObjFanin1(pObj)->Id << ", C1 = " << c1 << endl;
-    // cerr << endl;
-    sat_solver_add_and(pSat, id2Var[pObj->Id], id2Var[fanin0], id2Var[fanin1], c0, c1, 0);
-    if (pObj->Id != id)
-      sat_solver_add_and(pSat, id2VarSA[pObj->Id], id2VarSA[fanin0], id2VarSA[fanin1], c0, c1, 0);
-  }
-  int* miterVar = new int[Abc_NtkPoNum(pNtk)];
-  lit* clause = new lit[Abc_NtkPoNum(pNtk)];
-  Abc_NtkForEachPo(pNtk, pObj, i) {
-    int var = id2Var[Abc_ObjFanin0(pObj)->Id];
-    int varSA = id2VarSA[Abc_ObjFanin0(pObj)->Id];
-    miterVar[i] = sat_solver_addvar(pSat);
-    sat_solver_add_xor(pSat, miterVar[i], var, varSA, !undetectable);
-    clause[i] = toLitCond(miterVar[i], 0);
-    // assert(id2Var.find(Abc_ObjFanin0(pObj)->Id) != id2Var.end());
-    // assert(id2VarSA.find(Abc_ObjFanin0(pObj)->Id) != id2VarSA.end());
-    // cerr << "Fanin0 = " << Abc_ObjFanin0(pObj)->Id << endl;
-  }
-  sat_solver_addclause(pSat, clause, clause + Abc_NtkPoNum(pNtk));
-  delete[] miterVar;
-  delete[] clause;
-  clause = new lit[Abc_NtkPiNum(pNtk)];
-  int index = 0;
-  clause[index++] = toLitCond(id2VarSA[id], saValue == 0);
-  if (!undetectable) {
-    int value;
-    cout << "Enter PI assignment(index start from 1): ";
-    while (cin >> value) {
-      if (value == 0)
-        break;
-      if (index == Abc_NtkPiNum(pNtk) + 1) {
-        cerr << "Error: index out of bound" << endl;
-        break;
-      }
-      clause[index++] = toLitCond(id2Var[abs(value)], value < 0);
-    }
-  }
 
-  int result = (1 == sat_solver_solve(pSat, clause, clause + index, 0, 0, 0, 0)); // l_True = 1 in MiniSat
-  cerr << "Result = " << result << endl;
-  if (!result) {
-    cout << "The result is UNSAT" << endl;
-  }
-  else {
-    cout << "The result is SAT, you fuck up" << endl;
-    cout << "--------- CEX ---------" << endl;
-    Abc_NtkForEachPi(pNtk, pObj, i) {
-      int var = id2Var[pObj->Id];
-      cout << sat_solver_var_value(pSat, var);
-    }
-    cout << endl;
-    cout << "--------- CEX END ---------" << endl;
-  }
-  delete[] clause;
-  sat_solver_delete(pSat);
-  return (result != 1);
+// // test2 id sa? 1
+// static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
+//   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
+//   Abc_Ntk_t* pNtkSA = Abc_NtkDup(pNtk);
+//   if (argc != 4) {
+//     Abc_Print(-2, "usage: test2 <node> <sa(1/0)> <undetectable(1/0)>\n");
+//     Abc_NtkDelete(pNtkSA);
+//     return 0;
+//   }
+//   int id = atoi(argv[1]);
+//   int saValue = atoi(argv[2]);
+//   int undetectable = atoi(argv[3]);
+//   if (id <= Abc_NtkPiNum(pNtk) + Abc_NtkPoNum(pNtk) || id > Abc_NtkObjNum(pNtk)) {
+//     Abc_Print(-2, "Error: id is out of bound\n");
+//     Abc_NtkDelete(pNtkSA);
+//     return 0;
+//   }
+//   Abc_NtkDelete(pNtkSA);
+//   return stupid(pNtk, id, saValue, undetectable);
+//   Abc_Obj_t* pTarget = Abc_NtkObj(pNtkSA, id);
+//   Abc_Obj_t* pFanout;
+//   // cerr << pTarget->Type << endl;
+//   int i;
+//   Abc_ObjForEachFanout(pTarget, pFanout, i) {
+//     Abc_ObjDeleteFanin(pFanout, pTarget);
+//     Abc_ObjAddFanin(pFanout, Abc_ObjNotCond(Abc_AigConst1(pNtkSA), saValue == 0));
+//   }
+//   // cerr << pTarget->Type << endl;
 
-  // return 0;
-}
-// test2 id sa? 1
-static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
-  Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
-  Abc_Ntk_t* pNtkSA = Abc_NtkDup(pNtk);
-  if (argc != 4) {
-    Abc_Print(-2, "usage: test2 <node> <sa(1/0)> <undetectable(1/0)>\n");
-    Abc_NtkDelete(pNtkSA);
-    return 0;
-  }
-  int id = atoi(argv[1]);
-  int saValue = atoi(argv[2]);
-  int undetectable = atoi(argv[3]);
-  if (id <= Abc_NtkPiNum(pNtk) + Abc_NtkPoNum(pNtk) || id > Abc_NtkObjNum(pNtk)) {
-    Abc_Print(-2, "Error: id is out of bound\n");
-    Abc_NtkDelete(pNtkSA);
-    return 0;
-  }
-  Abc_NtkDelete(pNtkSA);
-  return stupid(pNtk, id, saValue, undetectable);
-  Abc_Obj_t* pTarget = Abc_NtkObj(pNtkSA, id);
-  Abc_Obj_t* pFanout;
-  // cerr << pTarget->Type << endl;
-  int i;
-  Abc_ObjForEachFanout(pTarget, pFanout, i) {
-    Abc_ObjDeleteFanin(pFanout, pTarget);
-    Abc_ObjAddFanin(pFanout, Abc_ObjNotCond(Abc_AigConst1(pNtkSA), saValue == 0));
-  }
-  // cerr << pTarget->Type << endl;
+//   Abc_NtkDeleteObj(pTarget);
+//   Abc_Ntk_t* pNtkTemp = pNtkSA;
+//   pNtkSA = Abc_NtkStrash(pNtkTemp, 1, 1, 0); // fAllNodes, fCleanup, fRecord
+//   Abc_NtkDelete(pNtkTemp);
+//   int temp = Abc_AigCleanup( (Abc_Aig_t *)pNtkSA->pManFunc ); // ???
+// // cerr << temp << endl;
+//   // Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtkSA);
+//   // return 0;
+//   Aig_Man_t* pMan = Abc_NtkToDar(pNtk, 0, 0); // 0 -> fExors, 0 -> fRegisters
+//   Cnf_Dat_t* pCnf = Cnf_Derive(pMan, Aig_ManCoNum(pMan));
+// // cerr << "pNtk to Cnf done" << endl; 
 
-  Abc_NtkDeleteObj(pTarget);
-  Abc_Ntk_t* pNtkTemp = pNtkSA;
-  pNtkSA = Abc_NtkStrash(pNtkTemp, 1, 1, 0); // fAllNodes, fCleanup, fRecord
-  Abc_NtkDelete(pNtkTemp);
-  int temp = Abc_AigCleanup( (Abc_Aig_t *)pNtkSA->pManFunc ); // ???
-// cerr << temp << endl;
-  // Abc_FrameReplaceCurrentNetwork(Abc_FrameReadGlobalFrame(), pNtkSA);
-  // return 0;
-  Aig_Man_t* pMan = Abc_NtkToDar(pNtk, 0, 0); // 0 -> fExors, 0 -> fRegisters
-  Cnf_Dat_t* pCnf = Cnf_Derive(pMan, Aig_ManCoNum(pMan));
-// cerr << "pNtk to Cnf done" << endl; 
+//   Aig_Man_t* pManSA = Abc_NtkToDar(pNtkSA, 0, 0); // 0 -> fExors, 0 -> fRegisters
+//   Cnf_Dat_t* pCnfSA = Cnf_Derive(pManSA, Aig_ManCoNum(pManSA));
+// // cerr << "pNtkSA to Cnf done" << endl; 
 
-  Aig_Man_t* pManSA = Abc_NtkToDar(pNtkSA, 0, 0); // 0 -> fExors, 0 -> fRegisters
-  Cnf_Dat_t* pCnfSA = Cnf_Derive(pManSA, Aig_ManCoNum(pManSA));
-// cerr << "pNtkSA to Cnf done" << endl; 
+//   int liftNum = Aig_ManObjNum(pMan);
+//   Cnf_DataLift(pCnfSA, liftNum);
 
-  int liftNum = Aig_ManObjNum(pMan);
-  Cnf_DataLift(pCnfSA, liftNum);
+//   sat_solver* pSat = sat_solver_new();
+//   pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnf, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
+//   pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnfSA, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
 
-  sat_solver* pSat = sat_solver_new();
-  pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnf, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
-  pSat = (sat_solver *)Cnf_DataWriteIntoSolverInt( pSat, pCnfSA, 1, 0 ); // 1 -> nFrames, 0 -> fInit 
+//   assert(Abc_NtkPiNum(pNtk) == Abc_NtkPiNum(pNtkSA));
+//   assert(Abc_NtkPoNum(pNtk) == Abc_NtkPoNum(pNtkSA));
+//   Abc_Obj_t* pObj;
+//   Abc_NtkForEachPi(pNtk, pObj, i) {
+//     lit clause[2];
+//     // (a + ~b)(~a + b)
+//     clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 0); // Pi in pNtk
+//     clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 1); // Pi in pNtkSA
+//     sat_solver_addclause(pSat, clause, clause + 2);
+//     clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 1); // Pi in pNtk
+//     clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 0); // Pi in pNtkSA
+//     sat_solver_addclause(pSat, clause, clause + 2);
+//   }
 
-  assert(Abc_NtkPiNum(pNtk) == Abc_NtkPiNum(pNtkSA));
-  assert(Abc_NtkPoNum(pNtk) == Abc_NtkPoNum(pNtkSA));
-  Abc_Obj_t* pObj;
-  Abc_NtkForEachPi(pNtk, pObj, i) {
-    lit clause[2];
-    // (a + ~b)(~a + b)
-    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 0); // Pi in pNtk
-    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 1); // Pi in pNtkSA
-    sat_solver_addclause(pSat, clause, clause + 2);
-    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , 1); // Pi in pNtk
-    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPi(pNtkSA, i)->Id], 0); // Pi in pNtkSA
-    sat_solver_addclause(pSat, clause, clause + 2);
-  }
-
-  Abc_NtkForEachPo(pNtk, pObj, i) {
-    lit clause[2];
-    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , !undetectable); // Po in pNtk
-    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 1);     // Po in pNtkSA
-    sat_solver_addclause(pSat, clause, clause + 2);
-    clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , undetectable);  // Po in pNtk
-    clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 0);     // Po in pNtkSA
-    sat_solver_addclause(pSat, clause, clause + 2);
-  }
-  lit* clause = new lit[Abc_NtkPiNum(pNtk)];
-  int index = 0;
-  if (undetectable) {
-    int value;
-    cout << "Enter PI assignment(index start from 1): ";
-    while (cin >> value) {
-      if (value == 0)
-        break;
-      if (index == Abc_NtkPiNum(pNtk)) {
-        cerr << "Error: index out of bound" << endl;
-        break;
-      }
-      clause[index++] = toLitCond(pCnf->pVarNums[abs(value)], value < 0);
-    }
-  }
-  bool result = (1 == sat_solver_solve(pSat, clause, clause + index, 0, 0, 0, 0)); // l_True = 1 in MiniSat
-  if (!result) {
-    cout << "The result is UNSAT" << endl;
-  }
-  else {
-    cout << "The result is SAT, you fuck up" << endl;
-    cout << "--------- CEX ---------" << endl;
-    Abc_NtkForEachPi(pNtk, pObj, i) {
-      int var = pCnf->pVarNums[pObj->Id];
-      cout << sat_solver_var_value(pSat, var);
-    }
-    cout << endl;
-    cout << "--------- CEX END ---------" << endl;
-  }
-  delete[] clause;
-  return 0;
-}
+//   Abc_NtkForEachPo(pNtk, pObj, i) {
+//     lit clause[2];
+//     clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , !undetectable); // Po in pNtk
+//     clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 1);     // Po in pNtkSA
+//     sat_solver_addclause(pSat, clause, clause + 2);
+//     clause[0] = toLitCond(pCnf->pVarNums[pObj->Id]                  , undetectable);  // Po in pNtk
+//     clause[1] = toLitCond(pCnfSA->pVarNums[Abc_NtkPo(pNtkSA, i)->Id], 0);     // Po in pNtkSA
+//     sat_solver_addclause(pSat, clause, clause + 2);
+//   }
+//   lit* clause = new lit[Abc_NtkPiNum(pNtk)];
+//   int index = 0;
+//   if (undetectable) {
+//     int value;
+//     cout << "Enter PI assignment(index start from 1): ";
+//     while (cin >> value) {
+//       if (value == 0)
+//         break;
+//       if (index == Abc_NtkPiNum(pNtk)) {
+//         cerr << "Error: index out of bound" << endl;
+//         break;
+//       }
+//       clause[index++] = toLitCond(pCnf->pVarNums[abs(value)], value < 0);
+//     }
+//   }
+//   bool result = (1 == sat_solver_solve(pSat, clause, clause + index, 0, 0, 0, 0)); // l_True = 1 in MiniSat
+//   if (!result) {
+//     cout << "The result is UNSAT" << endl;
+//   }
+//   else {
+//     cout << "The result is SAT, you fuck up" << endl;
+//     cout << "--------- CEX ---------" << endl;
+//     Abc_NtkForEachPi(pNtk, pObj, i) {
+//       int var = pCnf->pVarNums[pObj->Id];
+//       cout << sat_solver_var_value(pSat, var);
+//     }
+//     cout << endl;
+//     cout << "--------- CEX END ---------" << endl;
+//   }
+//   delete[] clause;
+//   return 0;
+// }

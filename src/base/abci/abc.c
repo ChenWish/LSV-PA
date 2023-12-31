@@ -24568,7 +24568,7 @@ int Abc_CommandCec( Abc_Frame_t * pAbc, int argc, char ** argv )
     int fIgnoreNames;
 
     extern void Abc_NtkCecSat( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nConfLimit, int nInsLimit );
-    extern void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose );
+    extern void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose, int* isEqui);
     extern void Abc_NtkCecFraigPart( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int nPartSize, int fVerbose );
     extern void Abc_NtkCecFraigPartAuto( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose );
 
@@ -24683,7 +24683,7 @@ int Abc_CommandCec( Abc_Frame_t * pAbc, int argc, char ** argv )
     else if ( fSat )
         Abc_NtkCecSat( pNtk1, pNtk2, nConfLimit, nInsLimit );
     else
-        Abc_NtkCecFraig( pNtk1, pNtk2, nSeconds, fVerbose );
+        Abc_NtkCecFraig( pNtk1, pNtk2, nSeconds, fVerbose , 0);
 
     if ( fDelete1 ) Abc_NtkDelete( pNtk1 );
     if ( fDelete2 ) Abc_NtkDelete( pNtk2 );

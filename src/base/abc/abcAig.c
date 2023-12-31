@@ -19,6 +19,7 @@
 ***********************************************************************/
 
 #include "abc.h"
+// #include "abcAig.h"
 
 ABC_NAMESPACE_IMPL_START
 
@@ -98,22 +99,164 @@ static unsigned Abc_HashKey2( Abc_Obj_t * p0, Abc_Obj_t * p1, int TableSize )
 }
 
 // structural hash table procedures
-static Abc_Obj_t * Abc_AigAndCreate( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1 );
-static Abc_Obj_t * Abc_AigAndCreateFrom( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1, Abc_Obj_t * pAnd );
-static void        Abc_AigAndDelete( Abc_Aig_t * pMan, Abc_Obj_t * pThis );
-static void        Abc_AigResize( Abc_Aig_t * pMan );
+Abc_Obj_t * Abc_AigAndCreate( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1 );
+Abc_Obj_t * Abc_AigAndCreateFrom( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1, Abc_Obj_t * pAnd );
+void        Abc_AigAndDelete( Abc_Aig_t * pMan, Abc_Obj_t * pThis );
+void        Abc_AigResize( Abc_Aig_t * pMan );
 // incremental AIG procedures
-static void        Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel );
-static void        Abc_AigUpdateLevel_int( Abc_Aig_t * pMan );
-static void        Abc_AigUpdateLevelR_int( Abc_Aig_t * pMan );
-static void        Abc_AigRemoveFromLevelStructure( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
-static void        Abc_AigRemoveFromLevelStructureR( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
+int        Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel, int isremovingWire, int Fanouttoskip);
+void        Abc_AigUpdateLevel_int( Abc_Aig_t * pMan );
+void        Abc_AigUpdateLevelR_int( Abc_Aig_t * pMan );
+void        Abc_AigRemoveFromLevelStructure( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
+void        Abc_AigRemoveFromLevelStructureR( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
+
+
+int Lsv_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, Abc_Obj_t* pFanout, int fUpdateLevel , int ispNewCompl, int forcedFanouttoPositive);
+void Lsv_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, Abc_Obj_t* pFanout, int fUpdateLevel , int ispNewCompl, int forcedFanouttoPositive);
+// // structural hash table procedures
+// static Abc_Obj_t * Abc_AigAndCreate( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1 );
+// static Abc_Obj_t * Abc_AigAndCreateFrom( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1, Abc_Obj_t * pAnd );
+// static void        Abc_AigAndDelete( Abc_Aig_t * pMan, Abc_Obj_t * pThis );
+// static void        Abc_AigResize( Abc_Aig_t * pMan );
+// // incremental AIG procedures
+// static void        Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel );
+// static void        Abc_AigUpdateLevel_int( Abc_Aig_t * pMan );
+// static void        Abc_AigUpdateLevelR_int( Abc_Aig_t * pMan );
+// static void        Abc_AigRemoveFromLevelStructure( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
+// static void        Abc_AigRemoveFromLevelStructureR( Vec_Vec_t * vStruct, Abc_Obj_t * pNode );
 
 
 ////////////////////////////////////////////////////////////////////////
 ///                     FUNCTION DEFINITIONS                         ///
 ////////////////////////////////////////////////////////////////////////
+// let user to determine which node to be replaced by which node for which fanout
+int Lsv_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, Abc_Obj_t* pFanout,int fUpdateLevel, int ispNewCompl, int forcedFanouttoPositive)
+{
+    assert( Vec_PtrSize(pMan->vStackReplaceOld) == 0 );
+    assert( Vec_PtrSize(pMan->vStackReplaceNew) == 0 );
+    Vec_PtrPush( pMan->vStackReplaceOld, pOld );
+    Vec_PtrPush( pMan->vStackReplaceNew, pNew );
+    assert( !Abc_ObjIsComplement(pOld) );
+    // process the replacements
+    while ( Vec_PtrSize(pMan->vStackReplaceOld) )
+    {
+        pOld = (Abc_Obj_t *)Vec_PtrPop( pMan->vStackReplaceOld );
+        pNew = (Abc_Obj_t *)Vec_PtrPop( pMan->vStackReplaceNew );
+        if ( Abc_ObjFanoutNum(pOld) == 0 )
+            return 0;
+        Lsv_AigReplace_int( pMan, pOld, pNew, pFanout, fUpdateLevel, ispNewCompl, forcedFanouttoPositive);
+    }
+    if ( fUpdateLevel )
+    {
+        Abc_AigUpdateLevel_int( pMan );
+        if ( pMan->pNtkAig->vLevelsR ) 
+            Abc_AigUpdateLevelR_int( pMan );
+    }
+    return 1;
+}
 
+void Lsv_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew,Abc_Obj_t* pFanout, int fUpdateLevel , int ispNewCompl, int forcedFanouttoPositive)
+{
+    // Abc_Obj_t * pFanin1, * pFanin2, * pFanout, * pFanoutNew, * pFanoutFanout;
+    Abc_Obj_t * pFanin1, * pFanin2, * pFanoutNew, * pFanoutFanout;
+    int k, v, iFanin; 
+    // make sure the old node is regular and has fanouts
+    // (the new node can be complemented and can have fanouts)
+    assert( !Abc_ObjIsComplement(pOld) );
+    assert( Abc_ObjFanoutNum(pOld) > 0 );
+    // look at the fanouts of old node
+    // Abc_NodeCollectFanouts( pOld, pMan->vNodes );
+    // Vec_PtrForEachEntry( Abc_Obj_t *, pMan->vNodes, pFanout, k )
+    for(int k = 0, nk = 1; k < nk; ++k)
+    {
+        if ( Abc_ObjIsCo(pFanout) )
+        {
+            pFanin1 = Abc_ObjRegular( pNew );
+            if ( pFanin1->fMarkB )
+                Abc_AigRemoveFromLevelStructureR( pMan->vLevelsR, pFanin1 );
+            if ( fUpdateLevel && pMan->pNtkAig->vLevelsR )
+            {
+                Abc_ObjSetReverseLevel( pFanin1, Abc_ObjReverseLevel(pOld) );
+                assert( pFanin1->fMarkB == 0 );
+                if ( !Abc_ObjIsCi(pFanin1) )
+                {
+                    pFanin1->fMarkB = 1;
+                    Vec_VecPush( pMan->vLevelsR, Abc_ObjReverseLevel(pFanin1), pFanin1 );
+                }
+            }
+            Abc_ObjPatchFanin( pFanout, pOld, pNew );            
+            continue;
+        }
+        // find the old node as a fanin of this fanout
+        iFanin = Vec_IntFind( &pFanout->vFanins, pOld->Id );
+        assert( iFanin == 0 || iFanin == 1 );
+        // get the new fanin
+        if(ispNewCompl){
+            pFanin1 = Abc_ObjRegular( pNew );
+            pFanin1 = Abc_ObjNotCond( pNew, 1);
+        }
+        else if(forcedFanouttoPositive){
+            pFanin1 = Abc_ObjRegular( pNew );
+        }
+        else
+            pFanin1 = Abc_ObjNotCond( pNew, Abc_ObjFaninC(pFanout, iFanin) );
+        // pFanin1 = Abc_ObjNotCond( pNew, Abc_ObjFaninC(pFanout, iFanin) );
+        assert( Abc_ObjRegular(pFanin1) != pFanout );
+        // get another fanin
+        pFanin2 = Abc_ObjChild( pFanout, iFanin ^ 1 );
+        assert( Abc_ObjRegular(pFanin2) != pFanout );
+        // check if the node with these fanins exists
+        if ( (pFanoutNew = Abc_AigAndLookup( pMan, pFanin1, pFanin2 )) )
+        { // such node exists (it may be a constant)
+            // schedule replacement of the old fanout by the new fanout
+            Vec_PtrPush( pMan->vStackReplaceOld, pFanout );
+            Vec_PtrPush( pMan->vStackReplaceNew, pFanoutNew );
+            continue;
+        }
+        // such node does not exist - modify the old fanout node 
+        // (this way the change will not propagate all the way to the COs)
+        assert( Abc_ObjRegular(pFanin1) != Abc_ObjRegular(pFanin2) );             
+
+        // if the node is in the level structure, remove it
+        if ( pFanout->fMarkA )
+            Abc_AigRemoveFromLevelStructure( pMan->vLevels, pFanout );
+        // if the node is in the level structure, remove it
+        if ( pFanout->fMarkB )
+            Abc_AigRemoveFromLevelStructureR( pMan->vLevelsR, pFanout );
+
+        // remove the old fanout node from the structural hashing table
+        Abc_AigAndDelete( pMan, pFanout );
+        // remove the fanins of the old fanout
+        Abc_ObjRemoveFanins( pFanout );
+        // recreate the old fanout with new fanins and add it to the table
+        Abc_AigAndCreateFrom( pMan, pFanin1, pFanin2, pFanout);
+        assert( Abc_AigNodeIsAcyclic(pFanout, pFanout) );
+
+        if ( fUpdateLevel )
+        {
+            // schedule the updated fanout for updating direct level
+            assert( pFanout->fMarkA == 0 );
+            pFanout->fMarkA = 1;
+            Vec_VecPush( pMan->vLevels, pFanout->Level, pFanout );
+            // schedule the updated fanout for updating reverse level
+            if ( pMan->pNtkAig->vLevelsR ) 
+            {
+                assert( pFanout->fMarkB == 0 );
+                pFanout->fMarkB = 1;
+                Vec_VecPush( pMan->vLevelsR, Abc_ObjReverseLevel(pFanout), pFanout );
+            }
+        }
+
+        // the fanout has changed, update EXOR status of its fanouts
+        Abc_ObjForEachFanout( pFanout, pFanoutFanout, v )
+            if ( Abc_AigNodeIsAnd(pFanoutFanout) )
+                pFanoutFanout->fExor = Abc_NodeIsExorType(pFanoutFanout);
+    }
+    // if the node has no fanouts left, remove its MFFC
+    if ( Abc_ObjFanoutNum(pOld) == 0 )
+        Abc_AigDeleteNode( pMan, pOld );
+    return;
+}
 /**Function*************************************************************
 
   Synopsis    [Allocates the local AIG manager.]
@@ -847,7 +990,9 @@ Abc_Obj_t * Abc_AigMiter2( Abc_Aig_t * pMan, Vec_Ptr_t * vPairs )
   SeeAlso     []
 
 ***********************************************************************/
-int Abc_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel )
+// isremovingWire is used when replace a node with its child, we have to consider the complemented attribute between the child and the node
+// 往上傳的時候，如果我上面是complemented，the node跟他的fanout也是complemented，兩次complement會變positive
+int Abc_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel, int isremovingWire, int Fanouttoskip)
 {
     assert( Vec_PtrSize(pMan->vStackReplaceOld) == 0 );
     assert( Vec_PtrSize(pMan->vStackReplaceNew) == 0 );
@@ -861,7 +1006,8 @@ int Abc_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fU
         pNew = (Abc_Obj_t *)Vec_PtrPop( pMan->vStackReplaceNew );
         if ( Abc_ObjFanoutNum(pOld) == 0 )
             return 0;
-        Abc_AigReplace_int( pMan, pOld, pNew, fUpdateLevel );
+        if(!Abc_AigReplace_int( pMan, pOld, pNew, fUpdateLevel, isremovingWire, Fanouttoskip))
+            return 0;
     }
     if ( fUpdateLevel )
     {
@@ -883,7 +1029,7 @@ int Abc_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fU
   SeeAlso     []
 
 ***********************************************************************/
-void Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel )
+int Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, int fUpdateLevel, int isremovingWire, int Fanouttoskip)
 {
     Abc_Obj_t * pFanin1, * pFanin2, * pFanout, * pFanoutNew, * pFanoutFanout;
     int k, v, iFanin; 
@@ -895,6 +1041,8 @@ void Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, i
     Abc_NodeCollectFanouts( pOld, pMan->vNodes );
     Vec_PtrForEachEntry( Abc_Obj_t *, pMan->vNodes, pFanout, k )
     {
+        if(Fanouttoskip != -1 && pFanout->Id == Fanouttoskip)
+            continue;
         if ( Abc_ObjIsCo(pFanout) )
         {
             pFanin1 = Abc_ObjRegular( pNew );
@@ -917,11 +1065,17 @@ void Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, i
         iFanin = Vec_IntFind( &pFanout->vFanins, pOld->Id );
         assert( iFanin == 0 || iFanin == 1 );
         // get the new fanin
-        pFanin1 = Abc_ObjNotCond( pNew, Abc_ObjFaninC(pFanout, iFanin) );
+        int complIndex = pNew == Abc_ObjFanin0(pOld) ? 0 : 1;
+        if((isremovingWire == 1) && (pNew == Abc_ObjFanin0(pOld) || pNew == Abc_ObjFanin1(pOld)))
+            pFanin1 = Abc_ObjNotCond( pNew, Abc_ObjFaninC(pFanout, iFanin) ^ Abc_ObjFaninC(pOld, complIndex) );
+        else
+            pFanin1 = Abc_ObjNotCond( pNew, Abc_ObjFaninC(pFanout, iFanin) );
         assert( Abc_ObjRegular(pFanin1) != pFanout );
         // get another fanin
         pFanin2 = Abc_ObjChild( pFanout, iFanin ^ 1 );
         assert( Abc_ObjRegular(pFanin2) != pFanout );
+        if(Abc_ObjRegular(pFanin2)->Id == pFanout->Id || Abc_ObjRegular(pFanin1)->Id == pFanout->Id)
+            return 0;
         // check if the node with these fanins exists
         if ( (pFanoutNew = Abc_AigAndLookup( pMan, pFanin1, pFanin2 )) )
         { // such node exists (it may be a constant)
@@ -947,6 +1101,8 @@ void Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, i
         Abc_ObjRemoveFanins( pFanout );
         // recreate the old fanout with new fanins and add it to the table
         Abc_AigAndCreateFrom( pMan, pFanin1, pFanin2, pFanout );
+        if(!Abc_AigNodeIsAcyclic(pFanout, pFanout))
+            return 0;
         assert( Abc_AigNodeIsAcyclic(pFanout, pFanout) );
 
         if ( fUpdateLevel )
@@ -972,6 +1128,7 @@ void Abc_AigReplace_int( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, i
     // if the node has no fanouts left, remove its MFFC
     if ( Abc_ObjFanoutNum(pOld) == 0 )
         Abc_AigDeleteNode( pMan, pOld );
+    return 1;
 }
 
 /**Function*************************************************************

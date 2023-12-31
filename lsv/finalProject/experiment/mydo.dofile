@@ -1,0 +1,48 @@
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig
+s
+write_aiger tmp.aig
+read_truth -xf  lsv/finalProject/test1.truth
+cec -n tmp.aig

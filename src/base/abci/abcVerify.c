@@ -120,7 +120,7 @@ void Abc_NtkCecSat( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nConfLimit, int nI
   SeeAlso     []
 
 ***********************************************************************/
-void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose )
+void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose, int* isEqui)
 {
     abctime clk = Abc_Clock();
     Prove_Params_t Params, * pParams = &Params;
@@ -135,7 +135,7 @@ void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fV
         if ( pNtk1->pExdc != NULL && pNtk2->pExdc != NULL )
         {
             printf( "Comparing EXDC of the two networks:\n" );
-            Abc_NtkCecFraig( pNtk1->pExdc, pNtk2->pExdc, nSeconds, fVerbose );
+            Abc_NtkCecFraig( pNtk1->pExdc, pNtk2->pExdc, nSeconds, fVerbose , isEqui);
             printf( "Comparing networks under EXDC of the first network.\n" );
             pExdc = pNtk1->pExdc;
         }
@@ -178,6 +178,8 @@ void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fV
         ABC_FREE( pMiter->pModel );
         Abc_NtkDelete( pMiter );
         Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
+        if(isEqui != 0)
+            *isEqui = 0;
         return;
     }
     if ( RetValue == 1 )
@@ -185,6 +187,8 @@ void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fV
         printf( "Networks are equivalent after structural hashing.  " );
         Abc_NtkDelete( pMiter );
         Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
+        if(isEqui != 0)
+            *isEqui = 1;
         return;
     }
 /*
@@ -233,8 +237,11 @@ void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fV
             printf( "Networks are NOT EQUIVALENT.  " );
         ABC_FREE( pSimInfo );
     }
-    else
+    else{
         printf( "Networks are equivalent.  " );
+        if(isEqui != 0)
+            *isEqui = 1;
+    }
     Abc_PrintTime( 1, "Time", Abc_Clock() - clk );
     if ( pMiter->pModel )
         Abc_NtkVerifyReportError( pNtk1, pNtk2, pMiter->pModel );

@@ -242,13 +242,13 @@ ABC_PRT( "Nam", Abc_Clock() - clk );
 ***********************************************************************/
 void Bbl_ManVerify( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2 )
 {
-    extern void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose );
+    extern void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose , int* isEqui);
     Abc_Ntk_t * pAig1, * pAig2;
     pAig1 = Abc_NtkStrash( pNtk1, 0, 1, 0 );
     pAig2 = Abc_NtkStrash( pNtk2, 0, 1, 0 );
     Abc_NtkShortNames( pAig1 );
     Abc_NtkShortNames( pAig2 );
-    Abc_NtkCecFraig( pAig1, pAig2, 0, 0 );
+    Abc_NtkCecFraig( pAig1, pAig2, 0, 0 , 0);
     Abc_NtkDelete( pAig1 );
     Abc_NtkDelete( pAig2 );
 }
