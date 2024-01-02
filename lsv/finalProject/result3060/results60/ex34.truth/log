@@ -1,0 +1,124 @@
+UC Berkeley, ABC 1.01 (compiled Dec  1 2023 18:58:55)
+================== Command history ==================
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex32.truth/dc_iter7.aig
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex32.truth/smart_iter7.aig
+lsv_chain_dc_bound  9  4
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_dc.dofile
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex32.truth/dc_iter8.aig
+lsv_chain_time_limit 100
+lsv_chain_dc_bound  5  4
+lsv_chain_bad_root_clear
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_smart.dofile
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex32.truth/smart_iter8.aig
+=====================================================
+abc 01> read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex34.truth
+abc 02> strash
+abc 03> ps
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   9156  lev = 36
+abc 03> resyn
+abc 06> resyn2
+abc 10> resyn3
+abc 14> resyn
+abc 17> resyn2
+abc 21> resyn3
+abc 25> resyn
+abc 28> resyn2
+abc 32> resyn3
+abc 36> resyn
+abc 39> resyn2
+abc 43> resyn3
+abc 47> resyn
+abc 50> resyn2
+abc 54> resyn3
+abc 58> resyn
+abc 61> resyn2
+abc 65> resyn3
+abc 69> ps
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   6916  lev = 20
+abc 69> lsv_chain_time_limit 100
+abc 69> lsv_chain_dc_bound  9  4
+abc 69> lsv_chain_bad_root_clear
+abc 69> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_dc.dofile
+Cone Root = 3929, 3924 3925 3926 3927 3928 3929
+pinum: 2
+
+The number of referenced nodes = 72
+
+mintermCount: 63456
+subCircuit with size 1
+Time =     0.16 sec
+subCircuit with size 2
+Time =     0.39 sec
+subCircuit with size 3
+Time =     0.81 sec
+subCircuit with size 4
+Time =     2.02 sec
+subCircuit with size 5
+Time =     7.80 sec
+subCircuit with size 6
+Time =    14.10 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   6916  lev = 20
+Cone Root = 5556, 5550 5551 5552 5553 5554 5555 5556
+pinum: 2
+
+The number of referenced nodes = 69
+
+mintermCount: 63408
+subCircuit with size 1
+Time =     0.23 sec
+subCircuit with size 2
+Time =     0.57 sec
+subCircuit with size 3
+Time =     1.33 sec
+subCircuit with size 4
+Time =     4.85 sec
+subCircuit with size 5
+Time =    14.38 sec
+subCircuit with size 6
+Time =   115.77 sec
+subCircuit with size 7
+Time =    47.09 sec
+Success reduce subcircuit from 7 to 7
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   6916  lev = 20
+Cone Root = 6938, 6933 6934 6935 6937 6938
+pinum: 2
+
+The number of referenced nodes = 30
+
+mintermCount: 65168
+subCircuit with size 1
+Time =     0.20 sec
+subCircuit with size 2
+Time =     0.53 sec
+subCircuit with size 3
+Time =     1.00 sec
+subCircuit with size 4
+Time =     1.89 sec
+subCircuit with size 5
+Time =     4.49 sec
+Success reduce subcircuit from 5 to 5
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   6916  lev = 20
+[1;37mex                            :[0m i/o =   16/   18  lat =    0  and =   6916  lev = 20
+abc 94> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex34.truth/dc_iter0.aig
+abc 94> lsv_chain_time_limit 100
+abc 94> lsv_chain_dc_bound  5  4
+abc 94> lsv_chain_bad_root_clear
+abc 94> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_smart.dofile
+subCircuit with size 1
+Time =     5.37 sec
+subCircuit with size 2
+Time =    34.23 sec
+subCircuit with size 3
+Time =    93.96 sec
+subCircuit with size 4
+Time =   146.36 sec
+subCircuit with size 5
+Time =   142.43 sec
+subCircuit with size 6
+Time =   156.98 sec
+subCircuit with size 1
+Time =     5.24 sec
+subCircuit with size 2
+Time =    10.35 sec
+subCircuit with size 3

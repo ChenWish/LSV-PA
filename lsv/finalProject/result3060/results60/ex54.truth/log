@@ -1,0 +1,125 @@
+UC Berkeley, ABC 1.01 (compiled Dec  1 2023 18:58:55)
+================== Command history ==================
+resyn
+resyn2
+resyn3
+lsv_chain_dc_bound  9  4
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_dc.dofile
+write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex52.truth/dc_iter0.aig
+lsv_chain_time_limit 100
+lsv_chain_dc_bound  5  4
+lsv_chain_bad_root_clear
+source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_smart.dofile
+=====================================================
+abc 01> read_truth -xf  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/../../../../../IWLS/benchmarks/ex54.truth
+abc 02> strash
+abc 03> ps
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   4300  lev = 27
+abc 03> resyn
+abc 06> resyn2
+abc 10> resyn3
+abc 14> resyn
+abc 17> resyn2
+abc 21> resyn3
+abc 25> resyn
+abc 28> resyn2
+abc 32> resyn3
+abc 36> resyn
+abc 39> resyn2
+abc 43> resyn3
+abc 47> resyn
+abc 50> resyn2
+abc 54> resyn3
+abc 58> resyn
+abc 61> resyn2
+abc 65> resyn3
+abc 69> ps
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   3216  lev = 20
+abc 69> lsv_chain_time_limit 100
+abc 69> lsv_chain_dc_bound  9  4
+abc 69> lsv_chain_bad_root_clear
+abc 69> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_dc.dofile
+Cone Root = 2974, 2969 2970 2971 2972 2973 2974
+pinum: 2
+
+The number of referenced nodes = 122
+
+mintermCount: 30416
+subCircuit with size 1
+Time =     0.16 sec
+subCircuit with size 2
+Time =     0.42 sec
+subCircuit with size 3
+Time =     1.38 sec
+subCircuit with size 4
+Time =     6.49 sec
+subCircuit with size 5
+Time =    37.29 sec
+subCircuit with size 6
+Time =    83.75 sec
+Success reduce subcircuit from 6 to 6
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   3216  lev = 20
+Cone Root = 3138, 3133 3134 3135 3136 3137 3138
+pinum: 2
+
+The number of referenced nodes = 144
+
+mintermCount: 30512
+subCircuit with size 1
+Time =     0.29 sec
+subCircuit with size 2
+Time =     0.74 sec
+subCircuit with size 3
+Time =     2.56 sec
+subCircuit with size 4
+Time =    11.25 sec
+subCircuit with size 5
+Time =    24.89 sec
+Success reduce subcircuit from 6 to 5
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   3215  lev = 20
+Cone Root = 3227, 3222 3223 3224 3225 3226 3227
+pinum: 2
+
+The number of referenced nodes = 208
+
+mintermCount: 28328
+subCircuit with size 1
+Time =     0.33 sec
+subCircuit with size 2
+Time =     1.30 sec
+subCircuit with size 3
+Time =     7.00 sec
+subCircuit with size 4
+Time =    26.11 sec
+subCircuit with size 5
+Time =   107.08 sec
+subCircuit with size 6
+Time =   107.70 sec
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   3215  lev = 20
+[1;37mex                            :[0m i/o =   15/    7  lat =    0  and =   3214  lev = 20
+abc 94> write_aiger  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/results/ex54.truth/dc_iter0.aig
+abc 94> lsv_chain_time_limit 100
+abc 94> lsv_chain_dc_bound  5  4
+abc 94> lsv_chain_bad_root_clear
+abc 94> source  /home/wish/LSV/finalProject/LSV-PA/lsv/finalProject/experiment/reduce_smart.dofile
+subCircuit with size 1
+Time =     4.30 sec
+subCircuit with size 2
+Time =    13.54 sec
+subCircuit with size 3
+Time =    50.17 sec
+subCircuit with size 4
+Time =   133.58 sec
+subCircuit with size 5
+Time =   167.68 sec
+subCircuit with size 6
+Time =   144.31 sec
+subCircuit with size 1
+Time =     3.09 sec
+subCircuit with size 2
+Time =     9.56 sec
+subCircuit with size 3
+Time =    46.79 sec
+subCircuit with size 4
+Time =   119.99 sec
+subCircuit with size 5

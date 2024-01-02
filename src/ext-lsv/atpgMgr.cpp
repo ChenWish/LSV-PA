@@ -7,6 +7,9 @@ using namespace CoreNs;
 
 extern "C"{
     int Lsv_AigReplace( Abc_Aig_t * pMan, Abc_Obj_t * pOld, Abc_Obj_t * pNew, Abc_Obj_t* pFanout, int fUpdateLevel, int ispNewCompl, int forcedFanouttoPositive);
+    void Abc_NtkCecFraig( Abc_Ntk_t * pNtk1, Abc_Ntk_t * pNtk2, int nSeconds, int fVerbose, int* isEqui);
+    void Abc_FrameReplaceCurrentNetwork( Abc_Frame_t * p, Abc_Ntk_t * pNtk );
+
     // Abc_Obj_t * Abc_AigAndCreate( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1 );
     // Abc_Obj_t * Abc_AigAndCreateFrom( Abc_Aig_t * pMan, Abc_Obj_t * p0, Abc_Obj_t * p1, Abc_Obj_t * pAnd );
     // void        Abc_AigAndDelete( Abc_Aig_t * pMan, Abc_Obj_t * pThis );
@@ -311,6 +314,78 @@ Abc_Obj_t* LSV::AtpgMgr::getANDSMAs(Abc_Ntk_t* pNtk, unordered_map<int, bool>& S
         return NULL;
     return AND_SMA.back();
 }
+
+int LSV::AtpgMgr::rewire(Abc_Frame_t* pAbc, Abc_Ntk_t* pNtk, Abc_Obj_t* pTargetNode, Abc_Obj_t* pTargetNodeFanout, bool* cone){
+    init(pNtk);
+    int res = 1;
+    res = runSingleSAF(pNtk, pTargetNodeFanout->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
+    if(res == 1)
+        return 0;
+    unordered_map<int, bool> SMAs, CandidateDestinations, ValidDestinations;
+    collectSMA(pNtk, SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+    collectCandidateDestination(pNtk, CandidateDestinations, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+    for(auto i : CandidateDestinations){
+        if(1 == DestinationNodeCheck(pNtk, &SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1, i.first, i.second == 1 ? Fault::SA0 : Fault::SA1)){
+            ValidDestinations[i.first] = i.second;
+        }
+    }
+    CandidateDestinations.clear();
+    if(ValidDestinations.empty())
+        return 0;
+    for(auto i : ValidDestinations){
+        bool found = 0;
+        if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id || i.first == pTargetNodeFanout->Id)
+            continue;
+        Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+        std::unordered_set<Abc_Obj_t*> vTFO;
+        collectTFO(vTFO, Abc_NtkObj(pNtk,  i.first));
+        Abc_Obj_t* pPossibleSMANode;
+        int j;
+        Abc_NtkForEachNode(pNtkNew, pPossibleSMANode, j){
+            if(pPossibleSMANode->Id >= i.first)
+                break;
+            if(vTFO.count(pPossibleSMANode) == 1 || pPossibleSMANode->Id == pTargetNode->Id || (cone != 0 && cone[pPossibleSMANode->Id] == 1))
+                continue;
+
+            // add rectificationNetwork
+            addRectificationNetwork_v2(pNtkNew, Abc_NtkObj(pNtkNew, i.first), i.second == 1 ? Fault::SA0 : Fault::SA1, pPossibleSMANode);
+
+            // remove w_t
+            Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtkNew, pTargetNode->Id), *pDstNode = Abc_NtkObj(pNtkNew, pTargetNodeFanout->Id), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+            Abc_AigReplace((Abc_Aig_t*)pNtkNew->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+            Abc_NtkCheck(pNtkNew);
+            Abc_NtkReassignIds(pNtkNew);
+            int* isEqui = new int;
+            *isEqui = 0;
+            Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+            assert(*isEqui == 1 || *isEqui == 0);
+            if(*isEqui == 1 && rand() % 2 == 1)
+                *isEqui = 0;
+            if(*isEqui == 0){
+                Abc_NtkDelete(pNtkNew);
+                pNtkNew = Abc_NtkDup(pNtk);
+            }
+            else{
+            // Abc_NtkDelete(pNtk);
+                Abc_NtkStrash(pNtkNew, 0, 0, 0);
+                Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+                // vector<int> tmp({pPossibleSMANode->Id, i.first, pTargetNode->Id, pTargetNodeFanout->Id});
+                // rewiredNodes.push_back(tmp);
+                // found = 1;
+                cout << "we use " << pPossibleSMANode->Id << " and " << i.first << " to replace wire from " << pTargetNode->Id << " to " << pTargetNodeFanout->Id << endl;
+                return 1;
+                // break;
+            }
+
+        // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+        // return 1;
+        }
+    // if(found)
+    //     break;
+    }
+    return 0;
+}
+
 
 
 

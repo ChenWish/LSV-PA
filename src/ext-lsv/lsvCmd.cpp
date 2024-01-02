@@ -41,6 +41,7 @@ static int Lsv_CommandMyTest(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandConst1Searching(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandSimpleNodeSub(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandRewiring(Abc_Frame_t* pAbc, int argc, char** argv);
+static int Lsv_CommandRemoveCone(Abc_Frame_t* pAbc, int argc, char** argv);
 // static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 
 static BooleanChain booleanChain;
@@ -64,10 +65,11 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
   // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
-  Cmd_CommandAdd(pAbc, "LSV", "z", Lsv_CommandConst1Searching, 1);
-  Cmd_CommandAdd(pAbc, "LSV", "s", Lsv_CommandSimpleNodeSub, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_undectectable_fault_Searching", Lsv_CommandConst1Searching, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_node_merging", Lsv_CommandSimpleNodeSub, 1);
   Cmd_CommandAdd(pAbc, "LSV", "x", Lsv_CommandMyTest, 0);
-  Cmd_CommandAdd(pAbc, "LSV", "myrw", Lsv_CommandRewiring, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_rewire", Lsv_CommandRewiring, 1);
+  Cmd_CommandAdd(pAbc, "LSV", "lsv_cone_remove", Lsv_CommandRemoveCone, 1);
   // Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
 }
 
@@ -123,6 +125,31 @@ usage:
   return 1;
 }
 
+int Lsv_CommandRemoveCone(Abc_Frame_t* pAbc, int argc, char** argv){
+  Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
+  if(!Abc_NtkIsStrash(pNtk)){
+    printf("this command can only be called after strashed.\n");
+    return 0;
+  }
+  bool* coneRet = new bool[Abc_NtkObjNum(pNtk)], *input = new bool[Abc_NtkObjNum(pNtk)];
+  int sizeup = Abc_NtkNodeNum(pNtk) / 10, sizedown = 0;
+  set<int> badConeRoot;
+  // Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+  // while(badConeRoot.size() < 10){
+  while(badConeRoot.size() < Abc_NtkObjNum(pNtk) - 2){
+    int topID = getCone(pNtk, coneRet, input, sizeup, sizedown, badConeRoot);
+    if(topID == -1)
+      break;
+    if(Abc_ObjFanoutNum(Abc_NtkObj(pNtk, topID)) == 1){
+      if(atpgmgr.rewire(pAbc, pNtk, Abc_NtkObj(pNtk, topID), Abc_ObjFanout0(Abc_NtkObj(pNtk, topID)))){
+        cout << "we remove some cone with only one fanout" << endl;
+        return 1;
+      }
+      badConeRoot.insert(topID);
+    }
+  }
+  
+}
 
 
 int Lsv_CommandRewiring(Abc_Frame_t* pAbc, int argc, char** argv) {
@@ -141,96 +168,99 @@ int Lsv_CommandRewiring(Abc_Frame_t* pAbc, int argc, char** argv) {
   Abc_Obj_t* pTargetNode;
   int j = 0;
   Abc_NtkForEachNode(pNtk, pTargetNode, j){
-
     // Abc_Obj_t* pTargetNode = Abc_NtkObj(pNtk, 7);
     // Abc_Obj_t* pTargetNodeFanout0 = Abc_ObjFanout0(pTargetNode);
     Abc_Obj_t* pTargetNodeFanout;
     int k = 0;
     Abc_ObjForEachFanout(pTargetNode, pTargetNodeFanout, k){
-      atpgmgr.init(pNtk);
-      int res = 1;
-      res = atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
-      // if(isFanoutC(pTargetNode, pTargetNodeFanout0))
-      // else
-        // res =  atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout0->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
-      if(res == 1)
-        continue;
-      unordered_map<int, bool> SMAs, CandidateDestinations, ValidDestinations;
-      atpgmgr.collectSMA(pNtk, SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
-      atpgmgr.collectCandidateDestination(pNtk, CandidateDestinations, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
-      for(auto i : CandidateDestinations){
-        if(1 == atpgmgr.DestinationNodeCheck(pNtk, &SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1, i.first, i.second == 1 ? Fault::SA0 : Fault::SA1)){
-            ValidDestinations[i.first] = i.second;
-        }
-      }
-      CandidateDestinations.clear();
-      if(ValidDestinations.empty())
-        continue;
-      for(auto i : ValidDestinations){
-        bool found = 0;
-        if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id || i.first == pTargetNodeFanout->Id)
-          continue;
-        Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
-        std::unordered_set<Abc_Obj_t*> vTFO;
-        collectTFO(vTFO, Abc_NtkObj(pNtk,  i.first));
-        Abc_Obj_t* pPossibleSMANode;
-        int j;
-        Abc_NtkForEachNode(pNtkNew, pPossibleSMANode, j){
-          if(pPossibleSMANode->Id >= i.first)
-            break;
-          if(vTFO.count(pPossibleSMANode) == 1 || pPossibleSMANode->Id == pTargetNode->Id)
-            continue;
+      if(atpgmgr.rewire(pAbc, pNtk, pTargetNode, pTargetNodeFanout))
+        return 1;
+      continue;
+      // atpgmgr.init(pNtk);
+      // int res = 1;
+      // res = atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
+      // // if(isFanoutC(pTargetNode, pTargetNodeFanout0))
+      // // else
+      //   // res =  atpgmgr.runSingleSAF(pNtk, pTargetNodeFanout0->Id, CoreNs::Fault::SA1, pTargetNode->Id, 1);
+      // if(res == 1)
+      //   continue;
+      // unordered_map<int, bool> SMAs, CandidateDestinations, ValidDestinations;
+      // atpgmgr.collectSMA(pNtk, SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+      // atpgmgr.collectCandidateDestination(pNtk, CandidateDestinations, pTargetNodeFanout->Id, CoreNs::Fault::SA1);
+      // for(auto i : CandidateDestinations){
+      //   if(1 == atpgmgr.DestinationNodeCheck(pNtk, &SMAs, pTargetNodeFanout->Id, CoreNs::Fault::SA1, i.first, i.second == 1 ? Fault::SA0 : Fault::SA1)){
+      //       ValidDestinations[i.first] = i.second;
+      //   }
+      // }
+      // CandidateDestinations.clear();
+      // if(ValidDestinations.empty())
+      //   continue;
+      // for(auto i : ValidDestinations){
+      //   bool found = 0;
+      //   if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id || i.first == pTargetNodeFanout->Id)
+      //     continue;
+      //   Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
+      //   std::unordered_set<Abc_Obj_t*> vTFO;
+      //   collectTFO(vTFO, Abc_NtkObj(pNtk,  i.first));
+      //   Abc_Obj_t* pPossibleSMANode;
+      //   int j;
+      //   Abc_NtkForEachNode(pNtkNew, pPossibleSMANode, j){
+      //     if(pPossibleSMANode->Id >= i.first)
+      //       break;
+      //     if(vTFO.count(pPossibleSMANode) == 1 || pPossibleSMANode->Id == pTargetNode->Id)
+      //       continue;
 
-          // add rectificationNetwork
-          atpgmgr.addRectificationNetwork_v2(pNtkNew, Abc_NtkObj(pNtkNew, i.first), i.second == 1 ? Fault::SA0 : Fault::SA1, pPossibleSMANode);
+      //     // add rectificationNetwork
+      //     atpgmgr.addRectificationNetwork_v2(pNtkNew, Abc_NtkObj(pNtkNew, i.first), i.second == 1 ? Fault::SA0 : Fault::SA1, pPossibleSMANode);
 
-          // remove w_t
-          Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtkNew, pTargetNode->Id), *pDstNode = Abc_NtkObj(pNtkNew, pTargetNodeFanout->Id), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
-          Abc_AigReplace((Abc_Aig_t*)pNtkNew->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
-          Abc_NtkCheck(pNtkNew);
-          Abc_NtkReassignIds(pNtkNew);
-          int* isEqui = new int;
-          *isEqui = 0;
-          Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
-          assert(*isEqui == 1 || *isEqui == 0);
-          if(*isEqui == 1 && rand() % 2 == 1)
-            *isEqui = 0;
-          if(*isEqui == 0){
-            Abc_NtkDelete(pNtkNew);
-            pNtkNew = Abc_NtkDup(pNtk);
-          }
-          else{
-            // Abc_NtkDelete(pNtk);
-            Abc_NtkStrash(pNtkNew, 0, 0, 0);
-            Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
-            vector<int> tmp({pPossibleSMANode->Id, i.first, pTargetNode->Id, pTargetNodeFanout->Id});
-            rewiredNodes.push_back(tmp);
-            flag = 1;
-            found = 1;
-            cout << "we use " << pPossibleSMANode->Id << " and " << i.first << " to replace wire from " << pTargetNode->Id << " to " << pTargetNodeFanout->Id << endl;
-            return 1;
-            break;
-          }
+      //     // remove w_t
+      //     Abc_Obj_t* pSrcNode = Abc_NtkObj(pNtkNew, pTargetNode->Id), *pDstNode = Abc_NtkObj(pNtkNew, pTargetNodeFanout->Id), *pSrcNodeSiblingFanin = Abc_ObjFanin1(pDstNode) == pSrcNode ? Abc_ObjFanin0(pDstNode) : Abc_ObjFanin1(pDstNode);
+      //     Abc_AigReplace((Abc_Aig_t*)pNtkNew->pManFunc, pDstNode, pSrcNodeSiblingFanin, 1, 1, -1); // a!b!c = a(!b!c) != a!(b!c)
+      //     Abc_NtkCheck(pNtkNew);
+      //     Abc_NtkReassignIds(pNtkNew);
+      //     int* isEqui = new int;
+      //     *isEqui = 0;
+      //     Abc_NtkCecFraig( pNtk, pNtkNew, 100, 1, isEqui);
+      //     assert(*isEqui == 1 || *isEqui == 0);
+      //     if(*isEqui == 1 && rand() % 2 == 1)
+      //       *isEqui = 0;
+      //     if(*isEqui == 0){
+      //       Abc_NtkDelete(pNtkNew);
+      //       pNtkNew = Abc_NtkDup(pNtk);
+      //     }
+      //     else{
+      //       // Abc_NtkDelete(pNtk);
+      //       Abc_NtkStrash(pNtkNew, 0, 0, 0);
+      //       Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+      //       vector<int> tmp({pPossibleSMANode->Id, i.first, pTargetNode->Id, pTargetNodeFanout->Id});
+      //       rewiredNodes.push_back(tmp);
+      //       flag = 1;
+      //       found = 1;
+      //       cout << "we use " << pPossibleSMANode->Id << " and " << i.first << " to replace wire from " << pTargetNode->Id << " to " << pTargetNodeFanout->Id << endl;
+      //       return 1;
+      //       break;
+      //     }
 
-          // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
-          // return 1;
-        }
-        if(found)
-          break;
-      }
+      //     // Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+      //     // return 1;
+      //   }
+      //   if(found)
+      //     break;
+      // }
     }
     }
-    if(flag){
-      cout << "we did find some alternative wire" << endl;
-      for(auto i : rewiredNodes){ 
-          cout << "we use " << i[0] << " and " << i[1] << " to replace wire from " << i[2] << " to " << i[3] << endl;
-      }
-      return 1;
-    }
-    else{
-      cout << "didn't find any alternative wire" << endl;
-      return 0;
-    }
+    cout << "didn't find any alternative wire" << endl;
+    // if(flag){
+    //   cout << "we did find some alternative wire" << endl;
+    //   for(auto i : rewiredNodes){ 
+    //       cout << "we use " << i[0] << " and " << i[1] << " to replace wire from " << i[2] << " to " << i[3] << endl;
+    //   }
+    //   return 1;
+    // }
+    // else{
+    //   cout << "didn't find any alternative wire" << endl;
+    //   return 0;
+    // }
       // for(auto i : ValidDestinations){
       //   Abc_Ntk_t* pNtkNew = Abc_NtkDup(pNtk);
       //   if(i.first < pTargetNode->Id || i.first < pTargetNodeFanout->Id){

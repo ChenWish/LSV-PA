@@ -7,6 +7,7 @@
 // #include "atpg/atpg.h"
 #include "atpg/atpg_mgr.h"
 #include "atpg/gate1.h"
+#include "base/main/main.h"
 #include "atpg/circuit1.h"
 #include "atpg/fault.h"
 #include "base/abc/abc.h"
@@ -41,6 +42,7 @@ public:
 	int addRectificationNetwork(Abc_Ntk_t* pNtk, Abc_Obj_t* pDstNode, CoreNs::Fault::Type ndFaultType,unordered_map<int, bool>& SMAs);
 	int addRectificationNetwork_v2(Abc_Ntk_t* pNtk, Abc_Obj_t* pDstNode, CoreNs::Fault::Type ndFaultType, Abc_Obj_t* pPossibleSMANode);
 	Abc_Obj_t* getANDSMAs(Abc_Ntk_t* pNtk, unordered_map<int, bool>& SMAs);
+	int rewire(Abc_Frame_t* pAbc, Abc_Ntk_t* pNtk, Abc_Obj_t* pTargetNode, Abc_Obj_t* pTargetNodeFanout, bool* cone = 0);
 
 private:
 	// CoreNs::Simulator* pSimulator;
