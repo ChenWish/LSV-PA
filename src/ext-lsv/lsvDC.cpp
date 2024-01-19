@@ -300,9 +300,19 @@ bool Check(DdNode*& hon,Abc_Ntk_t* pNtk,DdNode* fon,DdNode* foff, DdNode* yBdd, 
   
   DdNode* hoff;
   DdNode* temp=Cudd_bddAnd(dd, fon, yBdd);
+  Abc_Print(-2, "abs\n");
+  Cudd_PrintMinterm(dd, abs);
   Cudd_Ref(temp);
+  Abc_Print(-2, "temp\n");
+  Cudd_PrintMinterm(dd, temp);
   hon=Cudd_bddExistAbstract(dd, temp, abs);
   Cudd_Ref(hon);
+  Abc_Print(-2, "hon\n");
+  Cudd_PrintMinterm(dd, hon);
+  if(hon==Cudd_ReadZero(dd)){
+    Abc_Print(-2, "hon is zero\n");
+  }
+
   Cudd_RecursiveDeref(dd, temp);
 
   temp=Cudd_bddAnd(dd, foff, yBdd);
@@ -353,6 +363,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
     nodeid2ithvar[*itr]=Cudd_bddIthVar(dd, count);
     count++;
     Cudd_Ref(nodeid2ithvar[*itr]);
+    Abc_Print(-2, "candidate %d\n", *itr);
   }
   DdNode* yBdd;
   for(itr=candidates.begin();itr!=candidates.end();itr++){
@@ -376,10 +387,16 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   DdNode* fon;
   DdNode* foff;
   //generate fon and foff
+  Abc_Print(-2, "DC\n");
+  Cudd_PrintMinterm(dd, DC);
   fon=Cudd_bddAnd(dd, (DdNode *)Abc_ObjGlobalBdd(pNode), Cudd_Not(DC));
   Cudd_Ref(fon);
+  Abc_Print(-2, "fon\n");
+  Cudd_PrintMinterm(dd, fon);
   foff=Cudd_bddAnd(dd, Cudd_Not((DdNode *)Abc_ObjGlobalBdd(pNode)), Cudd_Not(DC));
   Cudd_Ref(foff);
+  Abc_Print(-2, "foff\n");
+  Cudd_PrintMinterm(dd, foff);
   //generate abs
   DdNode* abs=Cudd_bddIthVar(dd, 0);
   for(int i=1;i<Abc_NtkPiNum(pNtk);i++){
@@ -390,7 +407,9 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   }
   //generate hon and hoff
   bool success=false;
-  if(Check(hon,pNtk, fon, foff, DC, abs, dd)){
+  Abc_Print(-2, "yBdd\n");
+  Cudd_PrintMinterm(dd, yBdd);
+  if(Check(hon,pNtk, fon, foff, yBdd, abs, dd)){
     for(itr=candidates.begin();itr!=candidates.end();itr++){
       DdNode* temp=CheckRemove(hon,pNtk, fon, foff, yBdd, abs, dd, nodeid2ithvar[*itr]);
       if(temp!=NULL){
