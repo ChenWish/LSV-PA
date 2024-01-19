@@ -318,12 +318,10 @@ bool Check(DdNode*& hon,Abc_Ntk_t* pNtk,DdNode* fon,DdNode* foff, DdNode* yBdd, 
     Cudd_RecursiveDeref(dd, intersec);
     Cudd_RecursiveDeref(dd, hon);
     Cudd_RecursiveDeref(dd, hoff);
-    delete [] hoff;
     return false;
   }else{
     Cudd_RecursiveDeref(dd, intersec);
     Cudd_RecursiveDeref(dd, hoff);
-    delete [] hoff;
     return true;
   }
 }
@@ -349,8 +347,11 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   DdManager* dd=(DdManager*)Abc_NtkGlobalBddMan(pNtk);
   map<int, DdNode*> nodeid2ithvar;
   set<int>::iterator itr;
+  int count=Abc_NtkPiNum(pNtk);
   for(itr=candidates.begin();itr!=candidates.end();itr++){
-    nodeid2ithvar[*itr]=Cudd_bddIthVar(dd, *itr);
+    Abc_Print(-2, "candidate %d\n", *itr);
+    nodeid2ithvar[*itr]=Cudd_bddIthVar(dd, count);
+    count++;
     Cudd_Ref(nodeid2ithvar[*itr]);
   }
   DdNode* yBdd;
@@ -408,8 +409,6 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   Cudd_RecursiveDeref(dd, fon);
   Cudd_RecursiveDeref(dd, foff);
 
-  delete [] fon;
-  delete [] foff;
   return success;
 }
 
@@ -424,17 +423,18 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   DdManager* dd=NULL;
   Abc_Ntk_t* pNtkNew=Abc_NtkDup(pNtk);
   set<int> badConeRoot;
-  bool cone[Abc_NtkObjNum(pNtkNew)];
-  bool input[Abc_NtkObjNum(pNtkNew)];
+  bool cone[Abc_NtkObjNum(pNtkNew)]= {false};
+  bool input[Abc_NtkObjNum(pNtkNew)]= {false};
   int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.8), 3, badConeRoot);
   set<int> candidates;
   for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
     if(input[i]){
+      Abc_Print(-2, "input %d\n", i);
       candidates.insert(i);
     }
   }
   Abc_Print(-2, "root: %d\n", root);
-  Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, nodeid);
+  Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
   DdNode* dc=getDC_bdd(pNtkNew, Nodenew, dd,fReorder);
   Abc_Print(-2, "nodenum afterdc%d\n",Abc_NtkObjNum(pNtkNew));
   if(dd==NULL){

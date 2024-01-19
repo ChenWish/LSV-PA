@@ -137,7 +137,15 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
           Abc_Obj_t* pFanin;
           int k = 0;
           Abc_ObjForEachFanin(Abc_NtkObj(pNtk, j), pFanin, k) {
-            input[Abc_ObjId(pFanin)] = coneset[Abc_ObjId(pFanin)]?false:true;
+            if(coneset[j]){
+              if(coneset[Abc_ObjId(pFanin)]){
+                input[Abc_ObjId(pFanin)] = false;
+              }
+              else{
+                input[Abc_ObjId(pFanin)] = (coneset[Abc_ObjId(pFanin)]?false:true);
+                Abc_Print(-2, "node %d set %d  in input\n",j, Abc_ObjId(pFanin));
+              }
+            }
           }
         }
       }
