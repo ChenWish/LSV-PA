@@ -99,7 +99,7 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
     if (badConeRoot.find(i) != badConeRoot.end()) {
       continue;
     }
-    if(Abc_ObjIsCo(Abc_ObjFanout(pNode, 0))) {
+    if(Abc_ObjIsCo(Abc_ObjFanout(pNode, 0))||Abc_ObjIsCi(pNode)) {
       badConeRoot.insert(i);
       continue;
     }
