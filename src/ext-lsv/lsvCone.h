@@ -1,3 +1,4 @@
+
 #include "base/abc/abc.h"
 #include "base/main/main.h"
 #include "base/main/mainInt.h"
@@ -6,10 +7,11 @@
 #include <bdd/cudd/cudd.h>
 #include <set>
 
-#define RATIO 8
+#define RATIO 4
 
 using namespace std;
-
+#ifndef LSVCONE_H
+#define LSVCONE_H
 typedef struct coneobj 
 {
   int out_count=0;
@@ -34,7 +36,6 @@ bool forallfanout(coneobj_t* node, bool* set){
     return true;
 }
 int recursive_include(coneobj_t* cone,int node, bool* set,bool* input){
-
   int total=1;
   int i;
   Abc_Obj_t* pFanin;
@@ -75,18 +76,11 @@ int zerofanout(coneobj_t* cone,int node, bool* set, bool* input,int length){
   return total;
 }
 //set is a bool array to record the node is in the window
-int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, set<int>& badConeRoot) {
+int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, set<int>& badConeRoot,bool verbose=false) {
   if (Abc_NtkIsStrash(pNtk) == NULL) {
     Abc_Print(-1, "The network is not Aig logic.\n");
   }
   int i;
-  //Abc_NtkForEachObj(pNtk, pNode, i){
-  //  Abc_Print(-2, "node %d type %d \n", Abc_ObjId(pNode), Abc_ObjType(pNode));
-  //}
-  //Abc_Obj_t* pCi;
-  //Abc_NtkForEachCi(pNtk, pCi, i){
-  //  Abc_Print(-2, "CI: %s %d\n", Abc_ObjName(pCi),Abc_ObjId(pCi));
-  //}
   Abc_Obj_t* pNode;
   int length = Abc_NtkObjNum(pNtk);
   if (input == NULL) {
@@ -100,6 +94,7 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
   int conemax=-1;
   int conemaxid=-1;
   int input_min=length;
+  int ratio=RATIO;
   Abc_NtkForEachNode(pNtk, pNode, i) {
     if (badConeRoot.find(i) != badConeRoot.end()) {
       continue;
@@ -115,7 +110,13 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
     }
     //find all 
     coneset[Abc_ObjId(pNode)] = true;
-    int res = zerofanout(cone ,i, coneset, input, length) + 1;
+    zerofanout(cone ,i, coneset, input, length);
+    int res = 0;
+    for (int j = 0; j < length; ++j) {
+      if (coneset[j]) {
+        res++;
+      }
+    }
     if (res > sizedown) {
       if (res > sizeup) {
         int count = 0;
@@ -123,8 +124,6 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
           if (coneset[j]) {
             count++;
             coneset[j] = false;
-            Abc_Obj_t* pFanin;
-            int k = 0;
             if(count == res-sizeup)
               break;
           }
@@ -148,32 +147,27 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
         }
       }
 
-      if(input_num <= input_min && res >= conemax && ((rand() % RATIO) != 0)) {
+      if(((res == conemax && input_num < input_min)&&((rand() % ratio) != 0))||(res > conemax) ) {
+        if(verbose){
+          Abc_Print(-2, "node %d res=%d: ", i, res);
+          for(int j=0;j<length;++j){
+            if(coneset[j])
+              Abc_Print(-2, "%d ", j);
+          }
+          Abc_Print(-2, "\n");
+        } 
         input_min = input_num;
         conemax = res;
         conemaxid = i;
         memcpy(coneRet, coneset, sizeof(bool) * length);
+        ratio+=1;
       }
-/*
-      Abc_Print(-2, "Cone %d num %d\n", Abc_ObjId(pNode), res);
-      for(int i=0;i<length;i++){
-        if(coneset[i]){
-          Abc_Print(-2, "node %d ", i);
-        }
-      }
-      Abc_Print(-2, "\n");
-      Abc_Print(-2, "input num %d\n", input_num);
-      for(int i=0;i<length;i++){
-        if(input[i]){
-          Abc_Print(-2, "node %d ", i);
-        }
-      }
-      Abc_Print(-2, "\n");
-*/
     }else{
       badConeRoot.insert(i);
     }
   }
+  badConeRoot.insert(conemaxid);
   delete [] cone;
   return conemaxid;
 }
+#endif
