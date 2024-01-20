@@ -143,7 +143,7 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
               }
               else{
                 input[Abc_ObjId(pFanin)] = (coneset[Abc_ObjId(pFanin)]?false:true);
-                Abc_Print(-2, "node %d set %d  in input\n",j, Abc_ObjId(pFanin));
+                //Abc_Print(-2, "node %d set %d  in input\n",j, Abc_ObjId(pFanin));
               }
             }
           }

@@ -47,7 +47,7 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "xtest", XDC_simp, 1);
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
-  Cmd_CommandAdd(pAbc, "LSV", "rtest", resub_test, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "rrr", resub_test, 0);
 }
 
 void destroy(Abc_Frame_t* pAbc) {}
