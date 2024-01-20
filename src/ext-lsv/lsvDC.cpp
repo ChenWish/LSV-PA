@@ -295,6 +295,26 @@ int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNod
   }
 }
 //ref: Abc_NtkBuildGlobalBdds
+int TFO(Abc_Ntk_t* pNtk, Abc_Obj_t* pNode, set<int>& tfoSet){
+  int i;
+  Abc_Obj_t* pFanout;
+  int count=0;
+  set<Abc_Obj_t*> temp;
+  temp.insert(pNode);
+  tfoSet.insert(Abc_ObjId(pNode));
+  while(!temp.empty()){
+    Abc_Obj_t* pTemp=*(temp.begin());
+    temp.erase(pTemp);
+    Abc_ObjForEachFanout(pTemp, pFanout, i){
+      if(tfoSet.find(Abc_ObjId(pFanout))==tfoSet.end()){
+        tfoSet.insert(Abc_ObjId(pFanout));
+        temp.insert(pFanout);
+        count++;
+      }
+    }
+  }
+  return count;
+}
 bool Check(DdNode*& hon,Abc_Ntk_t* pNtk,DdNode* fon,DdNode* foff, DdNode* yBdd, DdNode* abs, DdManager* dd){
   int i;
   Abc_Obj_t* pCo;
@@ -401,6 +421,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   DdManager* dd=(DdManager*)Abc_NtkGlobalBddMan(pNtk);
   map<int, DdNode*> nodeid2ithvar;
   int iteration=(maxinput-candidates.size())*maxinput;
+  Abc_Print(-2, "iteration %d\n", iteration);
   if(iteration<0)
     iteration=0;
   set<int>selected;
@@ -408,16 +429,16 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   //construct original ybdd
   for(int i=0;i<maxinput;i++){
     int temp=RandomPickSet(candidates);
-    Abc_Print(-2, "candidate %d\n", temp);
     nodeid2ithvar[temp]=Cudd_bddIthVar(dd, count);
+    Abc_Print(-2, "node %d ithvar %d\n", temp, count);
     selected.insert(temp);
     count++;
     Cudd_Ref(nodeid2ithvar[temp]);
     candidates.erase(temp);
   }
-
   set<int>::iterator itr;
   DdNode* yBdd;
+  
   for(itr=selected.begin();itr!=selected.end();itr++){
     if(itr==selected.begin()){
       yBdd=Cudd_bddXnor(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtk,*itr)), nodeid2ithvar[*itr]);
@@ -459,16 +480,24 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   //Cudd_PrintMinterm(dd, yBdd);
 
   //do check and random replace iteration times
+  set<int> erased;
   for(int i=0;i<iteration+1;i++){
     if(Check(hon,pNtk, fon, foff, yBdd, abs, dd)){
-      for(itr=candidates.begin();itr!=candidates.end();itr++){
+      for(itr=selected.begin();itr!=selected.end();itr++){
+        Abc_Print(-2, "selected %d\n", *itr);
+        Abc_Print(-2, "try remove %d\n", *itr);
         DdNode* temp=CheckRemove(hon,pNtk, fon, foff, yBdd, abs, dd, nodeid2ithvar[*itr]);
-        while(temp!=NULL){
+        if(temp!=NULL){
+          Abc_Print(-2, "remove success\n");
+          Cudd_RecursiveDeref(dd, yBdd);
           yBdd=temp;
-          temp=CheckRemove(hon,pNtk, fon, foff, yBdd, abs, dd, nodeid2ithvar[*itr]);
+          erased.insert(*itr);
         }
       }
       success=true;
+      for(itr=erased.begin();itr!=erased.end();itr++){
+        selected.erase(*itr);
+      }
       Abc_Print(-2, "resub success\n");
       for(itr=selected.begin();itr!=selected.end();itr++){
         Abc_Print(-2, "selected %d\n", *itr);
@@ -509,9 +538,13 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   bool input[Abc_NtkObjNum(pNtkNew)]= {false};
   int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.5), 3, badConeRoot);
   set<int> candidates;
+  set<int> tfoSet;
+  TFO(pNtkNew, Abc_NtkObj(pNtkNew, root), tfoSet);
   for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
-    if(!cone[i])
+    if(!cone[i] && (tfoSet.find(i)==tfoSet.end()) && (Abc_ObjIsPi(Abc_NtkObj(pNtkNew, i))||Abc_ObjIsNode(Abc_NtkObj(pNtkNew, i)))){
       candidates.insert(i);
+      Abc_Print(-2, "candidate insert%d\n", i);
+    }
   }
   Abc_Print(-2, "root: %d\n", root);
   Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
