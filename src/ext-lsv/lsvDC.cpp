@@ -10,13 +10,18 @@
 #include <list>
 #include "booleanChain.h"
 #include <map>
+#include "aig/hop/hop.h"
+
 extern "C"{
     Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
     Abc_Ntk_t * Abc_NtkFromGlobalBdds( Abc_Ntk_t * pNtk, int fReverse );
     void Abc_NtkShowBdd( Abc_Ntk_t * pNtk, int fCompl, int fReorder );
+    char * Abc_ConvertBddToSop( Mem_Flex_t * pMan, DdManager * dd, DdNode * bFuncOn, DdNode * bFuncOnDc, int nFanins, int fAllPrimes, Vec_Str_t * vCube, int fMode );
 }
+
 extern int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, set<int>& badConeRoot,bool verbose=false);
 int RandomPickSet(set<int>& candidates);
+
 static DdNode * my_NodeGlobalBdds_rec( DdManager * dd, Abc_Obj_t * pNode,int * pCounter, bool fDropInternal)
 {
     int nBddSizeMax = ABC_INFINITY;
@@ -577,6 +582,20 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   DdNode* hon;
   int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates);
   Abc_Print(-2, "success %d\n", success);
+  //build aig from bdd
+
+  Cudd_zddVarsFromBddVars( dd, 2 );
+  Vec_Str_t * vCube;
+  Mem_Flex_t * pManNew;
+  pManNew = Mem_FlexStart();
+  vCube = Vec_StrAlloc( 100 );
+  DdNode * bFunc;
+  bFunc = (DdNode *)pNode->pData;
+  pNode->pNext = (Abc_Obj_t *)Abc_ConvertBddToSop( pManNew, dd, bFunc, bFunc, Abc_ObjFaninNum(pNode), 0, vCube, -1 );
+  assert( Abc_ObjFaninNum(pNode) == Abc_SopGetVarNum((char *)pNode->pNext) );
+  Vec_StrFree( vCube );
+  Abc_Print(-2, "sop: %s\n", (char *)pNode->pNext);
+
 
   Abc_Print(-2, "ddvarnum %d\n",dd->size);
   Cudd_RecursiveDeref(dd, dc);
