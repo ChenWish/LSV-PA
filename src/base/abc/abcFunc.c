@@ -35,7 +35,7 @@ ABC_NAMESPACE_IMPL_START
 
 #define ABC_MAX_CUBES   100000
 
-static Hop_Obj_t * Abc_ConvertSopToAig( Hop_Man_t * pMan, char * pSop );
+Hop_Obj_t * Abc_ConvertSopToAig( Hop_Man_t * pMan, char * pSop );
 
 #ifdef ABC_USE_CUDD
 

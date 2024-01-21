@@ -16,6 +16,7 @@ extern "C"{
     Aig_Man_t* Abc_NtkToDar( Abc_Ntk_t * pNtk, int fExors, int fRegisters );
     Abc_Ntk_t * Abc_NtkFromGlobalBdds( Abc_Ntk_t * pNtk, int fReverse );
     void Abc_NtkShowBdd( Abc_Ntk_t * pNtk, int fCompl, int fReorder );
+    Hop_Obj_t * Abc_ConvertSopToAig( Hop_Man_t * pMan, char * pSop );
     char * Abc_ConvertBddToSop( Mem_Flex_t * pMan, DdManager * dd, DdNode * bFuncOn, DdNode * bFuncOnDc, int nFanins, int fAllPrimes, Vec_Str_t * vCube, int fMode );
 }
 
@@ -421,15 +422,13 @@ int RandomPickSet(set<int>& candidates){
   advance(itr, rand()%candidates.size());
   return *itr;
 }
-int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,set<int>& candidates, int maxinput=20){
+int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,set<int>& candidates,set<int>& selected,map<int, DdNode*>& nodeid2ithvar, int maxinput=20){
   int pinum=Abc_NtkPiNum(pNtk);
   DdManager* dd=(DdManager*)Abc_NtkGlobalBddMan(pNtk);
-  map<int, DdNode*> nodeid2ithvar;
   int iteration=(maxinput-candidates.size())*maxinput;
   Abc_Print(-2, "iteration %d\n", iteration);
   if(iteration<0)
     iteration=0;
-  set<int>selected;
   int count=Abc_NtkPiNum(pNtk);
   //construct original ybdd
   for(int i=0;i<maxinput;i++){
@@ -543,7 +542,9 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   bool input[Abc_NtkObjNum(pNtkNew)]= {false};
   int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.5), 3, badConeRoot);
   set<int> candidates;
+  set<int> selected;
   set<int> tfoSet;
+  map<int, DdNode*> nodeid2ithvar;
   TFO(pNtkNew, Abc_NtkObj(pNtkNew, root), tfoSet);
   for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
     if(!cone[i] && (tfoSet.find(i)==tfoSet.end()) && (Abc_ObjIsPi(Abc_NtkObj(pNtkNew, i))||Abc_ObjIsNode(Abc_NtkObj(pNtkNew, i)))){
@@ -580,21 +581,48 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   //testing image bdd
   
   DdNode* hon;
-  int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates);
+  int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar);
   Abc_Print(-2, "success %d\n", success);
   //build aig from bdd
 
-  Cudd_zddVarsFromBddVars( dd, 2 );
-  Vec_Str_t * vCube;
-  Mem_Flex_t * pManNew;
-  pManNew = Mem_FlexStart();
-  vCube = Vec_StrAlloc( 100 );
-  DdNode * bFunc;
-  bFunc = (DdNode *)pNode->pData;
-  pNode->pNext = (Abc_Obj_t *)Abc_ConvertBddToSop( pManNew, dd, bFunc, bFunc, Abc_ObjFaninNum(pNode), 0, vCube, -1 );
-  assert( Abc_ObjFaninNum(pNode) == Abc_SopGetVarNum((char *)pNode->pNext) );
-  Vec_StrFree( vCube );
-  Abc_Print(-2, "sop: %s\n", (char *)pNode->pNext);
+  //Cudd_zddVarsFromBddVars( dd, 2 );
+  //Vec_Str_t * vCube;
+  //Mem_Flex_t * pManNew;
+  //pManNew = Mem_FlexStart();
+  //vCube = Vec_StrAlloc( 100 );
+  //DdNode * bFunc;
+  //bFunc = (DdNode *)pNode->pData;
+  //pNode->pNext = (Abc_Obj_t *)Abc_ConvertBddToSop( pManNew, dd, bFunc, bFunc, Abc_ObjFaninNum(pNode), 0, vCube, -1 );
+  //assert( Abc_ObjFaninNum(pNode) == Abc_SopGetVarNum((char *)pNode->pNext) );
+  //Vec_StrFree( vCube );
+  //Abc_Print(-2, "sop: %s\n", (char *)pNode->pNext);
+
+  DdGen *gen;
+  int *cube;
+  set<int>::iterator itr;
+  string sopstr="";
+  CUDD_VALUE_TYPE value;
+  Cudd_ForeachCube(dd, hon, gen,cube,value ){
+    Abc_Print(-2, "cube: ");
+    for(itr=selected.begin();itr!=selected.end();itr++){
+      int id=nodeid2ithvar[*itr]->index;
+      if(cube[id]==0)
+        sopstr.append("0");
+      else if(cube[id]==1)
+        sopstr.append("1");
+      else
+        sopstr.append("-");
+    }
+    sopstr.append(" 1\n");
+  }
+  Abc_Print(-2, "sop: %s\n", sopstr.c_str());
+  Abc_Ntk_t* pNtkNewNew=Abc_NtkDup(pNtkNew);
+  Abc_Obj_t* pNodeNewNew=Abc_NtkObj(pNtkNewNew, root);
+  Hop_Man_t* pMan=(Hop_Man_t*)pNtkNewNew->pManFunc;
+  pNode->pData = Abc_ConvertSopToAig( pMan, (char *)pNode->pData );
+  pNode->pCopy=Abc_NodeStrash( pNtkNewNew, pNode, 0 );
+
+  
 
 
   Abc_Print(-2, "ddvarnum %d\n",dd->size);
