@@ -572,16 +572,25 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
 }
 
 int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> selected){
+  set<int>::iterator itr;
+  itr=selected.begin();
+  Abc_Obj_t* pNode;
+  int i;
+  map<Abc_Obj_t*, Abc_Obj_t*> nodenew2node;
+  Abc_Obj_t* pPo;
+  Abc_NtkForEachPi(pNtkNew, pNode, i){
+    nodenew2node[pNode]=Abc_NtkObj(pNtk, *itr);
+    Abc_Print(-2, "new %d original %d\n", i, *itr);
+    itr++;
+  }
   Abc_ObjRemoveFanins(Abc_NtkObj(pNtk, root));
   for(int i=Abc_NtkObjNum(pNtk)-1;i>=0;i--){
     if(i!=root && cone[i]){
       Abc_NtkDeleteObj(Abc_NtkObj(pNtk, i));
     }
   }
-  Abc_Obj_t* pNode;
-  int i;
-  map<Abc_Obj_t*, Abc_Obj_t*> nodenew2node;
-  Abc_Obj_t* pPo;
+  
+  
   pPo=Abc_NtkPo(pNtkNew, 0);
   bool shown=false;
   Abc_NtkForEachNode(pNtkNew, pNode, i){
@@ -593,25 +602,33 @@ int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> 
         Abc_Print(-1, "po shown twice");
       }
       nodenew2node[pNode]=Abc_NtkObj(pNtk, root);
+      Abc_Print(-2, "newnode %d original %d\n", i, root);
     }else{
       Abc_Obj_t* temp;
       temp=Abc_NtkCreateNode(pNtk);
       nodenew2node[pNode]=temp;
+      Abc_Print(-2, "newnode %d original %d\n", i, Abc_ObjId(temp));
     }
-  }
-  set<int>::iterator itr;
-  itr=selected.begin();
-  Abc_NtkForEachPi(pNtkNew, pNode, i){
-    nodenew2node[pNode]=Abc_NtkObj(pNtk, *itr);
-    itr++;
   }
   Abc_NtkForEachNode(pNtkNew, pNode, i){
     Abc_Obj_t* temp=nodenew2node[pNode];
     Abc_Obj_t* fanin0=nodenew2node[Abc_ObjFanin0(pNode)];
     Abc_Obj_t* fanin1=nodenew2node[Abc_ObjFanin1(pNode)];
+    Abc_ObjSetCopy(temp, temp);
+
+    if(temp==NULL || fanin0==NULL || fanin1==NULL){
+      Abc_Print(-1, "null pointer\n");
+    }
     Abc_ObjAddFanin(temp, fanin0);
     Abc_ObjAddFanin(temp, fanin1);
   }
+  Abc_NtkForEachObj(pNtk, pNode, i){
+    if(Abc_ObjCopy(pNode)==NULL){
+      Abc_Print(-1, "node %d has null copy\n",i);
+    }
+  }
+  Abc_NtkShow(pNtkNew,0, 0, 1, 0);
+  Abc_NtkShow(pNtk,0, 0, 1, 0);
   return 0;
 }
 int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int num,bool needntk){
@@ -668,7 +685,6 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   my_NtkBuildGlobalBdds(pNtkNew, fDropInternal, fReorder);
   dd=(DdManager*)Abc_NtkGlobalBddMan(pNtkNew);
   Abc_Print(-2, "nodenum after reconstruction%d\n",Abc_NtkObjNum(pNtkNew));
-  Abc_NtkShow(pNtkNew, 0, 0, 1, 0);
   //testing image bdd
   
   DdNode* hon;
@@ -720,12 +736,12 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
   Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
   int i;
-  if(Abc_NtkNodeNum(pNtkNewNew)<=conesize)
-    replace(pNtkNewNew, pNtkNew, root,cone,selected);
-  else{
-    Abc_Print(-2, "after resub is larger\n");
-    replace(pNtkNewNew, pNtkNew, root,cone,selected);
-  }
+  //if(Abc_NtkNodeNum(pNtkNewNew)<=conesize)
+  //  replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  //else{
+  //  Abc_Print(-2, "after resub is larger\n");
+  //  replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  //}
   Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
   //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
   //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
