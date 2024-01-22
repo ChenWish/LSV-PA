@@ -572,6 +572,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
 }
 
 int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> selected){
+  
   set<int>::iterator itr;
   itr=selected.begin();
   Abc_Obj_t* pNode;
@@ -627,7 +628,6 @@ int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> 
       Abc_Print(-1, "node %d has null copy\n",i);
     }
   }
-  Abc_NtkShow(pNtkNew,0, 0, 1, 0);
   Abc_NtkShow(pNtk,0, 0, 1, 0);
   return 0;
 }
@@ -736,12 +736,20 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
   Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
   int i;
-  //if(Abc_NtkNodeNum(pNtkNewNew)<=conesize)
-  //  replace(pNtkNewNew, pNtkNew, root,cone,selected);
-  //else{
-  //  Abc_Print(-2, "after resub is larger\n");
-  //  replace(pNtkNewNew, pNtkNew, root,cone,selected);
-  //}
+  Abc_NtkForEachObj(pNtk, pNode, i){
+    if(Abc_ObjCopy(pNode)==NULL){
+      Abc_Print(-1, "node before replace %d has null copy\n",i);
+    }
+  }
+  Abc_NtkShow(pNtkNew,0, 0, 1, 0);
+  if(Abc_NtkNodeNum(pNtkNewNew)<=conesize)
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  else{
+    Abc_Print(-2, "after resub is larger\n");
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  }
+
+  Abc_NtkShow(pNtkNew,0, 0, 1, 0);
   Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
   //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
   //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
