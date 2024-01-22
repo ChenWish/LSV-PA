@@ -18,6 +18,7 @@ extern "C"{
     void Abc_NtkShowBdd( Abc_Ntk_t * pNtk, int fCompl, int fReorder );
     Hop_Obj_t * Abc_ConvertSopToAig( Hop_Man_t * pMan, char * pSop );
     char * Abc_ConvertBddToSop( Mem_Flex_t * pMan, DdManager * dd, DdNode * bFuncOn, DdNode * bFuncOnDc, int nFanins, int fAllPrimes, Vec_Str_t * vCube, int fMode );
+    void Abc_NtkStrashPerform( Abc_Ntk_t * pNtk, Abc_Ntk_t * pNtkNew, int fAllNodes, int fRecord );
 }
 
 extern int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, set<int>& badConeRoot,bool verbose=false);
@@ -616,13 +617,27 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
     sopstr.append(" 1\n");
   }
   Abc_Print(-2, "sop: %s\n", sopstr.c_str());
-  Abc_Ntk_t* pNtkNewNew=Abc_NtkDup(pNtkNew);
-  Abc_Obj_t* pNodeNewNew=Abc_NtkObj(pNtkNewNew, root);
-  Hop_Man_t* pMan=(Hop_Man_t*)pNtkNewNew->pManFunc;
-  pNode->pData = Abc_ConvertSopToAig( pMan, (char *)pNode->pData );
-  pNode->pCopy=Abc_NodeStrash( pNtkNewNew, pNode, 0 );
 
+  Hop_Man_t * pMan;
+  pMan = Hop_ManStart();
+  int Max=selected.size();
+  if ( Max ) Hop_IthVar( pMan, Max-1 );
+  Abc_Ntk_t* pNtkNewNew=Abc_NtkStartFrom( pNtkNew, ABC_NTK_LOGIC, ABC_FUNC_SOP );
+  pNode=Abc_NtkCreateNode( pNtkNewNew );
+  Abc_Obj_t* pCo=Abc_NtkCreatePo( pNtkNewNew );
+  Abc_ObjAddFanin(pCo, pNode);
+  for(int i=0;i<selected.size();i++){
+    Abc_Obj_t* pPi=Abc_NtkCreatePi( pNtkNewNew );
+    Abc_ObjAddFanin(pNode, pPi);
+  }
+  pNode->pData = Abc_ConvertSopToAig( pMan, (char*)sopstr.c_str() );
+  pNtkNewNew->pManFunc=pMan;
+  pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
+  Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
+  Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
+  Abc_NtkFinalize( pNtkNewNew, pNtkAig );
   
+
 
 
   Abc_Print(-2, "ddvarnum %d\n",dd->size);
