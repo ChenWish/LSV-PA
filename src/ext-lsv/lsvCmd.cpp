@@ -619,4 +619,6 @@ int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
   Abc_Ntk_t* pNewNtk;
   Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false);
+  return 0;
+  
 }

@@ -678,7 +678,12 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
 
   pNtkNewNew=Abc_NtkStrash(pNtkNewNew, 0, 1, 0);
-  Abc_FrameSetCurrentNetwork(pAbc, pNtkNewNew);
+  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  Abc_NtkRewrite( pNtk, 1, 0, 0, 0, 0 );
+  Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
+  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
+  Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNewNew);
   //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
   //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
   //Abc_NtkFinalize( pNtkNewNew, pNtkAig );
