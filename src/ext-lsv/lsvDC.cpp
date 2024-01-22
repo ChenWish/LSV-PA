@@ -570,7 +570,35 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   return success;
 }
 
-
+int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> selected){
+  for(int i=Abc_NtkObjNum(pNtk)-1;i>=0;i--){
+    if(i!=root && cone[i]){
+      Abc_NtkDeleteObj(Abc_NtkObj(pNtk, i));
+    }
+  }
+  Abc_Obj_t* pNode;
+  int i;
+  map<Abc_Obj_t*, Abc_Obj_t*> nodenew2node;
+  Abc_NtkForEachNode(pNtkNew, pNode, i){
+    Abc_Obj_t* temp;
+    temp=Abc_NtkCreateNode(pNtk);
+    nodenew2node[pNode]=temp;
+  }
+  set<int>::iterator itr;
+  itr=selected.begin();
+  Abc_NtkForEachPi(pNtkNew, pNode, i){
+    nodenew2node[pNode]=Abc_NtkObj(pNtk, *itr);
+    itr++;
+  }
+  Abc_NtkForEachNode(pNtkNew, pNode, i){
+    Abc_Obj_t* temp=nodenew2node[pNode];
+    Abc_Obj_t* fanin0=nodenew2node[Abc_ObjFanin0(pNode)];
+    Abc_Obj_t* fanin1=nodenew2node[Abc_ObjFanin1(pNode)];
+    Abc_ObjAddFanin(temp, fanin0);
+    Abc_ObjAddFanin(temp, fanin1);
+  }
+  return 0;
+}
 int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int num,bool needntk){
   int ithPo, ithPi;
   Abc_Obj_t* pPo, *pPi, *pNode;
@@ -584,6 +612,11 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   bool cone[Abc_NtkObjNum(pNtkNew)]= {false};
   bool input[Abc_NtkObjNum(pNtkNew)]= {false};
   int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.5), 3, badConeRoot);
+  int conesize=0;
+  for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
+    if(cone[i])
+      conesize++;
+  }
   set<int> candidates;
   set<int> selected;
   set<int> tfoSet;
@@ -626,20 +659,8 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   DdNode* hon;
   int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar);
   Abc_Print(-2, "success %d\n", success);
+
   //build aig from bdd
-
-  //Cudd_zddVarsFromBddVars( dd, 2 );
-  //Vec_Str_t * vCube;
-  //Mem_Flex_t * pManNew;
-  //pManNew = Mem_FlexStart();
-  //vCube = Vec_StrAlloc( 100 );
-  //DdNode * bFunc;
-  //bFunc = (DdNode *)pNode->pData;
-  //pNode->pNext = (Abc_Obj_t *)Abc_ConvertBddToSop( pManNew, dd, bFunc, bFunc, Abc_ObjFaninNum(pNode), 0, vCube, -1 );
-  //assert( Abc_ObjFaninNum(pNode) == Abc_SopGetVarNum((char *)pNode->pNext) );
-  //Vec_StrFree( vCube );
-  //Abc_Print(-2, "sop: %s\n", (char *)pNode->pNext);
-
   DdGen *gen;
   int *cube;
   set<int>::iterator itr;
@@ -683,7 +704,14 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
   pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
   Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
-  Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNewNew);
+  int i;
+  if(Abc_NtkNodeNum(pNtkNewNew)<=conesize)
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  else{
+    Abc_Print(-2, "after resub is larger\n");
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+  }
+  Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
   //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
   //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
   //Abc_NtkFinalize( pNtkNewNew, pNtkAig );
