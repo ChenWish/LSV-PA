@@ -19,6 +19,7 @@ extern "C"{
     Hop_Obj_t * Abc_ConvertSopToAig( Hop_Man_t * pMan, char * pSop );
     char * Abc_ConvertBddToSop( Mem_Flex_t * pMan, DdManager * dd, DdNode * bFuncOn, DdNode * bFuncOnDc, int nFanins, int fAllPrimes, Vec_Str_t * vCube, int fMode );
     void Abc_NtkStrashPerform( Abc_Ntk_t * pNtk, Abc_Ntk_t * pNtkNew, int fAllNodes, int fRecord );
+    void Abc_NtkShow( Abc_Ntk_t * pNtk0, int fGateNames, int fSeq, int fUseReverse, int fKeepDot );
 }
 
 extern int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedown, set<int>& badConeRoot,bool verbose=false);
@@ -571,6 +572,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
 }
 
 int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> selected){
+  Abc_ObjRemoveFanins(Abc_NtkObj(pNtk, root));
   for(int i=Abc_NtkObjNum(pNtk)-1;i>=0;i--){
     if(i!=root && cone[i]){
       Abc_NtkDeleteObj(Abc_NtkObj(pNtk, i));
@@ -579,10 +581,23 @@ int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> 
   Abc_Obj_t* pNode;
   int i;
   map<Abc_Obj_t*, Abc_Obj_t*> nodenew2node;
+  Abc_Obj_t* pPo;
+  pPo=Abc_NtkPo(pNtkNew, 0);
+  bool shown=false;
   Abc_NtkForEachNode(pNtkNew, pNode, i){
-    Abc_Obj_t* temp;
-    temp=Abc_NtkCreateNode(pNtk);
-    nodenew2node[pNode]=temp;
+    if(pNode==Abc_ObjFanin0(pPo) || pNode==Abc_ObjFanin1(pPo)){
+      if(shown==false){
+        Abc_Print(-2, "po shown\n");
+        shown=true;
+      }else{
+        Abc_Print(-1, "po shown twice");
+      }
+      nodenew2node[pNode]=Abc_NtkObj(pNtk, root);
+    }else{
+      Abc_Obj_t* temp;
+      temp=Abc_NtkCreateNode(pNtk);
+      nodenew2node[pNode]=temp;
+    }
   }
   set<int>::iterator itr;
   itr=selected.begin();
@@ -653,7 +668,7 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   my_NtkBuildGlobalBdds(pNtkNew, fDropInternal, fReorder);
   dd=(DdManager*)Abc_NtkGlobalBddMan(pNtkNew);
   Abc_Print(-2, "nodenum after reconstruction%d\n",Abc_NtkObjNum(pNtkNew));
-  
+  Abc_NtkShow(pNtkNew, 0, 0, 1, 0);
   //testing image bdd
   
   DdNode* hon;
