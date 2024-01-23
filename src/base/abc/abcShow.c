@@ -289,10 +289,6 @@ void Abc_NtkShow( Abc_Ntk_t * pNtk0, int fGateNames, int fSeq, int fUseReverse, 
 
     // convert to logic SOP
     Abc_Obj_t* pObj;
-    Abc_Print(-2,"in ntkshow");
-    Abc_NtkForEachNode( pNtk0, pObj, i ){
-        Abc_Print(-2, "int ntkshow node %d has children %d %d\n",i,(long)Abc_ObjChild0Copy(pObj),(long)Abc_ObjChild1Copy(pObj));
-    }
     pNtk = Abc_NtkDup( pNtk0 );
     if ( Abc_NtkIsLogic(pNtk) && !Abc_NtkHasMapping(pNtk) )
         Abc_NtkToSop( pNtk, -1, ABC_INFINITY );

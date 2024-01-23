@@ -425,6 +425,7 @@ void Abc_NtkFinalizeRead( Abc_Ntk_t * pNtk )
 ***********************************************************************/
 Abc_Ntk_t * Abc_NtkDup( Abc_Ntk_t * pNtk )
 {
+    
     Abc_Ntk_t * pNtkNew; 
     Abc_Obj_t * pObj, * pFanin;
     int i, k;
@@ -436,9 +437,6 @@ Abc_Ntk_t * Abc_NtkDup( Abc_Ntk_t * pNtk )
     if ( Abc_NtkIsStrash(pNtk) )
     {
         // copy the AND gates
-        Abc_NtkForEachNode( pNtk, pObj, i ){
-            printf("node %d %d %d\n",i,(long)Abc_ObjChild0Copy(pObj),(long)Abc_ObjChild1Copy(pObj));
-        }
         Abc_AigForEachAnd( pNtk, pObj, i ){
             pObj->pCopy = Abc_AigAnd( (Abc_Aig_t *)pNtkNew->pManFunc, Abc_ObjChild0Copy(pObj), Abc_ObjChild1Copy(pObj) );
         }
