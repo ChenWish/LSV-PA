@@ -620,13 +620,17 @@ int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> 
     if(temp==NULL || fanin0==NULL || fanin1==NULL){
       Abc_Print(-1, "null pointer\n");
     }
-    Abc_ObjAddFanin(temp, fanin0);
-    Abc_ObjAddFanin(temp, fanin1);
+    Abc_ObjAddFanin(temp, Abc_ObjNotCond(fanin0,pNode->fCompl0));
+    Abc_ObjAddFanin(temp, Abc_ObjNotCond(fanin1,pNode->fCompl1));
   }
   Abc_NtkForEachObj(pNtk, pNode, i){
     if(Abc_ObjCopy(pNode)==NULL){
       Abc_Print(-1, "node %d has null copy\n",i);
     }
+  }
+  Abc_Obj_t* pObj;
+  Abc_NtkForEachNode( pNtk, pObj, i ){
+    Abc_Print(-2, "node %d has children %d %d\n",i,(long)Abc_ObjChild0Copy(pObj),(long)Abc_ObjChild1Copy(pObj));
   }
   Abc_NtkShow(pNtk,0, 0, 1, 0);
   return 0;
