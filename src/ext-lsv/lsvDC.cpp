@@ -206,8 +206,8 @@ DdNode* getDC_bdd(Abc_Ntk_t*& pNtk, Abc_Obj_t* tNode, DdManager*& dd,bool fReord
     else{
       DdNode* temp=Cudd_bddAnd(dd, dcnode, dccheck);
       Cudd_Ref(temp);
-      //Cudd_RecursiveDeref(dd, dccheck);
-      //Cudd_RecursiveDeref(dd, dcnode);
+      Cudd_RecursiveDeref(dd, dccheck);
+      Cudd_RecursiveDeref(dd, dcnode);
       dccheck=temp;
     }
   }
@@ -281,7 +281,7 @@ int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNod
     //Abc_Print(-2, "\n");
     count+=DCIntGen(cube, bc,dd->size-1);
   }
-  //Cudd_RecursiveDeref(dd, dccheck);
+  Cudd_RecursiveDeref(dd, dccheck);
 
   if(needntk){
     retntk=Abc_NtkFromGlobalBdds(pNtkNew, 0);
@@ -357,30 +357,12 @@ bool Check(DdNode*& hon,Abc_Ntk_t* pNtk,DdNode* fon,DdNode* foff, DdNode* yBdd, 
   CUDD_VALUE_TYPE value;
   if(verbose){
     Abc_Print(-2, "hon\n");
-    Cudd_ForeachCube(dd, hon, gen,cube,value ){
-      Abc_Print(-2, "cube: ");
-      for(int j=0;j<dd->size;j++){
-        if(cube[j]==0)
-          Abc_Print(-2, "0", j);
-        else if(cube[j]==1)
-          Abc_Print(-2, "1", j);
-        else
-          Abc_Print(-2, "-", j);
-      }
-      Abc_Print(-2, " 1\n");
+    if(Cudd_PrintMinterm(dd, hon)==0){
+      Abc_Print(-2, "memory out\n");
     }
     Abc_Print(-2, "hoff\n");
-    Cudd_ForeachCube(dd, hoff, gen,cube,value ){
-      Abc_Print(-2, "cube: ");
-      for(int j=0;j<dd->size;j++){
-        if(cube[j]==0)
-          Abc_Print(-2, "0", j);
-        else if(cube[j]==1)
-          Abc_Print(-2, "1", j);
-        else
-          Abc_Print(-2, "-", j);
-      }
-      Abc_Print(-2, " 1\n");
+    if(Cudd_PrintMinterm(dd, hoff)==0){
+      Abc_Print(-2, "memory out\n");
     }
   }
 
@@ -388,15 +370,15 @@ bool Check(DdNode*& hon,Abc_Ntk_t* pNtk,DdNode* fon,DdNode* foff, DdNode* yBdd, 
     Abc_Print(-2, "intersec is constant\n");
   }
   if(Cudd_IsConstant(intersec) && Cudd_IsComplement(intersec)){
-    //Cudd_RecursiveDeref(dd, intersec);
-    //Cudd_RecursiveDeref(dd, hoff);
+    Cudd_RecursiveDeref(dd, intersec);
+    Cudd_RecursiveDeref(dd, hoff);
     
     return true;
   }else{
     Abc_Print(-2, "onset and offset intersects\n");
-    //Cudd_RecursiveDeref(dd, intersec);
-    //Cudd_RecursiveDeref(dd, hon);
-    //Cudd_RecursiveDeref(dd, hoff);
+    Cudd_RecursiveDeref(dd, intersec);
+    Cudd_RecursiveDeref(dd, hon);
+    Cudd_RecursiveDeref(dd, hoff);
     return false;
   }
 }
@@ -429,7 +411,7 @@ int randomReplace(Abc_Ntk_t* pNtk,DdNode* yBdd, int replacer,map<int, DdNode*>& 
   Cudd_Ref(temp3);
   Cudd_RecursiveDeref(dd, temp);
   Cudd_RecursiveDeref(dd, temp2);
-  //Cudd_RecursiveDeref(dd, yBdd);
+  Cudd_RecursiveDeref(dd, yBdd);
   yBdd=temp3;
   nodeid2ithvar.erase(tar);
   selected.erase(tar);
@@ -484,7 +466,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
       Cudd_Ref(temp);
       DdNode* temp2=Cudd_bddAnd(dd, yBdd, temp);
       Cudd_Ref(temp2);
-      //Cudd_RecursiveDeref(dd, yBdd);
+      Cudd_RecursiveDeref(dd, yBdd);
       Cudd_RecursiveDeref(dd, temp);
       yBdd=temp2;
     }
@@ -528,7 +510,7 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
         DdNode* temp=CheckRemove(hon,pNtk, fon, foff, yBdd, abs, dd, nodeid2ithvar[*itr],verbose);
         if(temp!=NULL){
           Abc_Print(-2, "remove success\n");
-          //Cudd_RecursiveDeref(dd, yBdd);
+          Cudd_RecursiveDeref(dd, yBdd);
           yBdd=temp;
           erased.insert(*itr);
         }
@@ -547,10 +529,11 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
       int replacer=RandomPickSet(candidates);
       candidates.erase(replacer);
       int replaced=randomReplace(pNtk, yBdd, replacer, nodeid2ithvar, dd, selected);
+      candidates.insert(replaced);
       Abc_Print(-2, "replacer %d replaced %d\n", replacer, replaced);
     }
   }
-
+  Abc_Print(-2,"Iteration over\n");
 
   //if(!success){
   //  Cudd_RecursiveDeref(dd, yBdd);
@@ -561,9 +544,9 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   Cudd_Ref(hon);
   Cudd_RecursiveDeref(dd, temp);
   //free resources
-  //Cudd_RecursiveDeref(dd, abs);
-  //Cudd_RecursiveDeref(dd, fon);
-  //Cudd_RecursiveDeref(dd, foff);
+  Cudd_RecursiveDeref(dd, abs);
+  Cudd_RecursiveDeref(dd, fon);
+  Cudd_RecursiveDeref(dd, foff);
 
   return success;
 }
@@ -654,7 +637,7 @@ int replace(Abc_Ntk_t*& pNtkNew, Abc_Ntk_t*& pNtk, int root,bool* cone,set<int> 
   pNtk=pNtkRet;
   return 0;
 }
-int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int num,bool needntk){
+int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int num,bool needntk,set<int>& badConeRoot){
   int ithPo, ithPi;
   Abc_Obj_t* pPo, *pPi, *pNode;
   
@@ -662,128 +645,142 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   bool fDropInternal=false;
   bool fReorder=false;
   Abc_Ntk_t* pNtkNew=Abc_NtkDup(pNtk);
-  for(int k=0;k<Abc_NtkObjNum(pNtkNew)*0.1;k++){
-    DdManager* dd=NULL;
-    set<int> badConeRoot;
+  DdManager* dd=NULL;
 
-    bool cone[Abc_NtkObjNum(pNtkNew)]= {false};
-    bool input[Abc_NtkObjNum(pNtkNew)]= {false};
-    int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.25), 3, badConeRoot);
-    int conesize=0;
-    for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
-      if(cone[i])
-        conesize++;
-    }
-    set<int> candidates;
-    set<int> selected;
-    set<int> tfoSet;
-    map<int, DdNode*> nodeid2ithvar;
-    TFO(pNtkNew, Abc_NtkObj(pNtkNew, root), tfoSet);
-    for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
-      if(!cone[i] && (tfoSet.find(i)==tfoSet.end()) && (Abc_ObjIsPi(Abc_NtkObj(pNtkNew, i))||Abc_ObjIsNode(Abc_NtkObj(pNtkNew, i)))){
-        candidates.insert(i);
-        //Abc_Print(-2, "candidate insert%d\n", i);
-      }
-    }
-    Abc_Print(-2, "root: %d\n", root);
-    Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
-    DdNode* dc=getDC_bdd(pNtkNew, Nodenew, dd,fReorder);
-    Abc_Print(-2, "dc\n");
-    //Cudd_PrintMinterm(dd, dc);
-    if(dd==NULL){
-      Abc_Print(-1, "build bdd fail\n");
-    }
-    //Abc_NtkForEachNode(pNtkNew, pNode, ithPo){
-    //  if(Abc_ObjGlobalBdd(pNode)==NULL){
-    //    Abc_Print(-2, "node %d is null\n", ithPo);
-    //  }
-    //}
-
-    Abc_NtkForEachNode(pNtkNew, pNode, ithPo){
-      if(Abc_ObjGlobalBdd(Abc_ObjFanin0(pNode))==NULL || Abc_ObjGlobalBdd(Abc_ObjFanin1(pNode))==NULL){
-        if(Abc_ObjGlobalBdd(pNode)!=NULL){
-          Cudd_RecursiveDeref(dd,(DdNode*)(Abc_ObjGlobalBdd(pNode)));
-          Abc_ObjSetGlobalBdd(pNode, NULL);
-        }
-      }
-    }
-    //construct original bdd
-    my_NtkBuildGlobalBdds(pNtkNew, fDropInternal, fReorder);
-    dd=(DdManager*)Abc_NtkGlobalBddMan(pNtkNew);
-    //testing image bdd
-    
-    DdNode* hon;
-    int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar);
-    Abc_Print(-2, "success %d\n", success);
-
-    //build aig from bdd
-    DdGen *gen;
-    int *cube;
-    set<int>::iterator itr;
-    string sopstr="";
-    CUDD_VALUE_TYPE value;
-    //Abc_Print(-2, "root: %d\n", root);
-    //Cudd_PrintMinterm(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, root)));
-    for(itr=selected.begin();itr!=selected.end();itr++){
-      Abc_Print(-2, "node: %d, ithvar: %d\n", *itr, nodeid2ithvar[*itr]->index);
-      //Cudd_PrintMinterm(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
-    }
-    Cudd_ForeachCube(dd, hon, gen,cube,value ){
-      DdNode* temp=Cudd_ReadOne(dd);
-      for(itr=selected.begin();itr!=selected.end();itr++){
-        int id=nodeid2ithvar[*itr]->index;
-        if(cube[id]==0){
-          temp=Cudd_bddAnd(dd, temp, Cudd_Not((DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr))));
-          sopstr.append("0");
-        }
-        else if(cube[id]==1){
-          temp=Cudd_bddAnd(dd, temp, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
-          sopstr.append("1");
-        }
-        else
-          sopstr.append("-");
-      }
-      Cudd_Ref(temp);
-      //Abc_Print(-2, "cube: ");
-      //Cudd_PrintMinterm(dd, temp);
-      sopstr.append(" 1\n");
-    }
-    Hop_Man_t * pMan;
-    pMan = Hop_ManStart();
-    int Max=selected.size();
-    if ( Max ) Hop_IthVar( pMan, Max-1 );
-    Abc_Ntk_t* pNtkNewNew=Abc_NtkAlloc( ABC_NTK_LOGIC, ABC_FUNC_AIG, 1 );
-    pNode=Abc_NtkCreateNode( pNtkNewNew );
-    Abc_Obj_t* pCo=Abc_NtkCreatePo( pNtkNewNew );
-    Abc_ObjAddFanin(pCo, pNode);
-    for(int i=0;i<selected.size();i++){
-      Abc_Obj_t* pPi=Abc_NtkCreatePi( pNtkNewNew );
-      Abc_ObjAddFanin(pNode, pPi);
-    }
-    Abc_Print(-2, "sopstr: %s\n", sopstr.c_str());
-    pNode->pData = Abc_ConvertSopToAig( pMan, (char*)sopstr.c_str() );
-    pNtkNewNew->pManFunc=pMan;
-    pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
-
-    pNtkNewNew=Abc_NtkStrash(pNtkNewNew, 0, 1, 0);
-    pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
-    Abc_NtkRewrite( pNtk, 1, 0, 0, 0, 0 );
-    Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
-    pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
-    Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
-    int i;
-    if(Abc_NtkNodeNum(pNtkNewNew)<=conesize){
-      replace(pNtkNewNew, pNtkNew, root,cone,selected);
-      Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
-    }
-    else{
-      Abc_Print(-2, "after resub is larger\n");
-    }
-    //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
-    //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
-    //Abc_NtkFinalize( pNtkNewNew, pNtkAig );
-    Abc_Print(-2, "ddvarnum %d\n",dd->size);
-    //Cudd_RecursiveDeref(dd, dc);
+  bool cone[Abc_NtkObjNum(pNtkNew)]= {false};
+  bool input[Abc_NtkObjNum(pNtkNew)]= {false};
+  int root=getCone(pNtkNew, cone, input, int(Abc_NtkObjNum(pNtkNew)*0.25), 3, badConeRoot);
+  int conesize=0;
+  for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
+    if(cone[i])
+      conesize++;
   }
+  set<int> candidates;
+  set<int> selected;
+  set<int> tfoSet;
+  map<int, DdNode*> nodeid2ithvar;
+  TFO(pNtkNew, Abc_NtkObj(pNtkNew, root), tfoSet);
+  for(int i=0;i<Abc_NtkObjNum(pNtkNew);i++){
+    if(!cone[i] && (tfoSet.find(i)==tfoSet.end()) && (Abc_ObjIsPi(Abc_NtkObj(pNtkNew, i))||Abc_ObjIsNode(Abc_NtkObj(pNtkNew, i)))){
+      candidates.insert(i);
+      //Abc_Print(-2, "candidate insert%d\n", i);
+    }
+  }
+  Abc_Print(-2, "root: %d\n", root);
+  Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
+  DdNode* dc=getDC_bdd(pNtkNew, Nodenew, dd,fReorder);
+  //Abc_Print(-2, "dc\n");
+  //Cudd_PrintMinterm(dd, dc);
+  if(dd==NULL){
+    Abc_Print(-1, "build bdd fail\n");
+  }
+  //Abc_NtkForEachNode(pNtkNew, pNode, ithPo){
+  //  if(Abc_ObjGlobalBdd(pNode)==NULL){
+  //    Abc_Print(-2, "node %d is null\n", ithPo);
+  //  }
+  //}
+
+  Abc_NtkForEachNode(pNtkNew, pNode, ithPo){
+    if(Abc_ObjGlobalBdd(Abc_ObjFanin0(pNode))==NULL || Abc_ObjGlobalBdd(Abc_ObjFanin1(pNode))==NULL){
+      if(Abc_ObjGlobalBdd(pNode)!=NULL){
+        Cudd_RecursiveDeref(dd,(DdNode*)(Abc_ObjGlobalBdd(pNode)));
+        Abc_ObjSetGlobalBdd(pNode, NULL);
+      }
+    }
+  }
+  //construct original bdd
+  my_NtkBuildGlobalBdds(pNtkNew, fDropInternal, fReorder);
+  dd=(DdManager*)Abc_NtkGlobalBddMan(pNtkNew);
+  //testing image bdd
+  
+  DdNode* hon;
+  int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar);
+  Abc_Print(-2, "success %d\n", success);
+  
+  if(success==0){
+    Abc_Print(-2, "resub fail\n");
+    Abc_NtkDelete(pNtkNew);
+    return 0;
+  }
+  badConeRoot.clear();
+  //build aig from bdd
+  DdGen *gen;
+  int *cube;
+  set<int>::iterator itr;
+  string sopstr="";
+  CUDD_VALUE_TYPE value;
+  //Abc_Print(-2, "root: %d\n", root);
+  //Cudd_PrintMinterm(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, root)));
+  //for(itr=selected.begin();itr!=selected.end();itr++){
+  //  Abc_Print(-2, "node: %d, ithvar: %d\n", *itr, nodeid2ithvar[*itr]->index);
+  //  //Cudd_PrintMinterm(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
+  //}
+  Cudd_ForeachCube(dd, hon, gen,cube,value ){
+    DdNode* temp=Cudd_ReadOne(dd);
+    for(itr=selected.begin();itr!=selected.end();itr++){
+      int id=nodeid2ithvar[*itr]->index;
+      if(cube[id]==0){
+        temp=Cudd_bddAnd(dd, temp, Cudd_Not((DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr))));
+        sopstr.append("0");
+      }
+      else if(cube[id]==1){
+        temp=Cudd_bddAnd(dd, temp, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
+        sopstr.append("1");
+      }
+      else
+        sopstr.append("-");
+    }
+    Cudd_Ref(temp);
+    //Abc_Print(-2, "cube: ");
+    //Cudd_PrintMinterm(dd, temp);
+    sopstr.append(" 1\n");
+  }
+  Hop_Man_t * pMan;
+  pMan = Hop_ManStart();
+  int Max=selected.size();
+  if ( Max ) Hop_IthVar( pMan, Max-1 );
+  Abc_Ntk_t* pNtkNewNew=Abc_NtkAlloc( ABC_NTK_LOGIC, ABC_FUNC_AIG, 1 );
+  pNode=Abc_NtkCreateNode( pNtkNewNew );
+  Abc_Obj_t* pCo=Abc_NtkCreatePo( pNtkNewNew );
+  Abc_ObjAddFanin(pCo, pNode);
+  for(int i=0;i<selected.size();i++){
+    Abc_Obj_t* pPi=Abc_NtkCreatePi( pNtkNewNew );
+    Abc_ObjAddFanin(pNode, pPi);
+  }
+  Abc_Print(-2, "sopstr: %s\n", sopstr.c_str());
+  pNode->pData = Abc_ConvertSopToAig( pMan, (char*)sopstr.c_str() );
+  pNtkNewNew->pManFunc=pMan;
+  pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
+
+  pNtkNewNew=Abc_NtkStrash(pNtkNewNew, 0, 1, 0);
+  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  Abc_NtkRewrite( pNtk, 1, 0, 0, 0, 0 );
+  Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
+  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  Abc_NtkRewrite( pNtk, 1, 1, 0, 0, 0 );
+  int i;
+  if(Abc_NtkNodeNum(pNtkNewNew)<=conesize){
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+    Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+    Abc_NtkDelete(pNtk);
+  }
+  else{
+    Abc_Print(-2, "after resub is larger\n");
+  }
+  //Abc_Ntk_t* pNtkAig = Abc_NtkStartFrom( pNtkNewNew, ABC_NTK_STRASH, ABC_FUNC_AIG );
+  //Abc_NtkStrashPerform( pNtkNewNew, pNtkAig, 0, 0 );
+  //Abc_NtkFinalize( pNtkNewNew, pNtkAig );
+  Abc_Print(-2, "ddvarnum %d\n",dd->size);
+  Cudd_RecursiveDeref(dd, dc);
+
+  Abc_NtkForEachObj(pNtkNew, pNode, ithPo){
+    if(Abc_ObjGlobalBdd(pNode)!=NULL){
+      Cudd_RecursiveDeref(dd,(DdNode*)(Abc_ObjGlobalBdd(pNode)));
+      Abc_ObjSetGlobalBdd(pNode, NULL);
+    }
+  }
+  Abc_NtkFreeGlobalBdds(pNtkNew, 1);
+  Abc_NtkDelete(pNtkNewNew);
+
   return 0;
 }

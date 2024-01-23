@@ -28,7 +28,7 @@ static int Lsv_CommandChainDCBound(Abc_Frame_t* pAbc, int argc, char** argv);
 static int Lsv_CommandChain2Ntk(Abc_Frame_t* pAbc, int argc, char** argv);
 static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
-extern int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int nodeid,bool needntk);
+extern int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int nodeid,bool needntk, set<int>& badConeRoot);
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 
 static BooleanChain booleanChain;
@@ -618,7 +618,11 @@ int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
   int nodeid=atoi(argv[1]);
   Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
   Abc_Ntk_t* pNewNtk;
-  Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false);
+  set<int> badConeRoot;
+  for(int i=0;i<Abc_NtkObjNum(pNtk)*0.1;i++){
+    Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false,badConeRoot);
+    Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
+  }
   return 0;
   
 }
