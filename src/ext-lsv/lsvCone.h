@@ -18,59 +18,57 @@ typedef struct coneobj
   Abc_Obj_t * node=NULL;
 }coneobj_t;
 
-bool forallfanout(coneobj_t* node, bool* set){
-  Abc_Obj_t* pFanout;
+//bool forallfanout(coneobj_t* node, bool* set){
+//  Abc_Obj_t* pFanout;
+//  int i;
+//  if(node->out_count!=0){
+//    //Abc_Print(-2, "node:%d out_count=%d\n", Abc_ObjId(node->node),node->out_count);
+//    return false;
+//  }
+//  Abc_ObjForEachFanout(node->node, pFanout, i){
+//    if(!set[Abc_ObjId(pFanout)]){
+//      node->out_count+=1;
+//    }
+//  }
+//  if(node->out_count>0)
+//    return false;
+//  else
+//    return true;
+//}
+//int recursive_include(coneobj_t* cone,int node, bool* set,bool* input){
+//  int total=1;
+//  int i;
+//  Abc_Obj_t* pFanin;
+//  if(input[node])
+//    input[node]=false;
+//  Abc_ObjForEachFanin(cone[node].node, pFanin, i){
+//    if(cone[Abc_ObjId(pFanin)].out_count==0)
+//      continue;
+//    else{
+//      if(--cone[Abc_ObjId(pFanin)].out_count==0){
+//        set[Abc_ObjId(pFanin)]=true;
+//        total+=1;
+//      }
+//      if(cone[Abc_ObjId(pFanin)].out_count<0){
+//        Abc_Print(-1, "out_count=%d\n", cone[Abc_ObjId(pFanin)].out_count);
+//      }
+//    }
+//  }
+//  return 
+//}
+int zerofanout(coneobj_t* cone,int node, bool* set,int length){
+  Abc_Obj_t* pFanin;
   int i;
-  if(node->out_count!=0){
-    //Abc_Print(-2, "node:%d out_count=%d\n", Abc_ObjId(node->node),node->out_count);
-    return false;
-  }
-  Abc_ObjForEachFanout(node->node, pFanout, i){
-    if(!set[Abc_ObjId(pFanout)]){
-      node->out_count+=1;
-    }
-  }
-  if(node->out_count>0)
-    return false;
-  else
-    return true;
-}
-int recursive_include(coneobj_t* cone,int node, bool* set,bool* input){
   int total=1;
-  int i;
-  Abc_Obj_t* pFanin;
-  if(input[node])
-    input[node]=false;
-  Abc_ObjForEachFanin(cone[node].node, pFanin, i){
-    if(cone[Abc_ObjId(pFanin)].out_count==0)
-      continue;
-    else{
-      if(--cone[Abc_ObjId(pFanin)].out_count==0){
-        set[Abc_ObjId(pFanin)]=true;
-        //Abc_Print(-2, "node %d set in recursive\n", Abc_ObjId(pFanin));
-        total+=recursive_include(cone,Abc_ObjId(pFanin), set,input);
+  for(int j=node;j>=0;j--){
+    Abc_ObjForEachFanin(cone[j].node, pFanin, i){
+      if(set[Abc_ObjId(cone[j].node)]){
+        cone[Abc_ObjId(pFanin)].out_count-=1;
+        if(cone[Abc_ObjId(pFanin)].out_count==0){
+          set[Abc_ObjId(pFanin)]=true;
+          total+=1;
+        }
       }
-      if(cone[Abc_ObjId(pFanin)].out_count<0){
-        Abc_Print(-1, "out_count=%d\n", cone[Abc_ObjId(pFanin)].out_count);
-      }
-    }
-  }
-  return total;
-}
-int zerofanout(coneobj_t* cone,int node, bool* set, bool* input,int length){
-  Abc_Obj_t* pFanin;
-  int i;
-  int total=0;
-  Abc_ObjForEachFanin(cone[node].node, pFanin, i){
-    if (Abc_ObjIsPi(pFanin))
-      continue;
-    if(Abc_ObjFanoutNum(pFanin)==1 || forallfanout(&cone[Abc_ObjId(pFanin)], set)){
-      set[Abc_ObjId(pFanin)]=true;
-      //Abc_Print(-2, "node %d set in zerofanout\n", Abc_ObjId(pFanin));
-      total+=recursive_include(cone,Abc_ObjId(pFanin), set, input);
-      total+=zerofanout(cone,Abc_ObjId(pFanin), set, input, length);
-    }else{
-      input[Abc_ObjId(pFanin)]=true;
     }
   }
   return total;
@@ -88,9 +86,6 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
   }
   coneobj_t* cone = new coneobj_t[length];
   bool* coneset=new bool[length];
-  for (i = 0; i < length; ++i) {
-    cone[i].node = Abc_NtkObj(pNtk, i);
-  } 
   int conemax=-1;
   int conemaxid=-1;
   int input_min=length;
@@ -103,20 +98,36 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
       badConeRoot.insert(i);
       continue;
     }
+    //Abc_Print(-2,"nodetype:%d children:%d %d\n",Abc_ObjType(pNode),Abc_ObjId(Abc_ObjFanin(pNode, 0)),Abc_ObjId(Abc_ObjFanin(pNode, 1)));
     memset(coneset, false, length);
     memset(input, false, length);
     for (int j = 0; j < length; ++j) {
-      cone[j].out_count = 0;
-    }
+      cone[j].node = Abc_NtkObj(pNtk, j);
+      cone[j].out_count = Abc_ObjFanoutNum(Abc_NtkObj(pNtk, j));
+    } 
     //find all 
     coneset[Abc_ObjId(pNode)] = true;
-    zerofanout(cone ,i, coneset, input, length);
-    int res = 0;
+    Abc_Print(-2, "Root: %d ", i);
+    int res=zerofanout(cone ,i, coneset, length);
     for (int j = 0; j < length; ++j) {
       if (coneset[j]) {
-        res++;
+        Abc_Print(-2, "%d ", j);
       }
     }
+    Abc_Print(-2, "\n");
+
+    for(int j=0;j<length;++j){
+      if(coneset[j]){
+        Abc_Obj_t* pFanin;
+        int k = 0;
+        Abc_ObjForEachFanout(Abc_NtkObj(pNtk, j), pFanin, k) {
+          if(!coneset[Abc_ObjId(pFanin)] && i!=j){
+            Abc_Print(-1, "initial node %d fanout %d not in cone\n", j, Abc_ObjId(pFanin));
+          }
+        }
+      }
+    }
+
     if (res > sizedown) {
       if (res > sizeup) {
         int count = 0;
@@ -154,7 +165,6 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
           input_num++;
         }
       }
-
       if(((res == conemax && input_num < input_min)&&((rand() % ratio) != 0))||(res > conemax) ) {
         if(verbose){
           Abc_Print(-2, "node %d res=%d: ", i, res);
@@ -175,6 +185,17 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
     }
   }
   badConeRoot.insert(conemaxid);
+  for(int j=0;j<length;++j){
+    if(coneRet[j]){
+      Abc_Obj_t* pFanin;
+      int k = 0;
+      Abc_ObjForEachFanout(Abc_NtkObj(pNtk, j), pFanin, k) {
+        if(!coneRet[Abc_ObjId(pFanin)] && Abc_ObjId(pFanin)!=conemaxid){
+          Abc_Print(-1, "node %d fanout %d not in cone\n", j, Abc_ObjId(pFanin));
+        }
+      }
+    }
+  }
   delete [] cone;
   return conemaxid;
 }

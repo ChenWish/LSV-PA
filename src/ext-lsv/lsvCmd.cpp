@@ -407,24 +407,13 @@ static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   return 0;
 }
 int XDC_simp(Abc_Frame_t* pAbc, int argc, char** argv){
-  if(argc!=2){
-    Abc_Print(-1, "Usage: xtest <target>\n");
-    return 1;
-  }
-  int target=atoi(argv[1]);
   Abc_Ntk_t* pNtk = Abc_FrameReadNtk(pAbc);
-  Abc_Print(-2, "ntk type: %d\n",pNtk->ntkType);
-  if(Abc_NtkIsStrash(pNtk)==NULL){
-    Abc_Print(-1, "The network is not Aig logic.\n");
-  }
   int i;
   Abc_Obj_t* pNode;
-  BooleanChain bc;
-
-  Abc_Ntk_t* newntk;
-  int cubecnt=Boolean_Chain_Insertion(newntk, pNtk, Abc_NtkObj(pNtk, target),false, bc);
-  Abc_Print(-2, "cube count: %d\n", cubecnt);
-  return 0;
+  set<int> badConeRoot;
+  bool input[Abc_NtkObjNum(pNtk)];
+  bool cone[Abc_NtkObjNum(pNtk)];
+  getCone(pNtk, cone,input, 7, 3, badConeRoot);
 }
 
 static int stupid(Abc_Ntk_t* pNtk, int id, int saValue, int undetectable) {
