@@ -179,12 +179,12 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
       badConeRoot.insert(i);
     }
   }
-  for(int j=0;j<length;++j){
-    if(coneRet[j]){
-      Abc_Print(-2, "%d ", j);
-    }
-  }
-  Abc_Print(-2,"\n") ;
+  //for(int j=0;j<length;++j){
+  //  if(coneRet[j]){
+  //    Abc_Print(-2, "%d ", j);
+  //  }
+  //}
+  //Abc_Print(-2,"\n") ;
   badConeRoot.insert(conemaxid);
   for(int j=0;j<length;++j){
     if(coneRet[j]){
