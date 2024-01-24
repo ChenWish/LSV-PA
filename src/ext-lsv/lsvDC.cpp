@@ -551,10 +551,10 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
     Cudd_Ref(hon);
   }
   //free resources
-  //Cudd_RecursiveDeref(dd, yBdd);
-  //Cudd_RecursiveDeref(dd, abs);
-  //Cudd_RecursiveDeref(dd, fon);
-  //Cudd_RecursiveDeref(dd, foff);
+  Cudd_RecursiveDeref(dd, yBdd);
+  Cudd_RecursiveDeref(dd, abs);
+  Cudd_RecursiveDeref(dd, fon);
+  Cudd_RecursiveDeref(dd, foff);
   Abc_Print(-2, "buildimage over\n");
   return success;
 }
@@ -736,20 +736,27 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   //}
   Cudd_ForeachCube(dd, hon, gen,cube,value ){
     DdNode* temp=Cudd_ReadOne(dd);
+    DdNode* temp2=NULL;
+    Cudd_Ref(temp);
     for(itr=selected.begin();itr!=selected.end();itr++){
       int id=nodeid2ithvar[*itr]->index;
       if(cube[id]==0){
-        temp=Cudd_bddAnd(dd, temp, Cudd_Not((DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr))));
+        temp2=Cudd_bddAnd(dd, temp, Cudd_Not((DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr))));
+        Cudd_Ref(temp2);
+        Cudd_RecursiveDeref(dd, temp);
+        temp=temp2;
         sopstr.append("0");
       }
       else if(cube[id]==1){
-        temp=Cudd_bddAnd(dd, temp, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
+        temp2=Cudd_bddAnd(dd, temp, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
+        Cudd_Ref(temp2);
+        Cudd_RecursiveDeref(dd, temp);
+        temp=temp2;
         sopstr.append("1");
       }
       else
         sopstr.append("-");
     }
-    Cudd_Ref(temp);
     //Abc_Print(-2, "cube: ");
     //Cudd_PrintMinterm(dd, temp);
     sopstr.append(" 1\n");
