@@ -621,8 +621,21 @@ int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
   set<int> badConeRoot;
   //int maxinput=Abc_NtkObjNum(pNtk)*0.2<70?(int)Abc_NtkObjNum(pNtk)*0.2:70;
   int maxinput=70;
-  for(int i=0;i<Abc_NtkObjNum(pNtk)*0.1;i++){
-    Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false,badConeRoot,maxinput);
+  float ratio;
+  if(Abc_NtkObjNum(pNtk)>1500){
+    ratio=0.2;
+  }else if(Abc_NtkObjNum(pNtk)>1000){
+    ratio=0.3;
+  }else if(Abc_NtkObjNum(pNtk)>500){
+    ratio=0.5;
+  }else{
+    ratio=0.8;
+  }
+  for(int i=0;i<Abc_NtkObjNum(pNtk)*ratio;i++){
+    if(Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false,badConeRoot,maxinput)==1){
+      Abc_Print(-2,"successfully reduced the ntk\n");
+      break;
+    }
     Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
   }
   return 0;
