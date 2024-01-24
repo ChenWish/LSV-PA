@@ -399,7 +399,10 @@ static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
     input[i] = false;
   }
   set<int> badCone;
-  getCone(pNtk, cone, input, 7, 3, badCone);
+
+  getCone(pNtk, cone, input, 20, 3, badCone);
+  getCone(pNtk, cone, input, 20, 3, badCone);
+  getCone(pNtk, cone, input, 20, 3, badCone);
   for (int i = 0; i < length; ++i){
     if (cone[i])
       Abc_Print(-2, "node %d\n", i);

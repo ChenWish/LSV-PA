@@ -107,14 +107,8 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
     } 
     //find all 
     coneset[Abc_ObjId(pNode)] = true;
-    Abc_Print(-2, "Root: %d ", i);
+
     int res=zerofanout(cone ,i, coneset, length);
-    for (int j = 0; j < length; ++j) {
-      if (coneset[j]) {
-        Abc_Print(-2, "%d ", j);
-      }
-    }
-    Abc_Print(-2, "\n");
 
     for(int j=0;j<length;++j){
       if(coneset[j]){
@@ -123,6 +117,7 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
         Abc_ObjForEachFanout(Abc_NtkObj(pNtk, j), pFanin, k) {
           if(!coneset[Abc_ObjId(pFanin)] && i!=j){
             Abc_Print(-1, "initial node %d fanout %d not in cone\n", j, Abc_ObjId(pFanin));
+            assert(0);
           }
         }
       }
@@ -184,14 +179,21 @@ int getCone(Abc_Ntk_t* pNtk, bool* coneRet, bool* input, int sizeup, int sizedow
       badConeRoot.insert(i);
     }
   }
+  for(int j=0;j<length;++j){
+    if(coneRet[j]){
+      Abc_Print(-2, "%d ", j);
+    }
+  }
+  Abc_Print(-2,"\n") ;
   badConeRoot.insert(conemaxid);
   for(int j=0;j<length;++j){
     if(coneRet[j]){
       Abc_Obj_t* pFanin;
       int k = 0;
       Abc_ObjForEachFanout(Abc_NtkObj(pNtk, j), pFanin, k) {
-        if(!coneRet[Abc_ObjId(pFanin)] && Abc_ObjId(pFanin)!=conemaxid){
+        if(!coneRet[Abc_ObjId(pFanin)] && j!=conemaxid){
           Abc_Print(-1, "node %d fanout %d not in cone\n", j, Abc_ObjId(pFanin));
+          assert(0);
         }
       }
     }
