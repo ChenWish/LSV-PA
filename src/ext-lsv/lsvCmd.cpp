@@ -619,7 +619,8 @@ int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
   Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
   Abc_Ntk_t* pNewNtk;
   set<int> badConeRoot;
-  int maxinput=Abc_NtkObjNum(pNtk)*0.2<40?(int)Abc_NtkObjNum(pNtk)*0.2:40;
+  //int maxinput=Abc_NtkObjNum(pNtk)*0.2<70?(int)Abc_NtkObjNum(pNtk)*0.2:70;
+  int maxinput=70;
   for(int i=0;i<Abc_NtkObjNum(pNtk)*0.1;i++){
     Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false,badConeRoot,maxinput);
     Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
