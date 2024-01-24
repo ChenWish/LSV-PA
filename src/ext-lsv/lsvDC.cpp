@@ -691,7 +691,6 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
       //Abc_Print(-2, "candidate insert%d\n", i);
     }
   }
-  Abc_Print(-2, "root: %d\n", root);
   Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
   DdNode* dc=getDC_bdd(pNtkNew, Nodenew, dd,fReorder);
   //Abc_Print(-2, "dc\n");
@@ -723,7 +722,6 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
     maxinput=inputsize+10;
   }
   int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar, maxinput);
-  Abc_Print(-2, "success %d\n", success);
   
   if(success==0){
     Abc_Print(-2, "resub fail\n");
@@ -787,13 +785,11 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
 
   pNtkNewNew=Abc_NtkStrash(pNtkNewNew, 0, 1, 0);
-  Abc_Print(-2, "node num %d\n", Abc_NtkNodeNum(pNtkNewNew));
   pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
   Abc_NtkRewrite( pNtkNewNew, 1, 0, 0, 0, 0 );
   Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
   pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
   Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
-  Abc_Print(-2, "node num %d\n", Abc_NtkNodeNum(pNtkNewNew));
   int i;
   int modified=0;
   Abc_Print(-2, "resubsize %d, %d\n", Abc_NtkNodeNum(pNtkNewNew), conesize);
