@@ -484,12 +484,14 @@ int Build_ImageBdd(DdNode*& hon,Abc_Ntk_t*& pNtk, Abc_Obj_t* pNode ,DdNode* DC,s
   //generate fon and foff
   //Abc_Print(-2, "DC\n");
   //Cudd_PrintMinterm(dd, DC);
-  fon=Cudd_bddAnd(dd, (DdNode *)Abc_ObjGlobalBdd(pNode), Cudd_Not(DC));
-  Cudd_Ref(fon);
+  fon=(DdNode *)Abc_ObjGlobalBdd(pNode);
+  //fon=Cudd_bddAnd(dd, (DdNode *)Abc_ObjGlobalBdd(pNode), Cudd_Not(DC));
+  //Cudd_Ref(fon);
   //Abc_Print(-2, "fon\n");
   //Cudd_PrintMinterm(dd, fon);
-  foff=Cudd_bddAnd(dd, Cudd_Not((DdNode *)Abc_ObjGlobalBdd(pNode)), Cudd_Not(DC));
-  Cudd_Ref(foff);
+  foff=Cudd_Not((DdNode *)Abc_ObjGlobalBdd(pNode));
+  //foff=Cudd_bddAnd(dd, Cudd_Not((DdNode *)Abc_ObjGlobalBdd(pNode)), Cudd_Not(DC));
+  //Cudd_Ref(foff);
   //Abc_Print(-2, "foff\n");
   //Cudd_PrintMinterm(dd, foff);
   //generate abs for existance quantification
@@ -691,6 +693,7 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
       //Abc_Print(-2, "candidate insert%d\n", i);
     }
   }
+  Abc_Print(-2, "root: %d\n", root);
   Abc_Obj_t* Nodenew=Abc_NtkObj(pNtkNew, root);
   DdNode* dc=getDC_bdd(pNtkNew, Nodenew, dd,fReorder);
   //Abc_Print(-2, "dc\n");
@@ -722,6 +725,7 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
     maxinput=inputsize+10;
   }
   int success=Build_ImageBdd(hon, pNtkNew, Nodenew, dc, candidates,selected,nodeid2ithvar, maxinput);
+  Abc_Print(-2, "success %d\n", success);
   
   if(success==0){
     Abc_Print(-2, "resub fail\n");
@@ -741,6 +745,7 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   //  Abc_Print(-2, "node: %d, ithvar: %d\n", *itr, nodeid2ithvar[*itr]->index);
   //  //Cudd_PrintMinterm(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, *itr)));
   //}
+  vector<DdNode*> selectedBdd;
   Cudd_ForeachCube(dd, hon, gen,cube,value ){
     DdNode* temp=Cudd_ReadOne(dd);
     DdNode* temp2=NULL;
@@ -764,10 +769,32 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
       else
         sopstr.append("-");
     }
+    selectedBdd.push_back(temp);
     //Abc_Print(-2, "cube: ");
     //Cudd_PrintMinterm(dd, temp);
     sopstr.append(" 1\n");
   }
+
+  DdNode* temp=selectedBdd[0];
+  DdNode* temp2;
+  for(int i=1;i<selectedBdd.size();i++){
+    temp2=Cudd_bddOr(dd, temp, selectedBdd[i]);
+    Cudd_Ref(temp2);
+    Cudd_RecursiveDeref(dd, temp);
+    Cudd_RecursiveDeref(dd, selectedBdd[i]);
+    temp=temp2;
+  }
+  temp2=Cudd_bddOr(dd, temp, dc);
+  Cudd_Ref(temp2);
+  Cudd_RecursiveDeref(dd, temp);
+  DdNode* manufac=temp2;
+  temp=Cudd_bddOr(dd, (DdNode*)Abc_ObjGlobalBdd(Abc_NtkObj(pNtkNew, root)), dc);
+  Cudd_Ref(temp);
+  temp2=Cudd_bddXnor(dd, temp, manufac);
+  Cudd_Ref(temp2);
+  Cudd_PrintMinterm(dd, temp2);
+
+
   Hop_Man_t * pMan;
   pMan = Hop_ManStart();
   int Max=selected.size();
@@ -785,15 +812,23 @@ int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int n
   pNtkNewNew->ntkFunc = ABC_FUNC_AIG;
 
   pNtkNewNew=Abc_NtkStrash(pNtkNewNew, 0, 1, 0);
-  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
-  Abc_NtkRewrite( pNtkNewNew, 1, 0, 0, 0, 0 );
-  Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
-  pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
-  Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
+  Abc_Print(-2, "node num %d\n", Abc_NtkNodeNum(pNtkNewNew));
+  //pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  //Abc_NtkRewrite( pNtkNewNew, 1, 0, 0, 0, 0 );
+  //Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
+  //pNtkNewNew=Abc_NtkBalance( pNtkNewNew, 0, 0, 1 );
+  //Abc_NtkRewrite( pNtkNewNew, 1, 1, 0, 0, 0 );
+  Abc_Print(-2, "node num %d\n", Abc_NtkNodeNum(pNtkNewNew));
   int i;
   int modified=0;
   Abc_Print(-2, "resubsize %d, %d\n", Abc_NtkNodeNum(pNtkNewNew), conesize);
   if(Abc_NtkNodeNum(pNtkNewNew)<=conesize){
+    replace(pNtkNewNew, pNtkNew, root,cone,selected);
+    Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
+    modified=1;
+    badConeRoot.clear();
+  }else{
+    Abc_Print(-2,"ying yao\n");
     replace(pNtkNewNew, pNtkNew, root,cone,selected);
     Abc_FrameReplaceCurrentNetwork(pAbc, pNtkNew);
     modified=1;
