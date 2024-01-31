@@ -30,7 +30,7 @@ static int test_Command(Abc_Frame_t* pAbc, int argc, char** argv);
 extern int Boolean_Chain_Insertion(Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, Abc_Obj_t* pNode,bool needntk, BooleanChain& bc);
 extern int Resubsitution(Abc_Frame_t*& pAbc ,Abc_Ntk_t*& retntk ,Abc_Ntk_t* pNtk, int nodeid,bool needntk, set<int>& badConeRoot,int maxinput);
 static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv);
-
+static int simulate(Abc_Frame_t* pAbc, int argc, char** argv);
 static BooleanChain booleanChain;
 
 void init(Abc_Frame_t* pAbc) {
@@ -48,8 +48,8 @@ void init(Abc_Frame_t* pAbc) {
   Cmd_CommandAdd(pAbc, "LSV", "test2", test2_Command, 0);
   srand(5487);
   Cmd_CommandAdd(pAbc, "LSV", "rrr", resub_test, 0);
+  Cmd_CommandAdd(pAbc, "LSV", "ss", simulate, 0);
 }
-
 void destroy(Abc_Frame_t* pAbc) {}
 
 Abc_FrameInitializer_t frame_initializer = {init, destroy};
@@ -603,18 +603,18 @@ static int test2_Command(Abc_Frame_t* pAbc, int argc, char** argv) {
   return 0;
 }
 int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
-  if(argc!=2){
-    Abc_Print(-1, "rtest <nodeID>\n");
-    return 0;
-  }
-  int nodeid=atoi(argv[1]);
+
+  int nodeid=0;
   Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
+  Abc_Print(-2,"pinum: %d\n",Abc_NtkPiNum(pNtk));
   Abc_Ntk_t* pNewNtk;
   set<int> badConeRoot;
   //int maxinput=Abc_NtkObjNum(pNtk)*0.2<70?(int)Abc_NtkObjNum(pNtk)*0.2:70;
-  int maxinput=70;
+  int maxinput=50;
   float ratio;
-  if(Abc_NtkObjNum(pNtk)>1500){
+  if(Abc_NtkObjNum(pNtk)>2200){
+    ratio=0.1;
+  }else if(Abc_NtkObjNum(pNtk)>1500){
     ratio=0.2;
   }else if(Abc_NtkObjNum(pNtk)>1000){
     ratio=0.3;
@@ -624,12 +624,103 @@ int resub_test(Abc_Frame_t* pAbc, int argc, char** argv){
     ratio=0.8;
   }
   for(int i=0;i<Abc_NtkObjNum(pNtk)*ratio;i++){
+    Io_WriteAiger(pNtk, "origorigorig.aig", 0, 0,0);
     if(Resubsitution(pAbc ,pNewNtk, pNtk,nodeid,false,badConeRoot,maxinput)==1){
       Abc_Print(-2,"successfully reduced the ntk\n");
       break;
     }
-    Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
+    pNtk =Abc_FrameReadNtk(pAbc);
   }
   return 0;
   
+}
+int traverse(Abc_Ntk_t* pNtk, vector<int> target, Abc_Obj_t* pObj, int* value){
+  for(int i=1;i<target.size();i++){
+    if(pObj->Id==target[i]){
+      Abc_Print(-2, "target\n");
+      Abc_Print(-2,"node: %d, value: %d\n",pObj->Id,value[pObj->Id]);
+      return 0;
+    }
+  }
+  if(Abc_ObjIsNode(pObj)){
+    Abc_Print(-2, "node %d, child %d %d\n",pObj->Id,Abc_ObjFanin0(pObj)->Id,Abc_ObjFanin1(pObj)->Id);
+    //Abc_Print(-2," child %d %d\n",pObj->Id,Abc_ObjFanin0(pObj)->Id,Abc_ObjFanin1(pObj)->Id);
+  }else if(Abc_ObjIsPi(pObj)){
+    Abc_Print(-2, "node %d\n",pObj->Id);
+  }else{
+    Abc_Print(-2, "node %d\n child %d\n",pObj->Id,Abc_ObjFanin0(pObj)->Id);
+  }
+  Abc_Print(-2,"node: %d, value: %d\n",pObj->Id,value[pObj->Id]);
+  Abc_Obj_t* pFanin;
+  int i;
+  Abc_ObjForEachFanin(pObj, pFanin, i) {
+    traverse(pNtk,target,pFanin,value);
+  }
+  return 0;
+}
+static int simulate(Abc_Frame_t* pAbc, int argc, char** argv){
+  if(argc<3){
+    Abc_Print(-2,"usage: ss <target> <pattern>\n");
+    return 0;
+  }
+  Abc_Ntk_t* pNtk =Abc_FrameReadNtk(pAbc);
+  vector<int> target;
+  char* inp=argv[1];
+  for(int i=2;i<argc;i++){
+    target.push_back(atoi(argv[i]));
+  }
+  int pattern[100];
+  bool end=false;
+  for(int i=0;i<Abc_NtkPiNum(pNtk);i++){
+    if(inp[i]=='\0'){
+      end=true;
+      Abc_Print(-2,"input too short\n");
+    }
+    if(end){
+      pattern[i]=0;
+    }else{
+      pattern[i]=(int)(inp[i])-48;
+    }
+  }
+  if(inp[Abc_NtkPiNum(pNtk)]!='\0'){
+    Abc_Print(-2,"input too long\n");
+  }
+  Abc_Obj_t* pObj;
+  int i;
+  int valuesize=0;
+  Abc_NtkForEachPo(pNtk, pObj, i) {
+    if(Abc_ObjFanin0(pObj)->Id>valuesize){
+      valuesize=Abc_ObjFanin0(pObj)->Id;
+    }
+  }
+  valuesize++;
+  Abc_Print(-2,"valuesize: %d\n",valuesize);
+  int* value=new int[valuesize];
+  memset(value,-1,sizeof(int)*valuesize);
+  Abc_NtkForEachPi(pNtk, pObj, i) {
+    value[pObj->Id]=pattern[i];
+  }
+  value[0]=1;
+  Abc_Print(-2,"po0 %d\n", Abc_NtkPo(pNtk, 0)->Id);
+  Abc_NtkForEachNode(pNtk, pObj, i) {
+    if(value[Abc_ObjFanin0(pObj)->Id]==-1 || value[Abc_ObjFanin1(pObj)->Id]==-1){
+      Abc_Print(-1,"error %d %d %d\n",pObj->Id,Abc_ObjFanin0(pObj)->Id,Abc_ObjFanin1(pObj)->Id);
+    }
+    value[pObj->Id]=((Abc_ObjFaninC0(pObj)^value[Abc_ObjFanin0(pObj)->Id])&(Abc_ObjFaninC1(pObj)^value[Abc_ObjFanin1(pObj)->Id]));
+  }
+  Abc_NtkForEachPo(pNtk, pObj, i) {
+    if(value[Abc_ObjFanin0(pObj)->Id]==-1 || value[Abc_ObjFanin1(pObj)->Id]==-1){
+      Abc_Print(-1,"error %d %d %d\n",pObj->Id,Abc_ObjFanin0(pObj)->Id,Abc_ObjFanin1(pObj)->Id);
+    }
+    value[pObj->Id]=((Abc_ObjFaninC0(pObj)^value[Abc_ObjFanin0(pObj)->Id])&(Abc_ObjFaninC1(pObj)^value[Abc_ObjFanin1(pObj)->Id]));
+    Abc_Print(-2,"po%d value: %d\n",i,value[pObj->Id]);
+  }
+  for(int i=0;i<target.size();i++){
+    Abc_Print(-2,"target: %d value: %d\n",target[i],value[target[i]]);
+  }
+  for(int i=1;i<target.size();i++){
+    Abc_Print(-2,"%d",value[target[i]]);
+  }
+  delete [] value;
+  return 0;
 }
